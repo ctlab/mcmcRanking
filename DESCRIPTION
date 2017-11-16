@@ -1,0 +1,14 @@
+Package: mcmcRanking
+Type: Package
+Title: Tool To Solve The Active Module Problem
+Version: 0.1.0
+Authors@R: person("Javlon", "Isomurodov", email = "isomurodov@rain.ifmo.ru",
+    role = c("aut", "cre"))
+Description: Tool for estimate probabilities of veritces to be
+    in active module using MCMC algoeithm.
+License: MIT + file LICENSE
+SystemRequirements: C++11
+Encoding: UTF-8
+LazyData: true
+Imports: Rcpp (>= 0.12.12)
+LinkingTo: Rcpp
