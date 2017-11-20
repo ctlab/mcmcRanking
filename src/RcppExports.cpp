@@ -5,70 +5,63 @@
 
 using namespace Rcpp;
 
-// mcmc_subgraph
-CharacterVector mcmc_subgraph(DataFrame df_edges, IntegerVector size, IntegerVector iter);
-RcppExport SEXP _mcmcRanking_mcmc_subgraph(SEXP df_edgesSEXP, SEXP sizeSEXP, SEXP iterSEXP) {
+// mcmc_subgraph_internal
+IntegerVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args);
+RcppExport SEXP _mcmcRanking_mcmc_subgraph_internal(SEXP df_edgesSEXP, SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type iter(iterSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_subgraph(df_edges, size, iter));
+    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_subgraph_internal(df_edges, args));
     return rcpp_result_gen;
 END_RCPP
 }
-// mcmc_sample
-NumericVector mcmc_sample(DataFrame df_edges, DataFrame df_nodes, IntegerVector size, IntegerVector times, IntegerVector iter);
-RcppExport SEXP _mcmcRanking_mcmc_sample(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP sizeSEXP, SEXP timesSEXP, SEXP iterSEXP) {
+// mcmc_sample_internal
+IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args);
+RcppExport SEXP _mcmcRanking_mcmc_sample_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type times(timesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type iter(iterSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_sample(df_edges, df_nodes, size, times, iter));
+    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_sample_internal(df_edges, df_nodes, args));
     return rcpp_result_gen;
 END_RCPP
 }
-// mcmc_onelong
-NumericVector mcmc_onelong(DataFrame df_edges, DataFrame df_nodes, IntegerVector size, IntegerVector start, IntegerVector end);
-RcppExport SEXP _mcmcRanking_mcmc_onelong(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP sizeSEXP, SEXP startSEXP, SEXP endSEXP) {
+// mcmc_onelong_internal
+IntegerVector mcmc_onelong_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args);
+RcppExport SEXP _mcmcRanking_mcmc_onelong_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type start(startSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type end(endSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_onelong(df_edges, df_nodes, size, start, end));
+    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_internal(df_edges, df_nodes, args));
     return rcpp_result_gen;
 END_RCPP
 }
-// mcmc_reciprocal_likelihood
-NumericVector mcmc_reciprocal_likelihood(DataFrame df_edges, DataFrame df_nodes, IntegerVector size, IntegerVector start, IntegerVector end);
-RcppExport SEXP _mcmcRanking_mcmc_reciprocal_likelihood(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP sizeSEXP, SEXP startSEXP, SEXP endSEXP) {
+// mcmc_inverse_likelihood_internal
+NumericVector mcmc_inverse_likelihood_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args);
+RcppExport SEXP _mcmcRanking_mcmc_inverse_likelihood_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type size(sizeSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type start(startSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type end(endSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_reciprocal_likelihood(df_edges, df_nodes, size, start, end));
+    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_inverse_likelihood_internal(df_edges, df_nodes, args));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_mcmcRanking_mcmc_subgraph", (DL_FUNC) &_mcmcRanking_mcmc_subgraph, 3},
-    {"_mcmcRanking_mcmc_sample", (DL_FUNC) &_mcmcRanking_mcmc_sample, 5},
-    {"_mcmcRanking_mcmc_onelong", (DL_FUNC) &_mcmcRanking_mcmc_onelong, 5},
-    {"_mcmcRanking_mcmc_reciprocal_likelihood", (DL_FUNC) &_mcmcRanking_mcmc_reciprocal_likelihood, 5},
+    {"_mcmcRanking_mcmc_subgraph_internal", (DL_FUNC) &_mcmcRanking_mcmc_subgraph_internal, 2},
+    {"_mcmcRanking_mcmc_sample_internal", (DL_FUNC) &_mcmcRanking_mcmc_sample_internal, 3},
+    {"_mcmcRanking_mcmc_onelong_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_internal, 3},
+    {"_mcmcRanking_mcmc_inverse_likelihood_internal", (DL_FUNC) &_mcmcRanking_mcmc_inverse_likelihood_internal, 3},
     {NULL, NULL, 0}
 };
 

@@ -1,3 +1,0 @@
-[submodule "src/mcmc-ranking"]
-	path = src/mcmc-ranking
-	url = https://github.com/javlon/mcmc-ranking.git
