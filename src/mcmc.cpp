@@ -213,19 +213,9 @@ namespace mcmc {
 
     vector<unsigned> Graph::subgraph_iteration(unsigned end) {
         for (int i = 0; i < end; ++i) {
-          std::cout << "until " << i << " :";
-          for(int j = 0; j < inner_nodes.size(); ++j){
-            std::cout << inner_nodes[j] << " ";
-          }
-          std::cout << "\n";
             unsigned candidate_in = inner_nodes[uniform_int_distribution<>(0, inner_nodes.size() - 1)(gen)];
             unsigned candidate_out = outer_nodes[uniform_int_distribution<>(0, outer_nodes.size() - 1)(gen)];
             next_iteration(candidate_in, candidate_out, 1.0, 1.0);
-            std::cout << "after " << i << " :";
-            for(int j = 0; j < inner_nodes.size(); ++j){
-                std::cout << inner_nodes[j] << " ";
-            }
-            std::cout << "\n";
         }
         return inner_nodes;
     }

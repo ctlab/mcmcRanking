@@ -17,3 +17,7 @@ mcmc_inverse_likelihood_internal <- function(df_edges, df_nodes, args) {
     .Call('_mcmcRanking_mcmc_inverse_likelihood_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes, args)
 }
 
+real_prob_internal <- function(df_edges, df_nodes) {
+    .Call('_mcmcRanking_real_prob_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes)
+}
+

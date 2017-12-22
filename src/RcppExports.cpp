@@ -56,12 +56,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// real_prob_internal
+NumericVector real_prob_internal(DataFrame df_edges, DataFrame df_nodes);
+RcppExport SEXP _mcmcRanking_real_prob_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
+    rcpp_result_gen = Rcpp::wrap(real_prob_internal(df_edges, df_nodes));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_mcmcRanking_mcmc_subgraph_internal", (DL_FUNC) &_mcmcRanking_mcmc_subgraph_internal, 2},
     {"_mcmcRanking_mcmc_sample_internal", (DL_FUNC) &_mcmcRanking_mcmc_sample_internal, 3},
     {"_mcmcRanking_mcmc_onelong_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_internal, 3},
     {"_mcmcRanking_mcmc_inverse_likelihood_internal", (DL_FUNC) &_mcmcRanking_mcmc_inverse_likelihood_internal, 3},
+    {"_mcmcRanking_real_prob_internal", (DL_FUNC) &_mcmcRanking_real_prob_internal, 2},
     {NULL, NULL, 0}
 };
 

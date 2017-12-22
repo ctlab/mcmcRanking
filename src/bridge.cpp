@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <queue>
 #include "mcmc.h"
 using namespace Rcpp;
 using namespace std;
@@ -74,4 +75,64 @@ NumericVector mcmc_inverse_likelihood_internal(DataFrame df_edges, DataFrame df_
   vector<unsigned> module = g.random_subgraph(args["size"]);
   g.initialize_module(module);
   return(NumericVector::create(g.onelong_inverse_likelihood(args["start"], args["end"])));
+}
+
+
+
+bool is_connected(vector<vector<unsigned>> edges, bool from_inner[]) {
+  int n = edges.size();
+  vector<bool> used(n, false);
+  queue<unsigned> q;
+  for(int i = 0; i < n; ++i){
+    if(from_inner[i]){
+      used[i] = true;
+      q.push(i);
+      break;
+    }else if(i == n - 1){
+      return true;
+    }
+  }
+  while (!q.empty()) {
+    unsigned v = q.front();
+    q.pop();
+    for (unsigned to : edges[v]) {
+      if (from_inner[to] && !used[to]) {
+        used[to] = true;
+        q.push(to);
+      }
+    }
+  }
+  for(int i = 0; i < n; ++i){
+    if(from_inner[i] && !used[i]){
+      return false;
+    }
+  }
+  return true;
+}
+
+// [[Rcpp::export]]
+NumericVector real_prob_internal(DataFrame df_edges, DataFrame df_nodes){
+  IntegerVector from = df_edges["from"];
+  IntegerVector to   = df_edges["to"];
+  NumericVector likelihood = df_nodes["likelihood"];
+  vector<double> nodes(likelihood.begin(), likelihood.end());
+  vector<vector<unsigned>> edges = make_edges(from, to, likelihood.size());
+  vector<double> scores(nodes.size(), 0.0);
+  double sumscores = 0;
+  int n = nodes.size();
+  bool x[n];
+  for(int i = 1; i < n + 1; ++i){
+    for(int j = 0; j < n; ++j)  x[j] = i + j < n ? false : true;
+    do{
+      if(is_connected(edges, x)){
+        double score = 1;
+        for(int i = 0; i < n; ++i) if(x[i]) score *= nodes[i];
+        sumscores += score;
+        for(int i = 0; i < n; ++i) if(x[i]) scores[i] += score;
+      }
+    } while (next_permutation(x, x + n));
+  }
+  for(int i = 0; i < n; ++i) scores[i] /= sumscores;
+  NumericVector ret(scores.begin(), scores.end());
+  return ret;
 }
