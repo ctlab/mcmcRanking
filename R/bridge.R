@@ -1,3 +1,13 @@
+#' @export
+mcmc <- function(mat, name, likelihood, fun){
+  if(!is.matrix(mat)) stop("mat must be matrix.")
+  if(!is.numeric(mat)) stop("mat mus be numeric vector.")
+  if(!is.character(name)) stop("name must be character vector.")
+  if(!is.numeric(likelihood)) stop("likelihood mus be numeric vector.")
+  if(!is.function(fun)) stop("fun must be a function.")
+  structure(list(mat = mat, name = name, likelihood = likelihood, fun = fun), class = "MCMC")
+}
+
 #' Connected subgraph from uniform distribution.
 #'
 #' Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
@@ -10,6 +20,8 @@
 #' @import igraph
 #' @export
 mcmc_subgraph <- function(graph, module_size, iter) {
+  if(module_size > gorder(graph))
+    stop("graph size less than required module size.")
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   args <- c(nodes_size=length(V(graph)), module_size=module_size, iter=iter)
@@ -23,18 +35,20 @@ mcmc_subgraph <- function(graph, module_size, iter) {
 #'
 #' @inheritParams mcmc_subgraph
 #' @param times Number of subgraphs.
-#' @return Matrix, where every row corresponds to one subgraph.
+#' @return Object of type MCMC.
 #' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_onelong}}
 #' @import igraph
 #' @export
-mcmc_sample <- function(graph, module_size, iter, times = 1) {
+mcmc_sample <- function(graph, module_size, iter, times = 1, fun = function(x) x) {
+  if(module_size > gorder(graph))
+    stop("graph size less than required module size.")
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
-  nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = V(graph)$likelihood)
+  nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
   args <- c(module_size=module_size, iter=iter, times=times)
   res <- mcmc_sample_internal(edges, nodes, args) + 1
-  mat <- matrix(V(graph)$name[res], ncol = module_size, byrow = T)
-  return(mat)
+  ret <- mcmc(matrix(res, ncol = module_size, byrow = T), V(graph)$name, V(graph)$likelihood, fun)
+  return(ret)
 }
 
 #' Set of connected subgraphs.
@@ -45,18 +59,20 @@ mcmc_sample <- function(graph, module_size, iter, times = 1) {
 #' @param module_size The size of subgraph.
 #' @param start Starting with this iteration, we write down all states of the Markov process.
 #' @param end Number of iterations.
-#' @return Matrix, where every row corresponds to one subgraph (or state of Markov process).
+#' @return Object of type MCMC.
 #' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_sample}}
 #' @import igraph
 #' @export
-mcmc_onelong <- function(graph, module_size, start = 1, end) {
+mcmc_onelong <- function(graph, module_size, start, end, fun = function(x) x) {
+  if(module_size > gorder(graph))
+    stop("graph size less than required module size.")
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
-  nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = V(graph)$likelihood)
+  nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
   args <- c(module_size=module_size, start=start, end=end)
-  res <- mcmc_onelong_internal(edges, nodes, args)+1
-  mat <- matrix(V(graph)$name[res], ncol = module_size, byrow = T)
-  return(mat)
+  res <- mcmc_onelong_internal(edges, nodes, args) + 1
+  ret <- mcmc(matrix(res, ncol = module_size, byrow = T), V(graph)$name, V(graph)$likelihood, fun)
+  return(ret)
 }
 
 #' Vertex probability.
@@ -83,17 +99,16 @@ real_prob <- function(graph) {
 #'
 #' Calculates the frequency of occurences of vertices in matrix object.
 #'
-#' @inheritParams real_prob
-#' @param mat Matrix object.
+#' @param mcmcObj Object of type MCMC.
 #' @param inds Index numbers of rows involved in the calculation.
 #' @return Named vector of frequency.
 #' @seealso \code{\link{get_prob}}
 #' @import igraph
 #' @export
-get_frequency <- function(graph, mat, inds = seq_len(nrow(mat))){
-  freq <- table(mat[inds,])
-  x <- numeric(length(V(graph)) - length(freq))
-  names(x) <- setdiff(V(graph)$name, names(freq))
+get_frequency <- function(mcmcObj, inds = seq_len(nrow(mcmcObj))){
+  freq <- table(mcmcObj$name[mcmcObj$mat[inds,]])
+  x <- numeric(length(mcmcObj$name) - length(freq))
+  names(x) <- setdiff(mcmcObj$name, names(freq))
   return(c(freq, x))
 }
 
@@ -105,8 +120,18 @@ get_frequency <- function(graph, mat, inds = seq_len(nrow(mat))){
 #' @return Named vector of probabilities.
 #' @seealso \code{\link{get_frequency}}
 #' @export
-get_prob <- function(graph, mat, inds = seq_len(nrow(mat))){
-  return(get_frequency(graph, mat, inds)/length(inds))
+get_prob <- function(mcmcObject, inds = seq_len(nrow(mcmcObject$mat))){
+  ret <- numeric(length(mcmcObject$name))
+  names(ret) <- mcmcObject$name
+  sumlh <- 0
+  for(i in inds){
+    nodes <- mcmcObject$mat[i,]
+    llh <- sum(vapply(nodes, function(x) log(mcmcObject$likelihood[x]), 1.0))
+    sumlh <- sumlh + exp(llh - mcmcObject$fun(llh))
+    ret[nodes] <- ret[nodes] + exp(llh - mcmcObject$fun(llh))
+  }
+  ret <- ret / sumlh
+  return(ret)
 }
 
 get_inverse_likelihood <- function(graph, mat, inds = seq_len(nrow(mat))){

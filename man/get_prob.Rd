@@ -4,13 +4,9 @@
 \alias{get_prob}
 \title{Vertex probability using MCMC.}
 \usage{
-get_prob(graph, mat, inds = seq_len(nrow(mat)))
+get_prob(mcmcObject, inds = seq_len(nrow(mcmcObject$mat)))
 }
 \arguments{
-\item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
-
-\item{mat}{Matrix object.}
-
 \item{inds}{Index numbers of rows involved in the calculation.}
 }
 \value{

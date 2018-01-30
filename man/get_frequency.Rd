@@ -4,12 +4,10 @@
 \alias{get_frequency}
 \title{Frequency of vertecies.}
 \usage{
-get_frequency(graph, mat, inds = seq_len(nrow(mat)))
+get_frequency(mcmcObj, inds = seq_len(nrow(mcmcObj)))
 }
 \arguments{
-\item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
-
-\item{mat}{Matrix object.}
+\item{mcmcObj}{Object of type MCMC.}
 
 \item{inds}{Index numbers of rows involved in the calculation.}
 }
