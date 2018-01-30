@@ -124,11 +124,19 @@ get_prob <- function(mcmcObject, inds = seq_len(nrow(mcmcObject$mat))){
   ret <- numeric(length(mcmcObject$name))
   names(ret) <- mcmcObject$name
   sumlh <- 0
+  x <- c()
   for(i in inds){
     nodes <- mcmcObject$mat[i,]
     llh <- sum(vapply(nodes, function(x) log(mcmcObject$likelihood[x]), 1.0))
-    sumlh <- sumlh + exp(llh - mcmcObject$fun(llh))
-    ret[nodes] <- ret[nodes] + exp(llh - mcmcObject$fun(llh))
+    x <- c(x, llh)
+  }
+  minllh <- min(x)
+  for(j in 1:length(inds)){
+    i <- inds[j]
+    nodes <- mcmcObject$mat[i,]
+    llhOfModule <- exp(x[j] - minllh) / mcmcObject$fun(exp(x[j] - minllh))
+    sumlh <- sumlh + llhOfModule
+    ret[nodes] <- ret[nodes] + llhOfModule
   }
   ret <- ret / sumlh
   return(ret)
