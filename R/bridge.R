@@ -8,6 +8,13 @@ mcmc <- function(mat, name, likelihood, fun){
   structure(list(mat = mat, name = name, likelihood = likelihood, fun = fun), class = "MCMC")
 }
 
+check_arguments <- function(graph, module_size){
+  if(module_size > gorder(graph))
+    stop("graph size less than required module size.")
+  if(!is_simple(graph))
+    stop("graph contains multiple or loop edges.")
+}
+
 #' Connected subgraph from uniform distribution.
 #'
 #' Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
@@ -20,8 +27,7 @@ mcmc <- function(mat, name, likelihood, fun){
 #' @import igraph
 #' @export
 mcmc_subgraph <- function(graph, module_size, iter) {
-  if(module_size > gorder(graph))
-    stop("graph size less than required module size.")
+  check_arguments(graph, module_size)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   args <- c(nodes_size=length(V(graph)), module_size=module_size, iter=iter)
@@ -40,8 +46,7 @@ mcmc_subgraph <- function(graph, module_size, iter) {
 #' @import igraph
 #' @export
 mcmc_sample <- function(graph, module_size, iter, times = 1, fun = function(x) x) {
-  if(module_size > gorder(graph))
-    stop("graph size less than required module size.")
+  check_arguments(graph, module_size)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
@@ -64,8 +69,7 @@ mcmc_sample <- function(graph, module_size, iter, times = 1, fun = function(x) x
 #' @import igraph
 #' @export
 mcmc_onelong <- function(graph, module_size, start, end, fun = function(x) x) {
-  if(module_size > gorder(graph))
-    stop("graph size less than required module size.")
+  check_arguments(graph, module_size)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
