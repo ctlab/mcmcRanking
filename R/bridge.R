@@ -11,8 +11,6 @@ mcmc <- function(mat, name, likelihood, fun){
 check_arguments <- function(graph, module_size){
   if(module_size > gorder(graph))
     stop("graph size less than required module size.")
-  if(!is_simple(graph))
-    stop("graph contains multiple or loop edges.")
 }
 
 #' Connected subgraph from uniform distribution.
@@ -110,40 +108,42 @@ real_prob <- function(graph) {
 #' @import igraph
 #' @export
 get_frequency <- function(mcmcObj, inds = seq_len(nrow(mcmcObj))){
-  freq <- table(mcmcObj$name[mcmcObj$mat[inds,]])
-  x <- numeric(length(mcmcObj$name) - length(freq))
-  names(x) <- setdiff(mcmcObj$name, names(freq))
-  return(c(freq, x))
+  freq <- tabulate(mcmcObj$mat[inds,], length(mcmcObj$name))
+  names(freq) <- mcmcObj$name
+  return(freq)
 }
 
 #' Vertex probability using MCMC.
 #'
 #' Calculates the probability of vertices using its frequency of occurence in matrix object.
 #'
-#' @inheritParams get_frequency
-#' @return Named vector of probabilities.
+#' @param mcmcObj Object of type MCMC.
+#' @return list.
 #' @seealso \code{\link{get_frequency}}
 #' @export
-get_prob <- function(mcmcObject, inds = seq_len(nrow(mcmcObject$mat))){
-  ret <- numeric(length(mcmcObject$name))
-  names(ret) <- mcmcObject$name
-  sumlh <- 0
-  x <- c()
-  for(i in inds){
-    nodes <- mcmcObject$mat[i,]
-    llh <- sum(vapply(nodes, function(x) log(mcmcObject$likelihood[x]), 1.0))
-    x <- c(x, llh)
+get_not_prob <- function(mcmcObject){
+  likelihood_node <- numeric(length(mcmcObject$name))
+  names(likelihood_node) <- mcmcObject$name
+  llh_row <- mcmcObject$llh_row
+  mid_llh <- (max(llh_row) + min(llh_row))/2
+  likelihood_row <- sapply(llh_row, function(x) exp(x - mid_llh) / mcmcObject$fun(exp(x - mid_llh)))
+  likelihood_sum <- accurate_sum(likelihood_row)
+  id_to_rows <- lapply(seq_along(likelihood_node), function(x) numeric())
+  for(i in 1:nrow(mcmcObject$mat)){
+    for(j in mcmcObject$mat[i,]){
+      id_to_rows[[j]] <- c(id_to_rows[[j]], i)
+    }
   }
-  minllh <- min(x)
-  for(j in 1:length(inds)){
-    i <- inds[j]
-    nodes <- mcmcObject$mat[i,]
-    llhOfModule <- exp(x[j] - minllh) / mcmcObject$fun(exp(x[j] - minllh))
-    sumlh <- sumlh + llhOfModule
-    ret[nodes] <- ret[nodes] + llhOfModule
+  for(i in seq_along(likelihood_node)){
+    likelihood_node[i] <- accurate_sum(likelihood_row[-id_to_rows[[i]]])
   }
-  ret <- ret / sumlh
-  return(ret)
+  probs <- likelihood_node / likelihood_sum
+  return(list(
+    q = probs,
+    likelihood_node = likelihood_node,
+    likelihood_row = likelihood_row,
+    sum = likelihood_sum,
+    id_to_rows = id_to_rows))
 }
 
 get_inverse_likelihood <- function(graph, mat, inds = seq_len(nrow(mat))){

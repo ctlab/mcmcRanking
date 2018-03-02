@@ -20,7 +20,8 @@ namespace mcmc {
         unsigned ind = uniform_int_distribution<>(0, number_of_nodes - 1)(gen);
         sg.push_back(ind);
         for (unsigned cand_node : edges[ind]) {
-            candidates.push_back(cand_node);
+            if(cand_node != ind)
+                candidates.push_back(cand_node);
         }
         while (sg.size() != size) {
             ind = candidates.size() == 1 ? 0 : uniform_int_distribution<>(0, candidates.size() - 1)(gen);

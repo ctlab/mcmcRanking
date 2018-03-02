@@ -68,6 +68,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// accurate_sum
+NumericVector accurate_sum(NumericVector v);
+RcppExport SEXP _mcmcRanking_accurate_sum(SEXP vSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
+    rcpp_result_gen = Rcpp::wrap(accurate_sum(v));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_mcmcRanking_mcmc_subgraph_internal", (DL_FUNC) &_mcmcRanking_mcmc_subgraph_internal, 2},
@@ -75,6 +86,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_mcmcRanking_mcmc_onelong_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_internal, 3},
     {"_mcmcRanking_mcmc_inverse_likelihood_internal", (DL_FUNC) &_mcmcRanking_mcmc_inverse_likelihood_internal, 3},
     {"_mcmcRanking_real_prob_internal", (DL_FUNC) &_mcmcRanking_real_prob_internal, 2},
+    {"_mcmcRanking_accurate_sum", (DL_FUNC) &_mcmcRanking_accurate_sum, 1},
     {NULL, NULL, 0}
 };
 

@@ -21,3 +21,12 @@ real_prob_internal <- function(df_edges, df_nodes) {
     .Call('_mcmcRanking_real_prob_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes)
 }
 
+#' Accurate sum of numbers
+#'
+#' Sums every time only two smallest numbers.
+#' This allows calculate the sum of numbers accurate enough.
+#' @export
+accurate_sum <- function(v) {
+    .Call('_mcmcRanking_accurate_sum', PACKAGE = 'mcmcRanking', v)
+}
+
