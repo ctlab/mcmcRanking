@@ -2,7 +2,6 @@
 #include <vector>
 #include <map>
 #include <string>
-#include <iostream>
 #include <queue>
 #include "mcmc.h"
 using namespace Rcpp;
@@ -22,12 +21,11 @@ vector<vector<unsigned>> make_edges(IntegerVector from, IntegerVector to, unsign
 IntegerVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args) {
   IntegerVector from = df_edges["from"];
   IntegerVector to   = df_edges["to"];
-  vector<double> nodes(args["nodes_size"]);
+  vector<double> nodes(args["nodes_size"], 1);
   vector<vector<unsigned>> edges = make_edges(from, to, args["nodes_size"]);
   Graph g = Graph(nodes, edges);
-  g.initialize_module(g.random_subgraph(args["module_size"]));
-  g.subgraph_iteration(args["iter"]);
-  vector<unsigned> ret = g.get_inner_nodes();
+  vector<unsigned> module = g.random_subgraph(args["module_size"]);
+  vector<unsigned> ret = g.sample_iteration(module, 1, args["iter"]);
   IntegerVector ret_(ret.begin(), ret.end());
   return ret_;
 }
@@ -63,21 +61,21 @@ IntegerVector mcmc_onelong_internal(DataFrame df_edges, DataFrame df_nodes, Inte
   return ret_;
 }
 
-
 // [[Rcpp::export]]
-NumericVector mcmc_inverse_likelihood_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args) {
+IntegerVector mcmc_onelong_frequency_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args) {
   IntegerVector from = df_edges["from"];
   IntegerVector to   = df_edges["to"];
+  IntegerVector names = df_nodes["name"];
   NumericVector likelihood = df_nodes["likelihood"];
   vector<double> nodes(likelihood.begin(), likelihood.end());
-  vector<vector<unsigned>> edges = make_edges(from, to, likelihood.size());
+  vector<vector<unsigned>> edges = make_edges(from, to, names.size());
   Graph g = Graph(nodes, edges);
-  vector<unsigned> module = g.random_subgraph(args["size"]);
+  vector<unsigned> module = g.random_subgraph(args["module_size"]);
   g.initialize_module(module);
-  return(NumericVector::create(g.onelong_inverse_likelihood(args["start"], args["end"])));
+  vector<unsigned> ret = g.onelong_iteration_frequency(args["start"], args["end"]);
+  IntegerVector ret_(ret.begin(), ret.end());
+  return ret_;
 }
-
-
 
 bool is_connected(vector<vector<unsigned>> edges, bool from_inner[]) {
   int n = edges.size();

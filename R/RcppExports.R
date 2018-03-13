@@ -13,8 +13,8 @@ mcmc_onelong_internal <- function(df_edges, df_nodes, args) {
     .Call('_mcmcRanking_mcmc_onelong_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes, args)
 }
 
-mcmc_inverse_likelihood_internal <- function(df_edges, df_nodes, args) {
-    .Call('_mcmcRanking_mcmc_inverse_likelihood_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes, args)
+mcmc_onelong_frequency_internal <- function(df_edges, df_nodes, args) {
+    .Call('_mcmcRanking_mcmc_onelong_frequency_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes, args)
 }
 
 real_prob_internal <- function(df_edges, df_nodes) {

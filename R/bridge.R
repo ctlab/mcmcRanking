@@ -77,6 +77,31 @@ mcmc_onelong <- function(graph, module_size, start, end, fun = function(x) x) {
   return(ret)
 }
 
+
+#' Frequency of vertices.
+#'
+#' The frequency of occurrenceof vertices in one long run of method Markov chain Monte Carlo (MCMC).
+#'
+#' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
+#' @param module_size The size of subgraph.
+#' @param start Starting with this iteration, we write down all states of the Markov process.
+#' @param end Number of iterations.
+#' @return Named frequency vector.
+#' @seealso \code{\link{mcmc_onelong}, \link{mcmc_subgraph}, \link{mcmc_sample}}
+#' @import igraph
+#' @export
+mcmc_onelong_frequency <- function(graph, module_size, start, end, fun = function(x) x) {
+  check_arguments(graph, module_size)
+  edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
+  colnames(edges) <- c("from", "to")
+  nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
+  args <- c(module_size=module_size, start=start, end=end)
+  res <- mcmc_onelong_frequency_internal(edges, nodes, args)
+  names(res) <- V(graph)$name
+  return(res)
+}
+
+
 #' Vertex probability.
 #'
 #' Accurate estimate of vertex probability using all connected subgraphs.

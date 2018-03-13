@@ -3,54 +3,44 @@
 
 #include <random>
 #include <vector>
+#include <unordered_map>
+#include "hsa.h"
 
 namespace mcmc {
     using namespace std;
-
     class Graph {
-        unsigned number_of_nodes;
+        size_t order;
         vector<double> nodes;
         vector<vector<unsigned>> edges;
 
-        vector<unsigned> inner_nodes;
-        vector<unsigned> outer_nodes;
-
-        bool* from_inner;
-        bool* from_outer;
+        HSA inner;
+        HSA outer;
 
         mt19937 gen;
         uniform_real_distribution<> unirealdis;
 
         bool update_outer_nodes(unsigned cand_in, unsigned cand_out);
 
-        bool is_connected(unsigned cand_in, unsigned cand_out);
-
     public:
         Graph(vector<double> nodes, vector<vector<unsigned>> edges);
 
-        //~Graph();
-
         bool is_connected();
 
-        bool next_iteration(unsigned cand_in, unsigned cand_out, double likelihood_cand_in, double likelihood_cand_out);
+        bool next_iteration();
 
         void initialize_module(vector<unsigned> nodes);
 
-        void check_inner_outer();
-
-        vector<unsigned> random_subgraph(unsigned size);
+        vector<unsigned> random_subgraph(size_t size);
 
         vector<unsigned> get_inner_nodes();
 
         vector<unsigned> get_outer_nodes();
 
-        vector<unsigned> subgraph_iteration(unsigned end);
+        vector<unsigned> sample_iteration(vector<unsigned> module, size_t times, size_t end);
 
-        vector<unsigned> sample_iteration(vector<unsigned> module, unsigned times, unsigned end);
+        vector<unsigned> onelong_iteration(size_t start, size_t end);
 
-        vector<unsigned> onelong_iteration(unsigned start, unsigned end);
-
-        double onelong_inverse_likelihood(unsigned start, unsigned end);
+        vector<unsigned> onelong_iteration_frequency(size_t start, size_t end);
     };
 
 }
