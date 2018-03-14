@@ -3,6 +3,8 @@
 export(accurate_sum)
 export(get_frequency)
 export(get_not_prob)
+export(get_rank)
+export(get_reverse_rank)
 export(mcmc)
 export(mcmc_onelong)
 export(mcmc_onelong_frequency)

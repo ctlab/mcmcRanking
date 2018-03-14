@@ -2,7 +2,7 @@
 % Please edit documentation in R/bridge.R
 \name{mcmc_onelong_frequency}
 \alias{mcmc_onelong_frequency}
-\title{Set of connected subgraphs.}
+\title{Frequency of vertices.}
 \usage{
 mcmc_onelong_frequency(graph, module_size, start, end, fun = function(x) x)
 }
@@ -16,11 +16,11 @@ mcmc_onelong_frequency(graph, module_size, start, end, fun = function(x) x)
 \item{end}{Number of iterations.}
 }
 \value{
-Object of type MCMC.
+Named frequency vector.
 }
 \description{
-Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
+The frequency of occurrence of vertices in one long run of method Markov chain Monte Carlo (MCMC).
 }
 \seealso{
-\code{\link{mcmc_subgraph}, \link{mcmc_sample}}
+\code{\link{mcmc_onelong}, \link{mcmc_subgraph}, \link{mcmc_sample}}
 }
