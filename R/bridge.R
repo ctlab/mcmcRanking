@@ -132,7 +132,7 @@ real_prob <- function(graph) {
 #' @seealso \code{\link{get_prob}}
 #' @import igraph
 #' @export
-get_frequency <- function(mcmcObj, inds = seq_len(nrow(mcmcObj))){
+get_frequency <- function(mcmcObj, inds = seq_len(nrow(mcmcObj$mat))){
   freq <- tabulate(mcmcObj$mat[inds,], length(mcmcObj$name))
   names(freq) <- mcmcObj$name
   return(freq)

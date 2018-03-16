@@ -3,6 +3,13 @@
 namespace mcmc {
     HSA::HSA(size_t size): map(), elements(), contain(size, false){
     }
+    void HSA::clear(){
+        map.clear();
+        elements.clear();
+        for(int i = 0; i < contain.size(); ++i){
+            contain[i] = false;
+        }
+    }
     size_t HSA::size(){
         return elements.size();
     }

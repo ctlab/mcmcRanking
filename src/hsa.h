@@ -12,6 +12,7 @@ namespace mcmc {
         vector<bool> contain;
     public:
         HSA(size_t size);
+        void clear();
         size_t size();
         unsigned get(size_t ind);
         size_t get_index(unsigned v);

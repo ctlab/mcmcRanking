@@ -36,6 +36,8 @@ namespace mcmc {
     }
 
     void Graph::initialize_module(vector<unsigned> nodes) {
+        inner.clear();
+        outer.clear();
         for(unsigned node : nodes){
             inner.insert(node);
         }
