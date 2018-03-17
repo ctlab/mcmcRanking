@@ -2,11 +2,8 @@
 % Please edit documentation in R/bridge.R
 \name{get_rank}
 \alias{get_rank}
-\alias{get_rank}
 \title{Ranking vertices.}
 \usage{
-get_rank(graph, q, size)
-
 get_rank(graph, q, size)
 }
 \arguments{
@@ -15,25 +12,13 @@ get_rank(graph, q, size)
 \item{q}{score.}
 
 \item{size}{The initial size.}
-
-\item{graph}{An object of type \code{igraph}.}
-
-\item{q}{score.}
-
-\item{size}{The initial size.}
 }
 \value{
-Named rank vector.
-
 Named rank vector.
 }
 \description{
 Ranking vertices according to the score.
-
-Ranking vertices according to the score.
 }
 \seealso{
-\code{\link{mcmc_onelong}, \link{mcmc_subgraph}, \link{mcmc_sample}}
-
 \code{\link{get_reverse_rank}}
 }

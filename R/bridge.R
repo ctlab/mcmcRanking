@@ -234,6 +234,21 @@ get_reverse_rank <- function(graph, q){
   i+1-ret
 }
 
+#' Set likelihood.
+#'
+#' Set likelihood attribute to vertices of graph using pval attribute.
+#'
+#' @param graph An object of type \code{igraph}.
+#' @return igraph object.
+#' @import igraph
+#' @import BioNet
+#' @export
+set_likelihood <- function(graph){
+  fb <- fitBumModel(V(graph)$pval, plot = FALSE)
+  V(graph)$likelihood <- fb$a * V(graph)$pval ^ (fb$a -1)
+  graph
+}
+
 get_inverse_likelihood <- function(graph, mat, inds = seq_len(nrow(mat))){
   inverse_likelihood <- 1 / apply(matrix(V(graph)[mat[inds,]]$likelihood, ncol = ncol(mat), byrow = F), 1, prod)
   inverse_likelihood <- sort(inverse_likelihood)

@@ -4,7 +4,7 @@
 \alias{get_frequency}
 \title{Frequency of vertecies.}
 \usage{
-get_frequency(mcmcObj, inds = seq_len(nrow(mcmcObj)))
+get_frequency(mcmcObj, inds = seq_len(nrow(mcmcObj$mat)))
 }
 \arguments{
 \item{mcmcObj}{Object of type MCMC.}

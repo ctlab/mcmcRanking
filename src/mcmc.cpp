@@ -88,7 +88,7 @@ namespace mcmc {
         }
 
         for (unsigned neighbour : edges[cand_in]) {
-            if (inner.contains(neighbour)) {
+            if (inner.contains(neighbour) || !outer.contains(neighbour)) {
                 continue;
             }
             for (size_t j = 0; j < edges[neighbour].size(); ++j) {
