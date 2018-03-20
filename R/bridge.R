@@ -42,15 +42,39 @@ mcmc_subgraph <- function(graph, module_size, iter) {
 #' @return Object of type MCMC.
 #' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_onelong}}
 #' @import igraph
+#' @import BiocParallel
 #' @export
-mcmc_sample <- function(graph, module_size, iter, times = 1, fun = function(x) x) {
+mcmc_sample <- function(graph, module_size, iter, times = 1, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
+  timesPerProc <- rep(granularity, floor(times/granularity))
+  if (times - sum(timesPerProc) > 0) {
+    timesPerProc <- c(timesPerProc, times - sum(timesPerProc))
+  }
+  if (is.null(BPPARAM)) {
+    if (nproc != 0) {
+      if (.Platform$OS.type == "windows") {
+        BPPARAM <- SnowParam(workers = nproc)
+      }
+      else {
+        BPPARAM <- MulticoreParam(workers = nproc)
+      }
+    }
+    else {
+      BPPARAM <- bpparam()
+    }
+  }
+
   check_arguments(graph, module_size)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
-  args <- c(module_size=module_size, iter=iter, times=times)
-  res <- mcmc_sample_internal(edges, nodes, args) + 1
-  ret <- mcmc(matrix(res, ncol = module_size, byrow = T), V(graph)$name, V(graph)$likelihood, fun)
+
+  mats <- bplapply(seq_along(timesPerProc), function(i) {
+    args <- c(module_size=module_size, iter=iter, times=timesPerProc[i])
+    res1 <- mcmc_sample_internal(edges, nodes, args)
+    matrix(res1, ncol = module_size, byrow = T) + 1 # switching to 1-indexing
+  }, BPPARAM = BPPARAM)
+
+  ret <- mcmc(do.call(rbind, mats), V(graph)$name, V(graph)$likelihood, fun)
   return(ret)
 }
 

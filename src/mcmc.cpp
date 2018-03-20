@@ -1,6 +1,7 @@
 #include <queue>
 #include <unordered_set>
 #include "mcmc.h"
+#include <Rcpp.h>
 
 namespace mcmc {
     Graph::Graph(vector<double> nodes, vector<vector<unsigned>> edges)
@@ -133,6 +134,7 @@ namespace mcmc {
     vector<unsigned> Graph::sample_iteration(vector<unsigned> module, size_t times, size_t end) {
         vector<unsigned> ret;
         for (size_t i = 0; i < times; ++i) {
+            Rcpp::checkUserInterrupt();
             initialize_module(module);
             for (size_t j = 0; j < end; ++j) {
                 next_iteration();
