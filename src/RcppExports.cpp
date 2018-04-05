@@ -18,15 +18,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // mcmc_sample_internal
-IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args);
-RcppExport SEXP _mcmcRanking_mcmc_sample_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP) {
+IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, IntegerVector start_module);
+RcppExport SEXP _mcmcRanking_mcmc_sample_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP, SEXP start_moduleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_sample_internal(df_edges, df_nodes, args));
+    Rcpp::traits::input_parameter< IntegerVector >::type start_module(start_moduleSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_sample_internal(df_edges, df_nodes, args, start_module));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -82,7 +83,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_mcmcRanking_mcmc_subgraph_internal", (DL_FUNC) &_mcmcRanking_mcmc_subgraph_internal, 2},
-    {"_mcmcRanking_mcmc_sample_internal", (DL_FUNC) &_mcmcRanking_mcmc_sample_internal, 3},
+    {"_mcmcRanking_mcmc_sample_internal", (DL_FUNC) &_mcmcRanking_mcmc_sample_internal, 4},
     {"_mcmcRanking_mcmc_onelong_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_internal, 3},
     {"_mcmcRanking_mcmc_onelong_frequency_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_frequency_internal, 3},
     {"_mcmcRanking_real_prob_internal", (DL_FUNC) &_mcmcRanking_real_prob_internal, 2},

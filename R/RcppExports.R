@@ -5,8 +5,8 @@ mcmc_subgraph_internal <- function(df_edges, args) {
     .Call('_mcmcRanking_mcmc_subgraph_internal', PACKAGE = 'mcmcRanking', df_edges, args)
 }
 
-mcmc_sample_internal <- function(df_edges, df_nodes, args) {
-    .Call('_mcmcRanking_mcmc_sample_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes, args)
+mcmc_sample_internal <- function(df_edges, df_nodes, args, start_module) {
+    .Call('_mcmcRanking_mcmc_sample_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes, args, start_module)
 }
 
 mcmc_onelong_internal <- function(df_edges, df_nodes, args) {

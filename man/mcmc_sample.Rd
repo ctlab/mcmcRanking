@@ -4,13 +4,16 @@
 \alias{mcmc_sample}
 \title{Set of connected subgraphs from uniform distribution.}
 \usage{
-mcmc_sample(graph, module_size, iter, times = 1, fun = function(x) x,
-  nproc = 0, BPPARAM = NULL, granularity = 10)
+mcmc_sample(graph, module_size = NULL, start_module = NULL, iter,
+  times = 1, fun = function(x) x, nproc = 0, BPPARAM = NULL,
+  granularity = 10)
 }
 \arguments{
 \item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
 
 \item{module_size}{The size of subgraph.}
+
+\item{start_module}{Vector of initial module vertecies names.}
 
 \item{iter}{Number of iterations.}
 

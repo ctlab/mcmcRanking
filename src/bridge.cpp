@@ -31,7 +31,7 @@ IntegerVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args) {
 }
 
 // [[Rcpp::export]]
-IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args) {
+IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, IntegerVector start_module) {
   IntegerVector from = df_edges["from"];
   IntegerVector to   = df_edges["to"];
   IntegerVector names = df_nodes["name"];
@@ -39,7 +39,7 @@ IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, Integ
   vector<double> nodes(likelihood.begin(), likelihood.end());
   vector<vector<unsigned>> edges = make_edges(from, to, names.size());
   Graph g = Graph(nodes, edges);
-  vector<unsigned> module = g.random_subgraph(args["module_size"]);
+  vector<unsigned> module(start_module.begin(), start_module.end());
   vector<unsigned> ret = g.sample_iteration(module, args["times"], args["iter"]);
   IntegerVector ret_(ret.begin(), ret.end());
   return ret_;

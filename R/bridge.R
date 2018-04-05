@@ -39,12 +39,13 @@ mcmc_subgraph <- function(graph, module_size, iter) {
 #'
 #' @inheritParams mcmc_subgraph
 #' @param times Number of subgraphs.
+#' @param start_module Vector of initial module vertecies names.
 #' @return Object of type MCMC.
 #' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_onelong}}
 #' @import igraph
 #' @import BiocParallel
 #' @export
-mcmc_sample <- function(graph, module_size, iter, times = 1, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
+mcmc_sample <- function(graph, module_size = NULL, start_module = NULL, iter, times = 1, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
   timesPerProc <- rep(granularity, floor(times/granularity))
   if (times - sum(timesPerProc) > 0) {
     timesPerProc <- c(timesPerProc, times - sum(timesPerProc))
@@ -62,15 +63,22 @@ mcmc_sample <- function(graph, module_size, iter, times = 1, fun = function(x) x
       BPPARAM <- bpparam()
     }
   }
-
+  if(!xor(is.null(module_size), is.null(start_module))){
+    stop("One of the arguments module_size or start_module must be set.")
+  }
+  if(!is.null(start_module)){
+    module_size <- length(start_module)
+  }else{
+    start_module <- mcmc_subgraph(graph, module_size, 1)
+  }
   check_arguments(graph, module_size)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
-
+  module_nodes <- as.vector(V(graph)[as.character(start_module)])-1
   mats <- bplapply(seq_along(timesPerProc), function(i) {
     args <- c(module_size=module_size, iter=iter, times=timesPerProc[i])
-    res1 <- mcmc_sample_internal(edges, nodes, args)
+    res1 <- mcmc_sample_internal(edges, nodes, args, module_nodes)
     matrix(res1, ncol = module_size, byrow = T) + 1 # switching to 1-indexing
   }, BPPARAM = BPPARAM)
 
