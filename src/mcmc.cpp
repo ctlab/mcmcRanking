@@ -131,11 +131,11 @@ namespace mcmc {
         return outer.get_all();
     }
 
-    vector<unsigned> Graph::sample_iteration(vector<unsigned> module, size_t times, size_t end) {
+    vector<unsigned> Graph::sample_iteration(vector<unsigned> module, size_t module_size, size_t times, size_t end) {
         vector<unsigned> ret;
         for (size_t i = 0; i < times; ++i) {
             Rcpp::checkUserInterrupt();
-            initialize_module(module);
+            initialize_module(vector<unsigned>(module.begin()+i*module_size, module.begin()+(i+1)*module_size));
             for (size_t j = 0; j < end; ++j) {
                 next_iteration();
             }

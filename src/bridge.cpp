@@ -25,7 +25,7 @@ IntegerVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args) {
   vector<vector<unsigned>> edges = make_edges(from, to, args["nodes_size"]);
   Graph g = Graph(nodes, edges);
   vector<unsigned> module = g.random_subgraph(args["module_size"]);
-  vector<unsigned> ret = g.sample_iteration(module, 1, args["iter"]);
+  vector<unsigned> ret = g.sample_iteration(module, args["module_size"], 1, args["iter"]);
   IntegerVector ret_(ret.begin(), ret.end());
   return ret_;
 }
@@ -40,7 +40,7 @@ IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, Integ
   vector<vector<unsigned>> edges = make_edges(from, to, names.size());
   Graph g = Graph(nodes, edges);
   vector<unsigned> module(start_module.begin(), start_module.end());
-  vector<unsigned> ret = g.sample_iteration(module, args["times"], args["iter"]);
+  vector<unsigned> ret = g.sample_iteration(module, args["module_size"], args["times"], args["iter"]);
   IntegerVector ret_(ret.begin(), ret.end());
   return ret_;
 }

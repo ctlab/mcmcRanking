@@ -36,7 +36,7 @@ namespace mcmc {
 
         vector<unsigned> get_outer_nodes();
 
-        vector<unsigned> sample_iteration(vector<unsigned> module, size_t times, size_t end);
+        vector<unsigned> sample_iteration(vector<unsigned> module, size_t module_size, size_t times, size_t end);
 
         vector<unsigned> onelong_iteration(size_t start, size_t end);
 

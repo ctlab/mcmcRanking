@@ -4,8 +4,8 @@
 \alias{mcmc_sample}
 \title{Set of connected subgraphs from uniform distribution.}
 \usage{
-mcmc_sample(graph, module_size = NULL, start_module = NULL, iter,
-  times = 1, fun = function(x) x, nproc = 0, BPPARAM = NULL,
+mcmc_sample(graph, module_size = NULL, times = NULL, start_module = NULL,
+  iter, fun = function(x) x, nproc = 0, BPPARAM = NULL,
   granularity = 10)
 }
 \arguments{
@@ -13,17 +13,26 @@ mcmc_sample(graph, module_size = NULL, start_module = NULL, iter,
 
 \item{module_size}{The size of subgraph.}
 
-\item{start_module}{Vector of initial module vertecies names.}
+\item{times}{Number of subgraphs.}
+
+\item{start_module}{Matrix of vetrex names where every row defines initial subgraph.}
 
 \item{iter}{Number of iterations.}
-
-\item{times}{Number of subgraphs.}
 }
 \value{
 Object of type MCMC.
 }
 \description{
 Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC) method.
+}
+\examples{
+graph <- barabasi.game(20, 1.2, 2, directed = F)
+V(graph)$name <- letters[1:20]
+V(graph)$likelihood <- 1
+x <- mcmc_sample(graph = graph, module_size = 5, iter = 10, times = 4)
+matrix(x$name[x$mat], nrow(x$mat))
+y <- mcmc_sample(graph = graph, start_module = matrix(x$name[x$mat], nrow(x$mat)), iter = 4)
+matrix(y$name[y$mat], nrow(y$mat))
 }
 \seealso{
 \code{\link{mcmc_subgraph}, \link{mcmc_onelong}}
