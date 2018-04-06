@@ -53,7 +53,7 @@ mcmc_subgraph <- function(graph, module_size, iter) {
 #' matrix(x$name[x$mat], nrow(x$mat))
 #' y <- mcmc_sample(graph = graph, start_module = matrix(x$name[x$mat], nrow(x$mat)), iter = 4)
 #' matrix(y$name[y$mat], nrow(y$mat))
-mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = NULL, iter, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
+mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = NULL, iter, fixed_size = TRUE, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
   if(!xor(is.null(module_size) && is.null(times), is.null(start_module))){
     stop("One of the arguments module_size and times or start_module must be set.")
   }
@@ -87,7 +87,7 @@ mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = 
   nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
   module_nodes <- as.vector(V(graph)[as.character(t(start_module))])-1
   mats <- bplapply(seq_along(timesPerProc), function(i) {
-    args <- c(module_size=module_size, iter=iter, times=timesPerProc[i])
+    args <- c(module_size=module_size, iter=iter, times=timesPerProc[i], fixed_size = ifelse(fixed_size, 1, 0))
     res1 <- mcmc_sample_internal(edges, nodes, args, module_nodes)
     matrix(res1, ncol = module_size, byrow = T) + 1 # switching to 1-indexing
   }, BPPARAM = BPPARAM)

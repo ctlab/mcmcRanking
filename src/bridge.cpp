@@ -23,7 +23,7 @@ IntegerVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args) {
   IntegerVector to   = df_edges["to"];
   vector<double> nodes(args["nodes_size"], 1);
   vector<vector<unsigned>> edges = make_edges(from, to, args["nodes_size"]);
-  Graph g = Graph(nodes, edges);
+  Graph g = Graph(nodes, edges, true);
   vector<unsigned> module = g.random_subgraph(args["module_size"]);
   vector<unsigned> ret = g.sample_iteration(module, args["module_size"], 1, args["iter"]);
   IntegerVector ret_(ret.begin(), ret.end());
@@ -38,7 +38,7 @@ IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, Integ
   NumericVector likelihood = df_nodes["likelihood"];
   vector<double> nodes(likelihood.begin(), likelihood.end());
   vector<vector<unsigned>> edges = make_edges(from, to, names.size());
-  Graph g = Graph(nodes, edges);
+  Graph g = Graph(nodes, edges, args["fixed_size"] == 1);
   vector<unsigned> module(start_module.begin(), start_module.end());
   vector<unsigned> ret = g.sample_iteration(module, args["module_size"], args["times"], args["iter"]);
   IntegerVector ret_(ret.begin(), ret.end());
@@ -53,7 +53,7 @@ IntegerVector mcmc_onelong_internal(DataFrame df_edges, DataFrame df_nodes, Inte
   NumericVector likelihood = df_nodes["likelihood"];
   vector<double> nodes(likelihood.begin(), likelihood.end());
   vector<vector<unsigned>> edges = make_edges(from, to, names.size());
-  Graph g = Graph(nodes, edges);
+  Graph g = Graph(nodes, edges, true);
   vector<unsigned> module = g.random_subgraph(args["module_size"]);
   g.initialize_module(module);
   vector<unsigned> ret = g.onelong_iteration(args["start"], args["end"]);
@@ -69,7 +69,7 @@ IntegerVector mcmc_onelong_frequency_internal(DataFrame df_edges, DataFrame df_n
   NumericVector likelihood = df_nodes["likelihood"];
   vector<double> nodes(likelihood.begin(), likelihood.end());
   vector<vector<unsigned>> edges = make_edges(from, to, names.size());
-  Graph g = Graph(nodes, edges);
+  Graph g = Graph(nodes, edges, true);
   vector<unsigned> module = g.random_subgraph(args["module_size"]);
   g.initialize_module(module);
   vector<unsigned> ret = g.onelong_iteration_frequency(args["start"], args["end"]);
