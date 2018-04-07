@@ -54,7 +54,7 @@ namespace mcmc {
     bool Graph::is_connected() {
         if(inner.size() == 0)
             return true;
-        vector<bool> used(order, false);
+        vector<char> used(order, false);
         queue<unsigned> q;
         int el = inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen));
         used[el] = true;
