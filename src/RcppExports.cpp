@@ -6,7 +6,7 @@
 using namespace Rcpp;
 
 // mcmc_subgraph_internal
-IntegerVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args);
+LogicalVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args);
 RcppExport SEXP _mcmcRanking_mcmc_subgraph_internal(SEXP df_edgesSEXP, SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -18,7 +18,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // mcmc_sample_internal
-IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, IntegerVector start_module);
+LogicalVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, LogicalMatrix start_module);
 RcppExport SEXP _mcmcRanking_mcmc_sample_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP, SEXP start_moduleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -26,7 +26,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type start_module(start_moduleSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type start_module(start_moduleSEXP);
     rcpp_result_gen = Rcpp::wrap(mcmc_sample_internal(df_edges, df_nodes, args, start_module));
     return rcpp_result_gen;
 END_RCPP

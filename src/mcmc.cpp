@@ -191,28 +191,28 @@ namespace mcmc {
         return outer.get_all();
     }
 
-    vector<unsigned> Graph::sample_iteration(vector<unsigned> module, size_t module_size, size_t times, size_t end) {
-        vector<unsigned> ret;
+    vector<char> Graph::sample_iteration(vector<vector<unsigned>> module, size_t module_size, size_t times, size_t end) {
+        vector<char> ret(order * times, false);
         for (size_t i = 0; i < times; ++i) {
             Rcpp::checkUserInterrupt();
-            initialize_module(vector<unsigned>(module.begin()+i*module_size, module.begin()+(i+1)*module_size));
+            initialize_module(module[i]);
             for (size_t j = 0; j < end; ++j) {
                 next_iteration();
             }
             for (unsigned x : inner.get_all()) {
-                ret.push_back(x);
+                ret[x + i * order] = true;
             }
         }
         return ret;
     }
 
-    vector<unsigned> Graph::onelong_iteration(size_t start, size_t end) {
-        vector<unsigned> ret;
+    vector<char> Graph::onelong_iteration(size_t start, size_t end) {
+        vector<char> ret(order * (end - start), false);
         for (size_t i = 0; i < end; ++i) {
             next_iteration();
             if (i >= start) {
                 for (unsigned x : inner.get_all()) {
-                    ret.push_back(x);
+                    ret[x + (i - start) * order] = true;
                 }
             }
         }

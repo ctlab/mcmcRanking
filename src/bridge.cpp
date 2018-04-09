@@ -18,20 +18,21 @@ vector<vector<unsigned>> make_edges(IntegerVector from, IntegerVector to, unsign
 }
 
 // [[Rcpp::export]]
-IntegerVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args) {
+LogicalVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args) {
   IntegerVector from = df_edges["from"];
   IntegerVector to   = df_edges["to"];
   vector<double> nodes(args["nodes_size"], 1);
   vector<vector<unsigned>> edges = make_edges(from, to, args["nodes_size"]);
   Graph g = Graph(nodes, edges, true);
-  vector<unsigned> module = g.random_subgraph(args["module_size"]);
-  vector<unsigned> ret = g.sample_iteration(module, args["module_size"], 1, args["iter"]);
-  IntegerVector ret_(ret.begin(), ret.end());
+  vector<vector<unsigned>> module;
+  module.push_back(g.random_subgraph(args["module_size"]));
+  vector<char> ret = g.sample_iteration(module, args["module_size"], 1, args["iter"]);
+  LogicalVector ret_(ret.begin(), ret.end());
   return ret_;
 }
 
 // [[Rcpp::export]]
-IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, IntegerVector start_module) {
+LogicalVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, LogicalMatrix start_module) {
   IntegerVector from = df_edges["from"];
   IntegerVector to   = df_edges["to"];
   IntegerVector names = df_nodes["name"];
@@ -39,9 +40,17 @@ IntegerVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, Integ
   vector<double> nodes(likelihood.begin(), likelihood.end());
   vector<vector<unsigned>> edges = make_edges(from, to, names.size());
   Graph g = Graph(nodes, edges, args["fixed_size"] == 1);
-  vector<unsigned> module(start_module.begin(), start_module.end());
-  vector<unsigned> ret = g.sample_iteration(module, args["module_size"], args["times"], args["iter"]);
-  IntegerVector ret_(ret.begin(), ret.end());
+  vector<vector<unsigned>> module;
+  for(int i = 0; i < start_module.nrow(); ++i){
+    module.push_back(vector<unsigned>());
+    for(int j = 0; j < start_module.ncol(); ++j){
+      if(start_module(i, j)){
+        module[i].push_back(j);
+      }
+    }
+  }
+  vector<char> ret = g.sample_iteration(module, args["module_size"], args["times"], args["iter"]);
+  LogicalVector ret_(ret.begin(), ret.end());
   return ret_;
 }
 
@@ -56,7 +65,7 @@ IntegerVector mcmc_onelong_internal(DataFrame df_edges, DataFrame df_nodes, Inte
   Graph g = Graph(nodes, edges, true);
   vector<unsigned> module = g.random_subgraph(args["module_size"]);
   g.initialize_module(module);
-  vector<unsigned> ret = g.onelong_iteration(args["start"], args["end"]);
+  vector<char> ret = g.onelong_iteration(args["start"], args["end"]);
   IntegerVector ret_(ret.begin(), ret.end());
   return ret_;
 }
