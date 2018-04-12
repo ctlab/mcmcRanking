@@ -105,14 +105,8 @@ namespace mcmc {
         }
     }
 
-    bool Graph::update_neighbours(unsigned v) {
-        if(inner.contains(v)){
-            for (unsigned neighbour : edges[v]) {
-                if (!inner.contains(neighbour) && !outer.contains(neighbour)) {
-                    outer.insert(neighbour);
-                }
-            }
-        }else{
+    bool Graph::update_neighbours(unsigned v, bool is_erased) {
+        if(is_erased){
             for (unsigned neighbour : edges[v]) {
                 if (inner.contains(neighbour) || !outer.contains(neighbour)) {
                     continue;
@@ -128,13 +122,22 @@ namespace mcmc {
                     outer.erase(neighbour);
                 }
             }
+        }else{
+            for (unsigned neighbour : edges[v]) {
+                if (!inner.contains(neighbour) && !outer.contains(neighbour)) {
+                    outer.insert(neighbour);
+                }
+            }
         }
     }
 
     bool Graph::next_iteration(){
-        unsigned cand_in = inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen));
-        unsigned cand_out = outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
         if(fixed_size){
+            if(inner.size() == order){
+                return false;
+            }
+            unsigned cand_in = inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen));
+            unsigned cand_out = outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
             inner.swap(cand_in, cand_out);
             if (!is_connected()) {
                 inner.swap(cand_out, cand_in);
@@ -150,24 +153,36 @@ namespace mcmc {
             inner.swap(cand_out, cand_in);
             update_outer_nodes(cand_out, cand_in);
             return false;
+        }else if(inner.size() == 0){
+            unsigned cand = uniform_int_distribution<>(0, order - 1)(gen);
+            double p = nodes[cand] * order / (1 + edges[cand].size());
+            if(unirealdis(gen) >= p){
+                return false;
+            }
+            inner.insert(cand);
+            update_neighbours(cand, false);
+            return true;
         }else{
-            bool erase = unirealdis(gen) < inner.size() / (inner.size() + outer.size());
-            unsigned cand = erase ? cand_in : cand_out;
+            bool erase = unirealdis(gen) < (1.0 * inner.size()) / (inner.size() + outer.size());
+            unsigned cand = erase
+                ? inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen))
+                : outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
             if(erase){
                 inner.erase(cand);
                 if (!is_connected()) {
                     inner.insert(cand);
                     return false;
                 }
-                outer.insert(cand);
+                if(inner.size() != 0)
+                  outer.insert(cand);
             }else{
                 outer.erase(cand);
                 inner.insert(cand);
             }
             unsigned cur_size_outer = outer.size();
-            update_neighbours(cand);
+            update_neighbours(cand, erase);
             unsigned new_size_outer = outer.size();
-            double p = (erase ? 1 / nodes[cand] : nodes[cand]) * (cur_size_outer + inner.size() + (int)erase) / (new_size_outer + inner.size());
+            double p = ((erase ? 1 / nodes[cand] : nodes[cand]) * (cur_size_outer + inner.size() + (int)erase)) / (new_size_outer + inner.size());
             if (unirealdis(gen) < p) {
                 return true;
             }
@@ -178,7 +193,7 @@ namespace mcmc {
                 outer.insert(cand);
                 inner.erase(cand);
             }
-            update_neighbours(cand);
+            update_neighbours(cand, !erase);
             return false;
         }
     }

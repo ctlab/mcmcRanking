@@ -22,7 +22,7 @@ namespace mcmc {
 
         bool update_outer_nodes(unsigned cand_in, unsigned cand_out);
 
-        bool update_neighbours(unsigned v);
+        bool update_neighbours(unsigned v, bool is_erased);
 
     public:
         Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size);
