@@ -1,16 +1,20 @@
 #' @export
 mcmc <- function(mat, name, likelihood, fun){
   if(!is.matrix(mat)) stop("mat must be matrix.")
-  if(!is.numeric(mat)) stop("mat mus be numeric vector.")
+  if(!is.logical(mat)) stop("mat mus be boolean vector.")
   if(!is.character(name)) stop("name must be character vector.")
   if(!is.numeric(likelihood)) stop("likelihood mus be numeric vector.")
   if(!is.function(fun)) stop("fun must be a function.")
   structure(list(mat = mat, name = name, likelihood = likelihood, fun = fun), class = "MCMC")
 }
 
-check_arguments <- function(graph, module_size){
-  if(module_size > gorder(graph))
-    stop("graph size less than required module size.")
+check_arguments <- function(graph, module_size, iter){
+  if(module_size > gorder(graph) || module_size < 1)
+    stop("Required module size must be positive and not greather than graph size.")
+  if(iter < 0)
+    stop("number of iteration must be positive a number.");
+  if(is.null(get.vertex.attribute(graph, "name")))
+    stop("graph must have 'name' attribute on vertices.")
 }
 
 #' Connected subgraph from uniform distribution.
@@ -25,12 +29,12 @@ check_arguments <- function(graph, module_size){
 #' @import igraph
 #' @export
 mcmc_subgraph <- function(graph, module_size, iter) {
-  check_arguments(graph, module_size)
+  check_arguments(graph, module_size, iter)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   args <- c(nodes_size=length(V(graph)), module_size=module_size, iter=iter)
-  res <- mcmc_subgraph_internal(edges, args) + 1
-  return(V(graph)$name[res])
+  res <- mcmc_subgraph_internal(edges, args)
+  return(V(graph)$name[which(res)])
 }
 
 #' Set of connected subgraphs from uniform distribution.
@@ -53,15 +57,19 @@ mcmc_subgraph <- function(graph, module_size, iter) {
 #' matrix(x$name[x$mat], nrow(x$mat))
 #' y <- mcmc_sample(graph = graph, start_module = matrix(x$name[x$mat], nrow(x$mat)), iter = 4)
 #' matrix(y$name[y$mat], nrow(y$mat))
-mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = NULL, iter, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
+mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = NULL, iter, fixed_size = TRUE, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
   if(!xor(is.null(module_size) && is.null(times), is.null(start_module))){
     stop("One of the arguments module_size and times or start_module must be set.")
   }
   if(!is.null(start_module)){
-    module_size <- ncol(start_module)
+    module_size <- sum(start_module[1,])
     times <- nrow(start_module)
   }else{
-    start_module <- t(replicate(times, mcmc_subgraph(graph, module_size, 1)))
+    start_module <- t(replicate(times,
+                                { ret <- logical(gorder(graph));
+                                  names(ret) <- V(graph)$name;
+                                  ret[mcmc_subgraph(graph, module_size, 1)] <- T;
+                                  ret}))
   }
   timesPerProc <- rep(granularity, floor(times/granularity))
   if (times - sum(timesPerProc) > 0) {
@@ -81,15 +89,15 @@ mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = 
     }
   }
 
-  check_arguments(graph, module_size)
+  check_arguments(graph, module_size, iter)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
-  module_nodes <- as.vector(V(graph)[as.character(t(start_module))])-1
+  #module_nodes <- as.vector(V(graph)[which(t(start_module))])-1
   mats <- bplapply(seq_along(timesPerProc), function(i) {
-    args <- c(module_size=module_size, iter=iter, times=timesPerProc[i])
-    res1 <- mcmc_sample_internal(edges, nodes, args, module_nodes)
-    matrix(res1, ncol = module_size, byrow = T) + 1 # switching to 1-indexing
+    args <- c(module_size=module_size, iter=iter, times=timesPerProc[i], fixed_size = ifelse(fixed_size, 1, 0))
+    res1 <- mcmc_sample_internal(edges, nodes, args, start_module)
+    matrix(res1, ncol = gorder(graph), byrow = T)# switching to 1-indexing
   }, BPPARAM = BPPARAM)
 
   ret <- mcmc(do.call(rbind, mats), V(graph)$name, V(graph)$likelihood, fun)
@@ -109,7 +117,7 @@ mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = 
 #' @import igraph
 #' @export
 mcmc_onelong <- function(graph, module_size, start, end, fun = function(x) x) {
-  check_arguments(graph, module_size)
+  check_arguments(graph, module_size, end)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
@@ -133,7 +141,7 @@ mcmc_onelong <- function(graph, module_size, start, end, fun = function(x) x) {
 #' @import igraph
 #' @export
 mcmc_onelong_frequency <- function(graph, module_size, start, end, fun = function(x) x) {
-  check_arguments(graph, module_size)
+  check_arguments(graph, module_size, end)
   edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
   colnames(edges) <- c("from", "to")
   nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = vapply(V(graph)$likelihood, fun, 1))
@@ -175,7 +183,7 @@ real_prob <- function(graph) {
 #' @import igraph
 #' @export
 get_frequency <- function(mcmcObj, inds = seq_len(nrow(mcmcObj$mat))){
-  freq <- tabulate(mcmcObj$mat[inds,], length(mcmcObj$name))
+  freq <- colSums(mcmcObj$mat[inds,])
   names(freq) <- mcmcObj$name
   return(freq)
 }

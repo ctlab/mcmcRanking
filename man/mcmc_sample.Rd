@@ -5,8 +5,8 @@
 \title{Set of connected subgraphs from uniform distribution.}
 \usage{
 mcmc_sample(graph, module_size = NULL, times = NULL, start_module = NULL,
-  iter, fun = function(x) x, nproc = 0, BPPARAM = NULL,
-  granularity = 10)
+  iter, fixed_size = TRUE, fun = function(x) x, nproc = 0,
+  BPPARAM = NULL, granularity = 10)
 }
 \arguments{
 \item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}

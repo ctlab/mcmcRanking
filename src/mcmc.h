@@ -9,6 +9,7 @@
 namespace mcmc {
     using namespace std;
     class Graph {
+        bool fixed_size;
         size_t order;
         vector<double> nodes;
         vector<vector<unsigned>> edges;
@@ -21,8 +22,10 @@ namespace mcmc {
 
         bool update_outer_nodes(unsigned cand_in, unsigned cand_out);
 
+        bool update_neighbours(unsigned v, bool is_erased);
+
     public:
-        Graph(vector<double> nodes, vector<vector<unsigned>> edges);
+        Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size);
 
         bool is_connected();
 
@@ -36,9 +39,9 @@ namespace mcmc {
 
         vector<unsigned> get_outer_nodes();
 
-        vector<unsigned> sample_iteration(vector<unsigned> module, size_t module_size, size_t times, size_t end);
+        vector<char> sample_iteration(vector<vector<unsigned>> module, size_t module_size, size_t times, size_t end);
 
-        vector<unsigned> onelong_iteration(size_t start, size_t end);
+        vector<char> onelong_iteration(size_t start, size_t end);
 
         vector<unsigned> onelong_iteration_frequency(size_t start, size_t end);
     };
