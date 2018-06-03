@@ -109,6 +109,26 @@ mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = 
 #' Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
 #'
 #' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
+#' @param q
+#' @return ranking.
+#' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_sample}}
+#' @import igraph
+#' @export
+mcmc_rank_q <- function(graph, q) {
+  edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
+  colnames(edges) <- c("from", "to")
+  nodes <- data.frame(name=as.vector(V(graph)) - 1, q = q[V(graph)$name])
+  res <- mcmc_rank_q_internal(edges, nodes)
+  print(head(sort(res)))
+  names(res) <- V(graph)$name
+  return(res)
+}
+
+#' Set of connected subgraphs.
+#'
+#' Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
+#'
+#' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
 #' @param module_size The size of subgraph.
 #' @param start Starting with this iteration, we write down all states of the Markov process.
 #' @param end Number of iterations.

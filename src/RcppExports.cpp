@@ -31,6 +31,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// mcmc_rank_q_internal
+IntegerVector mcmc_rank_q_internal(DataFrame df_edges, DataFrame df_nodes);
+RcppExport SEXP _mcmcRanking_mcmc_rank_q_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_rank_q_internal(df_edges, df_nodes));
+    return rcpp_result_gen;
+END_RCPP
+}
 // mcmc_onelong_internal
 IntegerVector mcmc_onelong_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args);
 RcppExport SEXP _mcmcRanking_mcmc_onelong_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP) {
@@ -84,6 +96,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_mcmcRanking_mcmc_subgraph_internal", (DL_FUNC) &_mcmcRanking_mcmc_subgraph_internal, 2},
     {"_mcmcRanking_mcmc_sample_internal", (DL_FUNC) &_mcmcRanking_mcmc_sample_internal, 4},
+    {"_mcmcRanking_mcmc_rank_q_internal", (DL_FUNC) &_mcmcRanking_mcmc_rank_q_internal, 2},
     {"_mcmcRanking_mcmc_onelong_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_internal, 3},
     {"_mcmcRanking_mcmc_onelong_frequency_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_frequency_internal, 3},
     {"_mcmcRanking_real_prob_internal", (DL_FUNC) &_mcmcRanking_real_prob_internal, 2},
