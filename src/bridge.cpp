@@ -108,80 +108,77 @@ bool get_best_comp(vector<vector<unsigned>> &edges, vector<double> &nodes, vecto
 }
 
 // [[Rcpp::export]]
-IntegerVector mcmc_rank_q_internal(DataFrame df_edges, DataFrame df_nodes) {
-  IntegerVector from = df_edges["from"];
-  IntegerVector to   = df_edges["to"];
-  IntegerVector names = df_nodes["name"];
+IntegerVector probabilistic_rank_internal(DataFrame df_edges, DataFrame df_nodes) {
   NumericVector q = df_nodes["q"];
-  unsigned n = names.size();
+  unsigned n = q.size();
   vector<double> nodes(q.begin(), q.end());
-  vector<vector<unsigned>> edges = make_edges(from, to, n);
+  vector<vector<unsigned>> edges = make_edges(df_edges["from"], df_edges["to"], n);
 
   vector<unsigned> ranked(n, 0);
   unsigned not_ranked_n = n;
 
-  double cum_p = 0;
+  double sum_p = 0;
   for(double x : nodes)
-    cum_p += 1-x;
-  double cum_q = n - cum_p;
+    sum_p += 1-x;
+  double sum_q = n - sum_p;
 
-  unsigned cand_remove;
+  unsigned cand_remove = 0;
   while(not_ranked_n != 0){
-    double best_cum_q = cum_q;
-    double best_cum_p = -1;
+    double best_q = sum_q;
+    double best_p = -1;
 
-    bool used[n] = {0};
-    bool is_cut_point[n] = {0};
+    bool used[n];
+    bool is_cut_point[n];
+    memset(used, 0, sizeof used);
+    memset(is_cut_point, 0, sizeof is_cut_point);
     int tin[n];
     int fup[n];
     int timer = 0;
-    for(int i = 0; i < n; ++i){
+    for(int i : edges[cand_remove]){
       if(!ranked[i]){
         cut_points_dfs(i, -1, timer, edges, ranked, used, tin, fup, is_cut_point);
         break;
-      }
+        }
     }
     for(int i = 0; i < n; ++i){
       if(ranked[i])
         continue;
-      double cur_cum_p;
-      double cur_cum_q;
+      double cur_p;
+      double cur_q;
       if(is_cut_point[i]){
         vector<unsigned> comp;
         vector<unsigned> to_remove;
         if(get_best_comp(edges, nodes, ranked, comp, to_remove, i))
           continue;
-        cur_cum_p = 0;
+        cur_p = 0;
         for(unsigned x : comp)
-          cur_cum_p += 1 - nodes[x];
-        cur_cum_q = comp.size() - cur_cum_p;
+          cur_p += 1 - nodes[x];
+        cur_q = comp.size() - cur_p;
       }else{
-        cur_cum_p = cum_p - (1-nodes[i]);
-        cur_cum_q = cum_q - nodes[i];
+        cur_p = sum_p - (1 - nodes[i]);
+        cur_q = sum_q - nodes[i];
       }
-      double sin = (best_cum_p-cum_p)*(cur_cum_q-cum_q)-(best_cum_q-cum_q)*(cur_cum_p-cum_p);
-      bool smaller = cur_cum_p*cur_cum_p+cur_cum_q*cur_cum_q < best_cum_p*best_cum_p+best_cum_q*best_cum_q;
-      if(sin > 0 || sin == 0 && smaller || best_cum_p == -1){
-        best_cum_p = cur_cum_p;
-        best_cum_q = cur_cum_q;
-        cand_remove=i;
+      double sin = (best_p - sum_p) * (cur_q - sum_q) - (best_q - sum_q) * (cur_p - sum_p);
+      bool smaller = cur_p * cur_p + cur_q * cur_q < best_p * best_p + best_q * best_q;
+      if(sin > 0 || sin == 0 && smaller || best_p == -1){
+        best_p = cur_p;
+        best_q = cur_q;
+        cand_remove = i;
       }
     }
-    unsigned rank_id = not_ranked_n;
     if(is_cut_point[cand_remove]){
       vector<unsigned> comp;
       vector<unsigned> to_remove;
       get_best_comp(edges, nodes, ranked, comp, to_remove, cand_remove);
       for(unsigned x : to_remove){
-        ranked[x] = rank_id;
+        ranked[x] = not_ranked_n;
       }
       not_ranked_n -= to_remove.size();
     }else{
-      ranked[cand_remove] = rank_id;
-      not_ranked_n--;
+      ranked[cand_remove] = not_ranked_n--;
     }
-    cum_p = best_cum_p;
-    cum_q = best_cum_q;
+    sum_p = best_p;
+    sum_q = best_q;
   }
   IntegerVector ret_(ranked.begin(), ranked.end());
   return ret_;

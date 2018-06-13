@@ -9,8 +9,8 @@ mcmc_sample_internal <- function(df_edges, df_nodes, args, start_module) {
     .Call('_mcmcRanking_mcmc_sample_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes, args, start_module)
 }
 
-mcmc_rank_q_internal <- function(df_edges, df_nodes) {
-    .Call('_mcmcRanking_mcmc_rank_q_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes)
+probabilistic_rank_internal <- function(df_edges, df_nodes) {
+    .Call('_mcmcRanking_probabilistic_rank_internal', PACKAGE = 'mcmcRanking', df_edges, df_nodes)
 }
 
 mcmc_onelong_internal <- function(df_edges, df_nodes, args) {

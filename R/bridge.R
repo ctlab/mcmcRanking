@@ -104,22 +104,22 @@ mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = 
   return(ret)
 }
 
-#' Set of connected subgraphs.
+#' Probabilistic ranking.
 #'
-#' Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
+#' Heuristic ranking maximizing the area under the ROC curve.
 #'
-#' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
-#' @param q
+#' @param graph An object of type \code{igraph}.
+#' @param q Vector of probabilities of vertices to not belong to active module.
 #' @return ranking.
-#' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_sample}}
+#' @seealso \code{\link{mcmc_sample}}
 #' @import igraph
 #' @export
-mcmc_rank_q <- function(graph, q) {
-  edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
+probabilistic_rank <- function(graph, q) {
+  edges <- data.frame(as_edgelist(graph, names = F)[, 1:2] - 1)
   colnames(edges) <- c("from", "to")
-  nodes <- data.frame(name=as.vector(V(graph)) - 1, q = q[V(graph)$name])
-  res <- mcmc_rank_q_internal(edges, nodes)
-  print(head(sort(res)))
+  nodes <-
+    data.frame(name = as.vector(V(graph)) - 1, q = q[V(graph)$name])
+  res <- probabilistic_rank_internal(edges, nodes)
   names(res) <- V(graph)$name
   return(res)
 }
