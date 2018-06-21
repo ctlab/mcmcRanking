@@ -20,9 +20,9 @@ namespace mcmc {
         mt19937 gen;
         uniform_real_distribution<> unirealdis;
 
-        bool update_outer_nodes(unsigned cand_in, unsigned cand_out);
+        void update_outer_nodes(unsigned cand_in, unsigned cand_out);
 
-        bool update_neighbours(unsigned v, bool is_erased);
+        void update_neighbours(unsigned v, bool is_erased);
 
     public:
         Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size);
@@ -38,6 +38,8 @@ namespace mcmc {
         vector<unsigned> get_inner_nodes();
 
         vector<unsigned> get_outer_nodes();
+
+        vector<double> sample_llh(vector<unsigned> module, size_t end);
 
         vector<char> sample_iteration(vector<vector<unsigned>> module, size_t module_size, size_t times, size_t end);
 

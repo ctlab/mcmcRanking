@@ -1,0 +1,78 @@
+---
+title: "Using mcmcRanking package"
+author: "Javlon Isomurodov"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  fig.width = 6,
+  fig.height = 4
+)
+```
+
+## Preparing Data
+
+```{r message=FALSE}
+library(BioNet)
+library(DLBCL)
+library(genefilter)
+library(impute)
+```
+
+First, we need to prepare network and p-values of genes. As an example, we took DLBCL (Diffuse large B-cell lymphoma expression data) data from [Bioconductor](https://bioconductor.org/packages/release/data/experiment/html/DLBCL.html).
+
+```{r message=FALSE, results='hide'}
+data(exprLym)
+data(interactome)
+network <- subNetwork(featureNames(exprLym), interactome)
+network <- largestComp(network)
+expressions <- impute.knn(exprs(exprLym))$data
+t.test <- rowttests(expressions, fac = exprLym$Subgroup)
+ttest.pval <- t.test[, "p.value"]
+names(ttest.pval) <- rownames(expressions)
+```
+
+## Estimation of mixing time
+
+We extract network and p-value for each gene as in [BioNet Tutorial](https://bioconductor.org/packages/release/bioc/html/BioNet.html). Next, transform network to `igraph` object, calculate likelihood of every gene with `FDR=1e-7` and run *MCMC* with parameter of iteration equal to `100000`. Function `sample_llh`, returns log-likelihoods of subgraph on every iteration.
+
+```{r message=FALSE, fig.show="hold", warning=FALSE}
+library(igraph)
+library(mcmcRanking)
+g <- graph_from_graphnel(network)
+V(g)$pval <- ttest.pval[V(g)$name]
+fb <- fitBumModel(V(g)$pval, F)
+x <- exp(scoreFunction(fb, 1e-7))
+deep <- repetition_depth(max(x))
+V(g)$likelihood <- x^(1/2^deep)
+y <- sample_llh(graph = g, module_size = 1, iter = 1e5, fixed_size = F)
+plot(x=names(y), y = y, type = 'l',
+     xlab = "iteration number", ylab = "log-likelihood")
+```
+
+Plot shows that log-liekelihood value stabilizes after about `20000` iterations. Thus we can estimate *MCMC* mxixing time as `20000` iterations.
+
+## Calculating the probability
+
+Next, run *MCMC* `1000` times and get probability of vertex as frequency of its presence  in a sampled subgraphs.
+
+```{r message=FALSE, eval=FALSE}
+iter <- 2e1
+times <- 1e3
+z <- mcmc_sample(graph = g, module_size = 1, times = times, iter = iter, fixed_size = F)
+for(i in (deep-1):0){
+  V(g)$likelihood <- x^(1/2^i)
+  z <- mcmc_sample(graph = g, previous_mcmc = z, iter = iter, fixed_size = F)
+}
+p <- get_frequency(z)/times
+r <- probabilistic_rank(graph = g, q = 1 - p)
+```
+
+Last two functions calculate probability of gene and connectivity preserving ranking respectivly. To increase the accuracy of the probability, increase the number of runs or parameter `times`.  

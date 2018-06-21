@@ -4,7 +4,7 @@
 \alias{mcmc_sample}
 \title{Set of connected subgraphs from uniform distribution.}
 \usage{
-mcmc_sample(graph, module_size = NULL, times = NULL, start_module = NULL,
+mcmc_sample(graph, module_size = NULL, times = NULL, previous_mcmc = NULL,
   iter, fixed_size = TRUE, fun = function(x) x, nproc = 0,
   BPPARAM = NULL, granularity = 10)
 }
@@ -15,7 +15,7 @@ mcmc_sample(graph, module_size = NULL, times = NULL, start_module = NULL,
 
 \item{times}{Number of subgraphs.}
 
-\item{start_module}{Matrix of vetrex names where every row defines initial subgraph.}
+\item{previous_mcmc}{Object of type MCMC.}
 
 \item{iter}{Number of iterations.}
 }
@@ -31,8 +31,6 @@ V(graph)$name <- letters[1:20]
 V(graph)$likelihood <- 1
 x <- mcmc_sample(graph = graph, module_size = 5, iter = 10, times = 4)
 matrix(x$name[x$mat], nrow(x$mat))
-y <- mcmc_sample(graph = graph, start_module = matrix(x$name[x$mat], nrow(x$mat)), iter = 4)
-matrix(y$name[y$mat], nrow(y$mat))
 }
 \seealso{
 \code{\link{mcmc_subgraph}, \link{mcmc_onelong}}

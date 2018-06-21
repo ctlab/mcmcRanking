@@ -1,5 +1,6 @@
 #include <queue>
 #include <unordered_set>
+#include <cmath>
 #include "mcmc.h"
 #include <Rcpp.h>
 
@@ -79,7 +80,7 @@ namespace mcmc {
         return true;
     }
 
-    bool Graph::update_outer_nodes(unsigned cand_in, unsigned cand_out) {
+    void Graph::update_outer_nodes(unsigned cand_in, unsigned cand_out) {
         outer.swap(cand_out, cand_in);
 
         for (unsigned neighbour : edges[cand_out]) {
@@ -87,7 +88,6 @@ namespace mcmc {
                 outer.insert(neighbour);
             }
         }
-
         for (unsigned neighbour : edges[cand_in]) {
             if (inner.contains(neighbour) || !outer.contains(neighbour)) {
                 continue;
@@ -105,7 +105,7 @@ namespace mcmc {
         }
     }
 
-    bool Graph::update_neighbours(unsigned v, bool is_erased) {
+    void Graph::update_neighbours(unsigned v, bool is_erased) {
         if(is_erased){
             for (unsigned neighbour : edges[v]) {
                 if (inner.contains(neighbour) || !outer.contains(neighbour)) {
@@ -204,6 +204,19 @@ namespace mcmc {
 
     vector<unsigned> Graph::get_outer_nodes() {
         return outer.get_all();
+    }
+
+    vector<double> Graph::sample_llh(vector<unsigned> module, size_t end){
+        vector<double> likelihoods(end);
+        initialize_module(module);
+        for(size_t i = 0; i < end; ++i){
+            next_iteration();
+            likelihoods[i] = 1;
+            for(unsigned x : inner.get_all()){
+                likelihoods[i] += log(nodes[x]);
+            }
+        }
+        return likelihoods;
     }
 
     vector<char> Graph::sample_iteration(vector<vector<unsigned>> module, size_t module_size, size_t times, size_t end) {

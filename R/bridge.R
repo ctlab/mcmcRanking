@@ -17,6 +17,17 @@ check_arguments <- function(graph, module_size, iter){
     stop("graph must have 'name' attribute on vertices.")
 }
 
+#' @export
+repetition_depth <- function(x){
+  d <- 0
+  while(x > 4){
+    x <- sqrt(x)
+    d <- d + 1
+  }
+  return(d)
+}
+
+
 #' Connected subgraph from uniform distribution.
 #'
 #' Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
@@ -37,13 +48,39 @@ mcmc_subgraph <- function(graph, module_size, iter) {
   return(V(graph)$name[which(res)])
 }
 
+#' @export
+sample_llh <- function(graph, module_size = NULL, start_module = NULL, iter, fixed_size = TRUE) {
+  if(!xor(is.null(module_size) && is.null(times), is.null(start_module))){
+    stop("One of the arguments module_size and times or start_module must be set.")
+  }
+  if(!is.null(start_module)){
+    module_size <- sum(start_module[1,])
+  }else{
+    ret <- logical(gorder(graph));
+    names(ret) <- V(graph)$name;
+    ret[mcmc_subgraph(graph, module_size, 1)] <- T;
+    start_module <- t(ret)
+  }
+
+  check_arguments(graph, module_size, iter)
+  edges <- data.frame(as_edgelist(graph, names = F)[,1:2] - 1)
+  colnames(edges) <- c("from", "to")
+  nodes <- data.frame(name=as.vector(V(graph)) - 1, likelihood = V(graph)$likelihood)
+
+  args <- c(module_size=module_size, iter=iter, fixed_size = ifelse(fixed_size, 1, 0))
+  res1 <- sample_llh_internal(edges, nodes, args, start_module)
+  names(res1) <- seq_len(iter)
+  return(res1)
+}
+
+
 #' Set of connected subgraphs from uniform distribution.
 #'
 #' Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC) method.
 #'
 #' @inheritParams mcmc_subgraph
 #' @param times Number of subgraphs.
-#' @param start_module Matrix of vetrex names where every row defines initial subgraph.
+#' @param previous_mcmc Object of type MCMC.
 #' @return Object of type MCMC.
 #' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_onelong}}
 #' @import igraph
@@ -55,13 +92,16 @@ mcmc_subgraph <- function(graph, module_size, iter) {
 #' V(graph)$likelihood <- 1
 #' x <- mcmc_sample(graph = graph, module_size = 5, iter = 10, times = 4)
 #' matrix(x$name[x$mat], nrow(x$mat))
-#' y <- mcmc_sample(graph = graph, start_module = matrix(x$name[x$mat], nrow(x$mat)), iter = 4)
-#' matrix(y$name[y$mat], nrow(y$mat))
-mcmc_sample <- function(graph, module_size = NULL, times = NULL, start_module = NULL, iter, fixed_size = TRUE, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
-  if(!xor(is.null(module_size) && is.null(times), is.null(start_module))){
-    stop("One of the arguments module_size and times or start_module must be set.")
+mcmc_sample <- function(graph, module_size = NULL, times = NULL, previous_mcmc = NULL, iter, fixed_size = TRUE, fun = function(x) x, nproc = 0, BPPARAM = NULL, granularity=10) {
+  if(!xor(is.null(module_size) && is.null(times), is.null(previous_mcmc))){
+    stop("One of the arguments module_size and times or previous_mcmc must be set.")
   }
-  if(!is.null(start_module)){
+  if(!is.null(previous_mcmc)){
+    if(class(previous_mcmc)!="MCMC")
+      stop("previous_mcmc must be type of \"MCMC\"")
+    start_module <- previous_mcmc$mat
+  }
+  if(!is.null(previous_mcmc)){
     module_size <- sum(start_module[1,])
     times <- nrow(start_module)
   }else{

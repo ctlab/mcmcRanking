@@ -32,6 +32,23 @@ LogicalVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args) {
 }
 
 // [[Rcpp::export]]
+NumericVector sample_llh_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, LogicalMatrix start_module) {
+  NumericVector likelihood = df_nodes["likelihood"];
+  vector<double> nodes(likelihood.begin(), likelihood.end());
+  vector<vector<unsigned>> edges = make_edges(df_edges["from"], df_edges["to"], likelihood.size());
+  Graph g = Graph(nodes, edges, args["fixed_size"] == 1);
+  vector<unsigned> module;
+  for(int j = 0; j < start_module.ncol(); ++j){
+    if(start_module(0, j)){
+      module.push_back(j);
+    }
+  }
+  vector<double> ret = g.sample_llh(module, args["iter"]);
+  NumericVector ret_(ret.begin(), ret.end());
+  return ret_;
+}
+
+// [[Rcpp::export]]
 LogicalVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, LogicalMatrix start_module) {
   IntegerVector from = df_edges["from"];
   IntegerVector to   = df_edges["to"];
