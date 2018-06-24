@@ -12,6 +12,14 @@ namespace mcmc {
         unirealdis = uniform_real_distribution<>(0, 1);
     }
 
+    Graph::Graph(Rcpp::NumericVector nodes, vector<vector<unsigned>> edges, bool fixed_size)
+        :order(nodes.size()), edges(edges), inner(order), outer(order), fixed_size(fixed_size) {
+        this->nodes = vector<double> (nodes.begin(), nodes.end());
+        random_device rd;
+        gen = mt19937(rd());
+        unirealdis = uniform_real_distribution<>(0, 1);
+    }
+
     vector<unsigned> Graph::random_subgraph(size_t size) {
         unordered_set<unsigned> sg;
         HSA candidates(order);

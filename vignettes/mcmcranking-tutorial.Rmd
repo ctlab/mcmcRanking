@@ -64,7 +64,7 @@ Plot shows that log-liekelihood value stabilizes after about `20000` iterations.
 Next, run *MCMC* `1000` times and get probability of vertex as frequency of its presence  in a sampled subgraphs.
 
 ```{r message=FALSE, eval=FALSE}
-iter <- 2e1
+iter <- 2e4
 times <- 1e3
 z <- mcmc_sample(graph = g, module_size = 1, times = times, iter = iter, fixed_size = F)
 for(i in (deep-1):0){

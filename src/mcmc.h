@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include "hsa.h"
+#include <Rcpp.h>
 
 namespace mcmc {
     using namespace std;
@@ -26,6 +27,8 @@ namespace mcmc {
 
     public:
         Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size);
+
+        Graph(Rcpp::NumericVector nodes, vector<vector<unsigned>> edges, bool fixed_size);
 
         bool is_connected();
 

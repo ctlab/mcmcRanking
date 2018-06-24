@@ -6,92 +6,92 @@
 using namespace Rcpp;
 
 // mcmc_subgraph_internal
-LogicalVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args);
-RcppExport SEXP _mcmcRanking_mcmc_subgraph_internal(SEXP df_edgesSEXP, SEXP argsSEXP) {
+LogicalVector mcmc_subgraph_internal(IntegerMatrix edgelist, List args);
+RcppExport SEXP _mcmcRanking_mcmc_subgraph_internal(SEXP edgelistSEXP, SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_subgraph_internal(df_edges, args));
+    Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
+    Rcpp::traits::input_parameter< List >::type args(argsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_subgraph_internal(edgelist, args));
     return rcpp_result_gen;
 END_RCPP
 }
 // sample_llh_internal
-NumericVector sample_llh_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, LogicalMatrix start_module);
-RcppExport SEXP _mcmcRanking_sample_llh_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP, SEXP start_moduleSEXP) {
+NumericVector sample_llh_internal(IntegerMatrix edgelist, NumericVector likelihood, List args, LogicalMatrix start_module);
+RcppExport SEXP _mcmcRanking_sample_llh_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP argsSEXP, SEXP start_moduleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
-    Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type likelihood(likelihoodSEXP);
+    Rcpp::traits::input_parameter< List >::type args(argsSEXP);
     Rcpp::traits::input_parameter< LogicalMatrix >::type start_module(start_moduleSEXP);
-    rcpp_result_gen = Rcpp::wrap(sample_llh_internal(df_edges, df_nodes, args, start_module));
+    rcpp_result_gen = Rcpp::wrap(sample_llh_internal(edgelist, likelihood, args, start_module));
     return rcpp_result_gen;
 END_RCPP
 }
 // mcmc_sample_internal
-LogicalVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, LogicalMatrix start_module);
-RcppExport SEXP _mcmcRanking_mcmc_sample_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP, SEXP start_moduleSEXP) {
+LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelihood, List args, LogicalMatrix start_module);
+RcppExport SEXP _mcmcRanking_mcmc_sample_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP argsSEXP, SEXP start_moduleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
-    Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type likelihood(likelihoodSEXP);
+    Rcpp::traits::input_parameter< List >::type args(argsSEXP);
     Rcpp::traits::input_parameter< LogicalMatrix >::type start_module(start_moduleSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_sample_internal(df_edges, df_nodes, args, start_module));
+    rcpp_result_gen = Rcpp::wrap(mcmc_sample_internal(edgelist, likelihood, args, start_module));
     return rcpp_result_gen;
 END_RCPP
 }
 // probabilistic_rank_internal
-IntegerVector probabilistic_rank_internal(DataFrame df_edges, DataFrame df_nodes);
-RcppExport SEXP _mcmcRanking_probabilistic_rank_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP) {
+IntegerVector probabilistic_rank_internal(IntegerMatrix edgelist, DataFrame df_nodes);
+RcppExport SEXP _mcmcRanking_probabilistic_rank_internal(SEXP edgelistSEXP, SEXP df_nodesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
+    Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
     Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    rcpp_result_gen = Rcpp::wrap(probabilistic_rank_internal(df_edges, df_nodes));
+    rcpp_result_gen = Rcpp::wrap(probabilistic_rank_internal(edgelist, df_nodes));
     return rcpp_result_gen;
 END_RCPP
 }
 // mcmc_onelong_internal
-IntegerVector mcmc_onelong_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args);
-RcppExport SEXP _mcmcRanking_mcmc_onelong_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP) {
+IntegerVector mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, List args);
+RcppExport SEXP _mcmcRanking_mcmc_onelong_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
-    Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_internal(df_edges, df_nodes, args));
+    Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type likelihood(likelihoodSEXP);
+    Rcpp::traits::input_parameter< List >::type args(argsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_internal(edgelist, likelihood, args));
     return rcpp_result_gen;
 END_RCPP
 }
 // mcmc_onelong_frequency_internal
-IntegerVector mcmc_onelong_frequency_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args);
-RcppExport SEXP _mcmcRanking_mcmc_onelong_frequency_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP, SEXP argsSEXP) {
+IntegerVector mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood, List args);
+RcppExport SEXP _mcmcRanking_mcmc_onelong_frequency_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP argsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
-    Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type args(argsSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_frequency_internal(df_edges, df_nodes, args));
+    Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type likelihood(likelihoodSEXP);
+    Rcpp::traits::input_parameter< List >::type args(argsSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_frequency_internal(edgelist, likelihood, args));
     return rcpp_result_gen;
 END_RCPP
 }
 // real_prob_internal
-NumericVector real_prob_internal(DataFrame df_edges, DataFrame df_nodes);
-RcppExport SEXP _mcmcRanking_real_prob_internal(SEXP df_edgesSEXP, SEXP df_nodesSEXP) {
+NumericVector real_prob_internal(IntegerMatrix edgelist, NumericVector likelihood);
+RcppExport SEXP _mcmcRanking_real_prob_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< DataFrame >::type df_edges(df_edgesSEXP);
-    Rcpp::traits::input_parameter< DataFrame >::type df_nodes(df_nodesSEXP);
-    rcpp_result_gen = Rcpp::wrap(real_prob_internal(df_edges, df_nodes));
+    Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type likelihood(likelihoodSEXP);
+    rcpp_result_gen = Rcpp::wrap(real_prob_internal(edgelist, likelihood));
     return rcpp_result_gen;
 END_RCPP
 }

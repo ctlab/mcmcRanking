@@ -8,35 +8,28 @@ using namespace Rcpp;
 using namespace std;
 using mcmc::Graph;
 
-vector<vector<unsigned>> make_edges(IntegerVector from, IntegerVector to, unsigned size){
-  vector<vector<unsigned>> edges(size);
-  for(int i = 0; i < from.size(); ++i){
-    edges[from[i]].push_back(to[i]);
-    edges[to[i]].push_back(from[i]);
+vector<vector<unsigned>> adj_list(IntegerMatrix edgelist, size_t gorder){
+  vector<vector<unsigned>> edges(gorder);
+  for(int i = 0; i < edgelist.nrow(); ++i){
+    edges[edgelist(i, 0)].push_back(edgelist(i, 1));
+    edges[edgelist(i, 1)].push_back(edgelist(i, 0));
   }
   return edges;
 }
 
 // [[Rcpp::export]]
-LogicalVector mcmc_subgraph_internal(DataFrame df_edges, IntegerVector args) {
-  IntegerVector from = df_edges["from"];
-  IntegerVector to   = df_edges["to"];
-  vector<double> nodes(args["nodes_size"], 1);
-  vector<vector<unsigned>> edges = make_edges(from, to, args["nodes_size"]);
-  Graph g = Graph(nodes, edges, true);
+LogicalVector mcmc_subgraph_internal(IntegerMatrix edgelist, List args) {
+  vector<double> nodes(args["gorder"], 1);
+  Graph g = Graph(nodes, adj_list(edgelist, args["gorder"]), true);
   vector<vector<unsigned>> module;
   module.push_back(g.random_subgraph(args["module_size"]));
   vector<char> ret = g.sample_iteration(module, args["module_size"], 1, args["iter"]);
-  LogicalVector ret_(ret.begin(), ret.end());
-  return ret_;
+  return LogicalVector (ret.begin(), ret.end());
 }
 
 // [[Rcpp::export]]
-NumericVector sample_llh_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, LogicalMatrix start_module) {
-  NumericVector likelihood = df_nodes["likelihood"];
-  vector<double> nodes(likelihood.begin(), likelihood.end());
-  vector<vector<unsigned>> edges = make_edges(df_edges["from"], df_edges["to"], likelihood.size());
-  Graph g = Graph(nodes, edges, args["fixed_size"] == 1);
+NumericVector sample_llh_internal(IntegerMatrix edgelist, NumericVector likelihood, List args, LogicalMatrix start_module) {
+  Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), args["fixed_size"]);
   vector<unsigned> module;
   for(int j = 0; j < start_module.ncol(); ++j){
     if(start_module(0, j)){
@@ -44,19 +37,12 @@ NumericVector sample_llh_internal(DataFrame df_edges, DataFrame df_nodes, Intege
     }
   }
   vector<double> ret = g.sample_llh(module, args["iter"]);
-  NumericVector ret_(ret.begin(), ret.end());
-  return ret_;
+  return NumericVector (ret.begin(), ret.end());
 }
 
 // [[Rcpp::export]]
-LogicalVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args, LogicalMatrix start_module) {
-  IntegerVector from = df_edges["from"];
-  IntegerVector to   = df_edges["to"];
-  IntegerVector names = df_nodes["name"];
-  NumericVector likelihood = df_nodes["likelihood"];
-  vector<double> nodes(likelihood.begin(), likelihood.end());
-  vector<vector<unsigned>> edges = make_edges(from, to, names.size());
-  Graph g = Graph(nodes, edges, args["fixed_size"] == 1);
+LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelihood, List args, LogicalMatrix start_module) {
+  Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), args["fixed_size"]);
   vector<vector<unsigned>> module;
   for(int i = 0; i < start_module.nrow(); ++i){
     module.push_back(vector<unsigned>());
@@ -67,8 +53,7 @@ LogicalVector mcmc_sample_internal(DataFrame df_edges, DataFrame df_nodes, Integ
     }
   }
   vector<char> ret = g.sample_iteration(module, args["module_size"], args["times"], args["iter"]);
-  LogicalVector ret_(ret.begin(), ret.end());
-  return ret_;
+  return LogicalVector (ret.begin(), ret.end());
 }
 
 void dfs(unsigned i, vector<vector<unsigned>> &edges, vector<unsigned> &new_comp, vector<bool> &used){
@@ -125,11 +110,11 @@ bool get_best_comp(vector<vector<unsigned>> &edges, vector<double> &nodes, vecto
 }
 
 // [[Rcpp::export]]
-IntegerVector probabilistic_rank_internal(DataFrame df_edges, DataFrame df_nodes) {
+IntegerVector probabilistic_rank_internal(IntegerMatrix edgelist, DataFrame df_nodes) {
   NumericVector q = df_nodes["q"];
   unsigned n = q.size();
   vector<double> nodes(q.begin(), q.end());
-  vector<vector<unsigned>> edges = make_edges(df_edges["from"], df_edges["to"], n);
+  vector<vector<unsigned>> edges = adj_list(edgelist, n);
 
   vector<unsigned> ranked(n, 0);
   unsigned not_ranked_n = n;
@@ -197,41 +182,26 @@ IntegerVector probabilistic_rank_internal(DataFrame df_edges, DataFrame df_nodes
     sum_p = best_p;
     sum_q = best_q;
   }
-  IntegerVector ret_(ranked.begin(), ranked.end());
-  return ret_;
+  return IntegerVector (ranked.begin(), ranked.end());
 }
 
 
 // [[Rcpp::export]]
-IntegerVector mcmc_onelong_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args) {
-  IntegerVector from = df_edges["from"];
-  IntegerVector to   = df_edges["to"];
-  IntegerVector names = df_nodes["name"];
-  NumericVector likelihood = df_nodes["likelihood"];
-  vector<double> nodes(likelihood.begin(), likelihood.end());
-  vector<vector<unsigned>> edges = make_edges(from, to, names.size());
-  Graph g = Graph(nodes, edges, true);
+IntegerVector mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, List args) {
+  Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), true);
   vector<unsigned> module = g.random_subgraph(args["module_size"]);
   g.initialize_module(module);
   vector<char> ret = g.onelong_iteration(args["start"], args["end"]);
-  IntegerVector ret_(ret.begin(), ret.end());
-  return ret_;
+  return IntegerVector (ret.begin(), ret.end());
 }
 
 // [[Rcpp::export]]
-IntegerVector mcmc_onelong_frequency_internal(DataFrame df_edges, DataFrame df_nodes, IntegerVector args) {
-  IntegerVector from = df_edges["from"];
-  IntegerVector to   = df_edges["to"];
-  IntegerVector names = df_nodes["name"];
-  NumericVector likelihood = df_nodes["likelihood"];
-  vector<double> nodes(likelihood.begin(), likelihood.end());
-  vector<vector<unsigned>> edges = make_edges(from, to, names.size());
-  Graph g = Graph(nodes, edges, true);
+IntegerVector mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood, List args) {
+  Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), true);
   vector<unsigned> module = g.random_subgraph(args["module_size"]);
   g.initialize_module(module);
   vector<unsigned> ret = g.onelong_iteration_frequency(args["start"], args["end"]);
-  IntegerVector ret_(ret.begin(), ret.end());
-  return ret_;
+  return IntegerVector (ret.begin(), ret.end());
 }
 
 bool is_connected(vector<vector<unsigned>> edges, bool from_inner[]) {
@@ -266,28 +236,24 @@ bool is_connected(vector<vector<unsigned>> edges, bool from_inner[]) {
 }
 
 // [[Rcpp::export]]
-NumericVector real_prob_internal(DataFrame df_edges, DataFrame df_nodes){
-  IntegerVector from = df_edges["from"];
-  IntegerVector to   = df_edges["to"];
-  NumericVector likelihood = df_nodes["likelihood"];
-  vector<double> nodes(likelihood.begin(), likelihood.end());
-  vector<vector<unsigned>> edges = make_edges(from, to, likelihood.size());
-  vector<double> scores(nodes.size(), 0.0);
+NumericVector real_prob_internal(IntegerMatrix edgelist, NumericVector likelihood){
+  vector<vector<unsigned>> edges = adj_list(edgelist, likelihood.size());
+  vector<double> scores(likelihood.size(), 0.0);
   double sumscores = 0;
-  int n = nodes.size();
+  int n = likelihood.size();
   bool x[n];
   for(int i = 1; i < n + 1; ++i){
     for(int j = 0; j < n; ++j)  x[j] = i + j < n ? false : true;
     do{
       if(is_connected(edges, x)){
         double score = 1;
-        for(int i = 0; i < n; ++i) if(x[i]) score *= nodes[i];
+        for(int i = 0; i < n; ++i) if(x[i]) score *= likelihood[i];
         sumscores += score;
         for(int i = 0; i < n; ++i) if(x[i]) scores[i] += score;
       }
     } while (next_permutation(x, x + n));
   }
-  for(int i = 0; i < n; ++i) scores[i] /= sumscores;
-  NumericVector ret(scores.begin(), scores.end());
-  return ret;
+  for(int i = 0; i < n; ++i)
+    scores[i] /= sumscores;
+  return NumericVector (scores.begin(), scores.end());
 }
