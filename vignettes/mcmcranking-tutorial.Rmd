@@ -26,7 +26,7 @@ library(genefilter)
 library(impute)
 ```
 
-First, we need to prepare network and p-values of genes. As an example, we took DLBCL (Diffuse large B-cell lymphoma expression data) data from [Bioconductor](https://bioconductor.org/packages/release/data/experiment/html/DLBCL.html).
+First, we need to prepare network and *p*-values of genes. As an example, we took DLBCL (Diffuse large B-cell lymphoma expression data) data from [Bioconductor](https://bioconductor.org/packages/release/data/experiment/html/DLBCL.html).
 
 ```{r message=FALSE, results='hide'}
 data(exprLym)
@@ -41,7 +41,7 @@ names(ttest.pval) <- rownames(expressions)
 
 ## Estimation of mixing time
 
-We extract network and p-value for each gene as in [BioNet Tutorial](https://bioconductor.org/packages/release/bioc/html/BioNet.html). Next, transform network to `igraph` object, calculate likelihood of every gene with `FDR=1e-7` and run *MCMC* with parameter of iteration equal to `100000`. Function `sample_llh`, returns log-likelihoods of subgraph on every iteration.
+We extract network and p-value for each gene as in [BioNet Tutorial](https://bioconductor.org/packages/release/bioc/html/BioNet.html). Next, transform network to `igraph` object. We can estimate proportion of vertices from active module and beta shape parameters using function `fitBumModel` from `BioNet` package. Function `scoreFunction` from the same package allows to calculate log-likelihood of every gene with *FDR*  equal to $10^{-7}$. Running with likelihood weights on vertices can cause to get stuck in locally good vertices, thereby finding locally significant solutions. So, we will iteratively increase vertex weights. `repetition_depth` function calculates number of iteration, where it finds smallest number $n$ where $2^n$-th root of maximum likelihood value less than $4$. To estimate how much iteration is enough to stabilize *MCMC*, we run function `sample_llh` $10^5$ iterations. This function returns log-likelihoods of subgraph on every iteration.
 
 ```{r message=FALSE, fig.show="hold", warning=FALSE}
 library(igraph)
@@ -49,7 +49,7 @@ library(mcmcRanking)
 g <- graph_from_graphnel(network)
 V(g)$pval <- ttest.pval[V(g)$name]
 fb <- fitBumModel(V(g)$pval, F)
-x <- exp(scoreFunction(fb, 1e-7))
+x <- exp(scoreFunction(fb = fb, fdr = 1e-7))
 deep <- repetition_depth(max(x))
 V(g)$likelihood <- x^(1/2^deep)
 y <- sample_llh(graph = g, module_size = 1, iter = 1e5, fixed_size = F)
@@ -57,11 +57,11 @@ plot(x=names(y), y = y, type = 'l',
      xlab = "iteration number", ylab = "log-likelihood")
 ```
 
-Plot shows that log-liekelihood value stabilizes after about `20000` iterations. Thus we can estimate *MCMC* mxixing time as `20000` iterations.
+Plot shows that log-liekelihood value stabilizes after about $2 \cdot 10^4$ iterations. Thus we can estimate *MCMC* mixing time as $2 \cdot 10^4$ iterations.
 
 ## Calculating the probability
 
-Next, run *MCMC* `1000` times and get probability of vertex as frequency of its presence  in a sampled subgraphs.
+Next, run *MCMC* $10^3$ times and get probability of vertex as frequency of its presence  in a sampled subgraphs.
 
 ```{r message=FALSE, eval=FALSE}
 iter <- 2e4
@@ -72,7 +72,21 @@ for(i in (deep-1):0){
   z <- mcmc_sample(graph = g, previous_mcmc = z, iter = iter, fixed_size = F)
 }
 p <- get_frequency(z)/times
+V(g)$q <- 1 - p[V(g)$name]
 r <- probabilistic_rank(graph = g, q = 1 - p)
+V(g)$r <- r[V(g)$name]
 ```
 
-Last two functions calculate probability of gene and connectivity preserving ranking respectivly. To increase the accuracy of the probability, increase the number of runs or parameter `times`.  
+After running *MCMC*, we calculate probability of gene and connectivity preserving ranking. To increase the accuracy of the probability, increase the number of runs or parameter `times`.  
+
+Now, we have a vertex probabilities. It allows us to estimate FDR for any subgraph as mean of complementary probability of vertices. Finally, we draw subgraph induced by vertices that has rank not higher than `rank`. Vertices on the plot below colored from *gray* to *gold* according to its importance. Subgraph consisting of more *golden*-colored vertices is more important. 
+
+```{r message=FALSE, tidy=TRUE, echo=c(-1,-2)}
+load("../inst/g.rda")
+par(mar = c(0,0,0,0))
+meanq <- sapply(seq_len(gorder(g)), function(i) mean(V(g)$q[which(V(g)$r <= i)]))
+rank <- tail(which(meanq <= 0.15), 1)
+subg <- induced_subgraph(g, which(V(g)$r <= rank))
+cols <- colorRampPalette(c("gold","gray"))(rank)
+plot(subg, vertex.label=V(subg)$geneSymbol, vertex.size = 10, vertex.label.cex=0.75, vertex.color=cols[V(subg)$r])
+```
