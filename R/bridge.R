@@ -17,10 +17,10 @@ mcmc <- function(mat, name, likelihood) {
 
 
 
-check_arguments <- function(graph, module_size, iter) {
+check_arguments <- function(graph, module_size, niter) {
   if (module_size > gorder(graph) || module_size < 1)
     stop("Required module size must be positive and not greather than graph size.")
-  if (iter < 0)
+  if (niter < 0)
     stop("number of iteration must be positive a number.")
   if (!("name" %in% vertex_attr_names(graph)))
     stop("graph must have 'name' attribute on vertices.")
@@ -46,20 +46,20 @@ repetition_depth <- function(x) {
 #'
 #' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
 #' @param module_size The size of subgraph.
-#' @param iter Number of iterations.
+#' @param niter Number of iterations.
 #' @return Vector of vertex names of connected subgraph.
 #' @seealso \code{\link{mcmc_sample}, \link{mcmc_onelong}}
 #' @import igraph
 #' @export
-mcmc_subgraph <- function(graph, module_size, iter) {
-  check_arguments(graph, module_size, iter)
+mcmc_subgraph <- function(graph, module_size, niter) {
+  check_arguments(graph, module_size, niter)
   if (module_size == 0)
     return(c())
   edgelist <- as_edgelist(graph, names = F) - 1
   args <-
     list(gorder = gorder(graph),
          module_size = module_size,
-         iter = iter)
+         iter = niter)
   res <- mcmc_subgraph_internal(edgelist, args)
   return(V(graph)$name[which(res)])
 }
@@ -71,8 +71,9 @@ sample_llh <-
   function(graph,
            module_size = NULL,
            start_module = NULL,
-           iter,
-           fixed_size = TRUE) {
+           niter,
+           exp_lh = 1,
+           fixed_size = FALSE) {
     if (!xor(is.null(module_size) &&
              is.null(times),
              is.null(start_module))) {
@@ -87,16 +88,16 @@ sample_llh <-
       start_module <- t(ret)
     }
 
-    check_arguments(graph, module_size, iter)
+    check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = F) - 1
 
     args <-
       list(module_size = module_size,
-           iter = iter,
+           iter = niter,
            fixed_size = fixed_size)
     res1 <-
-      sample_llh_internal(edgelist, V(graph)$likelihood, args, start_module)
-    names(res1) <- seq_len(iter)
+      sample_llh_internal(edgelist, V(graph)$likelihood^exp_lh, args, start_module)
+    names(res1) <- seq_len(niter)
     return(res1)
   }
 
@@ -125,8 +126,9 @@ mcmc_sample <-
            module_size = NULL,
            times = NULL,
            previous_mcmc = NULL,
-           iter,
-           fixed_size = TRUE,
+           niter,
+           exp_lh,
+           fixed_size = FALSE,
            nproc = 0,
            BPPARAM = NULL,
            granularity = 10) {
@@ -153,40 +155,36 @@ mcmc_sample <-
                                     ret
                                   }))
     }
-    timesPerProc <- rep(granularity, floor(times / granularity))
-    if (times - sum(timesPerProc) > 0) {
-      timesPerProc <- c(timesPerProc, times - sum(timesPerProc))
-    }
-    if (is.null(BPPARAM)) {
-      if (nproc != 0) {
-        if (.Platform$OS.type == "windows") {
-          BPPARAM <- SnowParam(workers = nproc)
-        }
-        else {
-          BPPARAM <- MulticoreParam(workers = nproc)
-        }
-      }
-      else {
-        BPPARAM <- bpparam()
-      }
-    }
-
-    check_arguments(graph, module_size, iter)
+    check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = F) - 1
-    mats <- bplapply(seq_along(timesPerProc), function(i) {
-      args <-
-        list(
-          module_size = module_size,
-          iter = iter,
-          times = timesPerProc[i],
-          fixed_size = fixed_size
-        )
-      res1 <-
-        mcmc_sample_internal(edgelist, V(graph)$likelihood, args, start_module)
-      matrix(res1, ncol = gorder(graph), byrow = T)# switching to 1-indexing
-    }, BPPARAM = BPPARAM)
 
-    return(mcmc(do.call(rbind, mats), V(graph)$name, V(graph)$likelihood))
+    args <-
+      list(
+        module_size = module_size,
+        iter = niter,
+        times = times,
+        fixed_size = fixed_size
+      )
+    res1 <-
+      mcmc_sample_internal(edgelist, V(graph)$likelihood ^ exp_lh[1], args, start_module)
+    mats <- matrix(res1, ncol = gorder(graph), byrow = T)
+
+    if (length(deg_lh) > 1) {
+      for (j in 2:length(deg_lh)) {
+        args <-
+          list(
+            module_size = module_size,
+            iter = niter,
+            times = times,
+            fixed_size = fixed_size
+          )
+        res1 <-
+          mcmc_sample_internal(edgelist, V(graph)$likelihood ^ exp_lh[j], args, mats)
+        mats <-  matrix(res1, ncol = gorder(graph), byrow = T)
+      }
+    }
+
+    return(mcmc(mats, V(graph)$name, V(graph)$likelihood))
   }
 
 
@@ -383,8 +381,8 @@ get_reverse_rank <- function(graph, q) {
 #' @import igraph
 #' @import BioNet
 #' @export
-set_likelihood <- function(graph) {
+set_likelihood <- function(graph, fdr) {
   fb <- fitBumModel(V(graph)$pval, plot = FALSE)
-  V(graph)$likelihood <- fb$a * V(graph)$pval ^ (fb$a - 1)
+  V(graph)$likelihood <- exp(scoreFunction(fb = fb, fdr = fdr))
   graph
 }

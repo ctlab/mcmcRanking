@@ -9,6 +9,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+This tutorial describes an R-package for estimating probabilities of vertices belong to active module and finding connectivity preserving ranking. Estimating probabilities  based on Markov chain Monte Carlo (MCMC) methods.
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -18,66 +20,120 @@ knitr::opts_chunk$set(
 ```
 
 ## Preparing Data
+### Calculating *p*-values
 
 ```{r message=FALSE}
 library(BioNet)
 library(DLBCL)
 library(genefilter)
 library(impute)
+library(igraph)
 ```
 
-First, we need to prepare network and *p*-values of genes. As an example, we took DLBCL (Diffuse large B-cell lymphoma expression data) data from [Bioconductor](https://bioconductor.org/packages/release/data/experiment/html/DLBCL.html).
+First, we need to prepare network and *p*-values of genes. As an example, we took [DLBCL](https://bioconductor.org/packages/release/data/experiment/html/DLBCL.html) (Diffuse large B-cell lymphoma expression data) data from Bioconductor. The expression data has been precompiled in an ExpressionSet structure.
 
-```{r message=FALSE, results='hide'}
+```{r message=FALSE}
 data(exprLym)
-data(interactome)
-network <- subNetwork(featureNames(exprLym), interactome)
-network <- largestComp(network)
+exprLym
+```
+We impute missing expression data, using nearest neighbor averaging.
+```{r, message=FALSE}
 expressions <- impute.knn(exprs(exprLym))$data
+```
+In the next step we use `rowttest` from the package `genefilter` to analyse differential expression.
+```{r, message=FALSE, results="hide"}
 t.test <- rowttests(expressions, fac = exprLym$Subgroup)
+head(t.test)
+```
+The result looks as follows:
+```{r, echo=FALSE, results="asis"}
+library(knitr)
+kable(head(t.test))
+```
+
+```{r message=FALSE}
 ttest.pval <- t.test[, "p.value"]
 names(ttest.pval) <- rownames(expressions)
 ```
 
+### Preparing network
+For the network data we use a an protein-protein interaction network obtained from [HPRD](http://www.hprd.org/index_html) release 6. Here, this data is a part of *DLBCL* package.
+
+```{r message=FALSE}
+data(interactome)
+interactome
+```
+
+From this we derive a interactome network as the vertex induced subgraph extracted by the subset of genes for which we have expression data. This can easily be done, using the subNetwork command.
+
+```{r message=FALSE}
+network <- subNetwork(featureNames(exprLym), interactome)
+network
+```
+Since we want to identify modules as connected subgraphs we focus on the largest connected component.
+```{r message=FALSE}
+network <- largestComp(network)
+network
+```
+We convert `graphNEL` object to `igraph` object because *mcmcRanking* package works only graph structure of type `igraph`. And we set *p*-values of vertices as `pval` field on it. Also, we removed multiple and loop edges from graph.
+```{r message=FALSE}
+g <- simplify(graph_from_graphnel(network))
+V(g)$pval <- ttest.pval[V(g)$name]
+```
+
 ## Estimation of mixing time
 
-We extract network and p-value for each gene as in [BioNet Tutorial](https://bioconductor.org/packages/release/bioc/html/BioNet.html). Next, transform network to `igraph` object. We can estimate proportion of vertices from active module and beta shape parameters using function `fitBumModel` from `BioNet` package. Function `scoreFunction` from the same package allows to calculate log-likelihood of every gene with *FDR*  equal to $10^{-7}$. Running with likelihood weights on vertices can cause to get stuck in locally good vertices, thereby finding locally significant solutions. So, we will iteratively increase vertex weights. `repetition_depth` function calculates number of iteration, where it finds smallest number $n$ where $2^n$-th root of maximum likelihood value less than $4$. To estimate how much iteration is enough to stabilize *MCMC*, we run function `sample_llh` $10^5$ iterations. This function returns log-likelihoods of subgraph on every iteration.
+We estimate likelihood of vertices to belong active module.
+Function `set_likelihood` allows to calculate likelihood of every gene with *FDR*  equal to $10^{-7}$. It returns the `igraph` object with `likelihood` field on vertices.
+```{r message=FALSE, warning=FALSE}
+library(mcmcRanking)
+g <- set_likelihood(graph = g, fdr = 1e-7)
+g
+```
+Running with likelihood weights on vertices can cause to get stuck in locally good vertices, thereby finding locally significant solutions.
+So, we will iteratively increase vertex weights.
+`repetition_depth` function calculates number of iteration, where it finds smallest number $n$ where $2^n$-th root of maximum likelihood devided minimum likelihood value less than $4$.
+```{r message=FALSE}
+depth <- repetition_depth(max(V(g)$likelihood)/min(V(g)$likelihood))
+depth
+```
+To estimate how much iteration is enough to stabilize *MCMC*, we run function `sample_llh` $10^5$ iterations with exponent value of likelihoods $1/2^{depth}$.
+This function returns log-likelihoods of subgraph on every iteration.
 
 ```{r message=FALSE, fig.show="hold", warning=FALSE}
-library(igraph)
-library(mcmcRanking)
-g <- graph_from_graphnel(network)
-V(g)$pval <- ttest.pval[V(g)$name]
-fb <- fitBumModel(V(g)$pval, F)
-x <- exp(scoreFunction(fb = fb, fdr = 1e-7))
-deep <- repetition_depth(max(x))
-V(g)$likelihood <- x^(1/2^deep)
-y <- sample_llh(graph = g, module_size = 1, iter = 1e5, fixed_size = F)
+y <- sample_llh(graph = g, module_size = 1, niter = 1e5, exp_lh = 1/2^depth)
 plot(x=names(y), y = y, type = 'l',
      xlab = "iteration number", ylab = "log-likelihood")
 ```
 
 Plot shows that log-liekelihood value stabilizes after about $2 \cdot 10^4$ iterations. Thus we can estimate *MCMC* mixing time as $2 \cdot 10^4$ iterations.
 
-## Calculating the probability
+## Calculating the probability and ranking
 
-Next, run *MCMC* $10^3$ times and get probability of vertex as frequency of its presence  in a sampled subgraphs.
+We found out how many iteration enough for convergence of *MCMC* method. Below function `mcmc_sample` iterativly runs *MCMC* with different likelihood values. We sample $10^3$ subgraphs using *MCMC*.
 
 ```{r message=FALSE, eval=FALSE}
-iter <- 2e4
-times <- 1e3
-z <- mcmc_sample(graph = g, module_size = 1, times = times, iter = iter, fixed_size = F)
-for(i in (deep-1):0){
-  V(g)$likelihood <- x^(1/2^i)
-  z <- mcmc_sample(graph = g, previous_mcmc = z, iter = iter, fixed_size = F)
-}
+z <- mcmc_sample(graph = g, module_size = 1, times = 1e3, niter = 2e4, exp_lh = 1/2^(depth:0))
+```
+
+After running *MCMC*, we calculate probability of gene and connectivity preserving ranking. To increase the accuracy of the probability, increase the number of runs or parameter `times`.  
+
+```{r message=FALSE, eval=FALSE}
 p <- get_frequency(z)/times
 V(g)$q <- 1 - p[V(g)$name]
 r <- probabilistic_rank(graph = g, q = 1 - p)
 V(g)$r <- r[V(g)$name]
 ```
 
-After running *MCMC*, we calculate probability of gene and connectivity preserving ranking. To increase the accuracy of the probability, increase the number of runs or parameter `times`.  
+```{r message=FALSE, echo=-(1:5)}
+load("../inst/g.rda")
+p <- 1 - V(g)$q
+names(p) <- V(g)$name
+r <- V(g)$r
+names(r) <- V(g)$name
+head(p, 10)
+head(r, 10)
+```
 
 Now, we have a vertex probabilities. It allows us to estimate FDR for any subgraph as mean of complementary probability of vertices. Finally, we draw subgraph induced by vertices that has rank not higher than `rank`. Vertices on the plot below colored from *gray* to *gold* according to its importance. Subgraph consisting of more *golden*-colored vertices is more important. 
 
