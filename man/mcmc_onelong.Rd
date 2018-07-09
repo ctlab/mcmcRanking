@@ -4,7 +4,7 @@
 \alias{mcmc_onelong}
 \title{Set of connected subgraphs.}
 \usage{
-mcmc_onelong(graph, module_size, start, end, fun = function(x) x)
+mcmc_onelong(graph, module_size, start, end)
 }
 \arguments{
 \item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
@@ -22,5 +22,5 @@ Object of type MCMC.
 Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
 }
 \seealso{
-\code{\link{mcmc_subgraph}, \link{mcmc_sample}}
+\code{\link{sample_subgraph}, \link{mcmc_sample}}
 }

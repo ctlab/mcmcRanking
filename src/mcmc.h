@@ -44,7 +44,7 @@ namespace mcmc {
 
         vector<double> sample_llh(vector<unsigned> module, size_t end);
 
-        vector<char> sample_iteration(vector<vector<unsigned>> module, size_t module_size, size_t times, size_t end);
+        vector<char> sample_iteration(vector<vector<unsigned>> module, size_t module_size, size_t end);
 
         vector<char> onelong_iteration(size_t start, size_t end);
 

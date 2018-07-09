@@ -4,7 +4,7 @@
 \alias{mcmc_onelong_frequency}
 \title{Frequency of vertices.}
 \usage{
-mcmc_onelong_frequency(graph, module_size, start, end, fun = function(x) x)
+mcmc_onelong_frequency(graph, module_size, start, end)
 }
 \arguments{
 \item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
@@ -22,5 +22,5 @@ Named frequency vector.
 The frequency of occurrence of vertices in one long run of method Markov chain Monte Carlo (MCMC).
 }
 \seealso{
-\code{\link{mcmc_onelong}, \link{mcmc_subgraph}, \link{mcmc_sample}}
+\code{\link{mcmc_onelong}, \link{sample_subgraph}, \link{mcmc_sample}}
 }

@@ -1,18 +1,13 @@
 #' @export
-mcmc <- function(mat, name, likelihood) {
+mcmc <- function(mat, name) {
   if (!is.matrix(mat))
     stop("mat must be matrix.")
   if (!is.logical(mat))
     stop("mat mus be boolean vector.")
   if (!is.character(name))
     stop("name must be character vector.")
-  if (!is.numeric(likelihood))
-    stop("likelihood mus be numeric vector.")
-  structure(list(
-    mat = mat,
-    name = name,
-    likelihood = likelihood
-  ), class = "MCMC")
+  structure(list(mat = mat,
+                 name = name), class = "MCMC")
 }
 
 
@@ -28,18 +23,6 @@ check_arguments <- function(graph, module_size, niter) {
 
 
 
-#' @export
-repetition_depth <- function(x) {
-  d <- 0
-  while (x > 4) {
-    x <- sqrt(x)
-    d <- d + 1
-  }
-  return(d)
-}
-
-
-
 #' Connected subgraph from uniform distribution.
 #'
 #' Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
@@ -51,16 +34,13 @@ repetition_depth <- function(x) {
 #' @seealso \code{\link{mcmc_sample}, \link{mcmc_onelong}}
 #' @import igraph
 #' @export
-mcmc_subgraph <- function(graph, module_size, niter) {
+sample_subgraph <- function(graph, module_size, niter) {
   check_arguments(graph, module_size, niter)
   if (module_size == 0)
     return(c())
   edgelist <- as_edgelist(graph, names = F) - 1
-  args <-
-    list(gorder = gorder(graph),
-         module_size = module_size,
-         iter = niter)
-  res <- mcmc_subgraph_internal(edgelist, args)
+  res <-
+    sample_subgraph_internal(edgelist, gorder(graph), module_size, niter)
   return(V(graph)$name[which(res)])
 }
 
@@ -79,24 +59,23 @@ sample_llh <-
              is.null(start_module))) {
       stop("One of the arguments module_size and times or start_module must be set.")
     }
-    if (!is.null(start_module)) {
-      module_size <- sum(start_module[1,])
-    } else{
-      ret <- logical(gorder(graph))
-      names(ret) <- V(graph)$name
-      ret[mcmc_subgraph(graph, module_size, 1)] <- T
-      start_module <- t(ret)
-    }
 
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = F) - 1
 
-    args <-
-      list(module_size = module_size,
-           iter = niter,
-           fixed_size = fixed_size)
+    if (!is.null(start_module)) {
+      module_size <- sum(start_module[1, ])
+    } else{
+      start_module <-
+        t(sample_subgraph_internal(edgelist, gorder(graph), module_size, 1))
+    }
+
     res1 <-
-      sample_llh_internal(edgelist, V(graph)$likelihood^exp_lh, args, start_module)
+      sample_llh_internal(edgelist,
+                          V(graph)$likelihood ^ exp_lh,
+                          niter,
+                          fixed_size,
+                          start_module)
     names(res1) <- seq_len(niter)
     return(res1)
   }
@@ -107,13 +86,12 @@ sample_llh <-
 #'
 #' Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC) method.
 #'
-#' @inheritParams mcmc_subgraph
+#' @inheritParams sample_subgraph
 #' @param times Number of subgraphs.
 #' @param previous_mcmc Object of type MCMC.
 #' @return Object of type MCMC.
-#' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_onelong}}
+#' @seealso \code{\link{sample_subgraph}, \link{mcmc_onelong}}
 #' @import igraph
-#' @import BiocParallel
 #' @export
 #' @examples
 #' graph <- barabasi.game(20, 1.2, 2, directed = F)
@@ -128,10 +106,7 @@ mcmc_sample <-
            previous_mcmc = NULL,
            niter,
            exp_lh,
-           fixed_size = FALSE,
-           nproc = 0,
-           BPPARAM = NULL,
-           granularity = 10) {
+           fixed_size = FALSE) {
     if (!xor(is.null(module_size) &&
              is.null(times),
              is.null(previous_mcmc))) {
@@ -142,71 +117,30 @@ mcmc_sample <-
         stop("previous_mcmc must be type of \"MCMC\"")
       start_module <- previous_mcmc$mat
     }
+    check_arguments(graph, module_size, niter)
+    edgelist <- as_edgelist(graph, names = F) - 1
+
     if (!is.null(previous_mcmc)) {
       module_size <- sum(start_module[1,])
       times <- nrow(start_module)
     } else{
-      start_module <- t(replicate(times,
-                                  {
-                                    ret <- logical(gorder(graph))
-                                    names(ret) <- V(graph)$name
-                                    ret[mcmc_subgraph(graph, module_size, 1)] <-
-                                      T
-                                    ret
-                                  }))
-    }
-    check_arguments(graph, module_size, niter)
-    edgelist <- as_edgelist(graph, names = F) - 1
-
-    args <-
-      list(
-        module_size = module_size,
-        iter = niter,
-        times = times,
-        fixed_size = fixed_size
-      )
-    res1 <-
-      mcmc_sample_internal(edgelist, V(graph)$likelihood ^ exp_lh[1], args, start_module)
-    mats <- matrix(res1, ncol = gorder(graph), byrow = T)
-
-    if (length(deg_lh) > 1) {
-      for (j in 2:length(deg_lh)) {
-        args <-
-          list(
-            module_size = module_size,
-            iter = niter,
-            times = times,
-            fixed_size = fixed_size
-          )
-        res1 <-
-          mcmc_sample_internal(edgelist, V(graph)$likelihood ^ exp_lh[j], args, mats)
-        mats <-  matrix(res1, ncol = gorder(graph), byrow = T)
-      }
+      start_module <- t(replicate(
+        times,
+        sample_subgraph_internal(edgelist, gorder(graph), module_size, 1)
+      ))
     }
 
-    return(mcmc(mats, V(graph)$name, V(graph)$likelihood))
+    for (i in seq_along(exp_lh)) {
+      res1 <- mcmc_sample_internal(edgelist,
+                                   V(graph)$likelihood ^ exp_lh[i],
+                                   fixed_size,
+                                   niter,
+                                   start_module)
+      start_module <-  matrix(res1, ncol = gorder(graph), byrow = T)
+    }
+
+    return(mcmc(start_module, V(graph)$name))
   }
-
-
-
-#' Probabilistic ranking.
-#'
-#' Heuristic ranking maximizing the area under the ROC curve.
-#'
-#' @param graph An object of type \code{igraph}.
-#' @param q Vector of probabilities of vertices to not belong to active module.
-#' @return ranking.
-#' @seealso \code{\link{mcmc_sample}}
-#' @import igraph
-#' @export
-probabilistic_rank <- function(graph, q) {
-  edgelist <- as_edgelist(graph, names = F) - 1
-  nodes <-
-    data.frame(name = as.vector(V(graph)) - 1, q = q[V(graph)$name])
-  res <- probabilistic_rank_internal(edgelist, nodes)
-  names(res) <- V(graph)$name
-  return(res)
-}
 
 
 
@@ -219,21 +153,16 @@ probabilistic_rank <- function(graph, q) {
 #' @param start Starting with this iteration, we write down all states of the Markov process.
 #' @param end Number of iterations.
 #' @return Object of type MCMC.
-#' @seealso \code{\link{mcmc_subgraph}, \link{mcmc_sample}}
+#' @seealso \code{\link{sample_subgraph}, \link{mcmc_sample}}
 #' @import igraph
 #' @export
 mcmc_onelong <- function(graph, module_size, start, end) {
   check_arguments(graph, module_size, end)
   edgelist <- as_edgelist(graph, names = F) - 1
-  args <- list(module_size = module_size,
-               start = start,
-               end = end)
   res <-
-    mcmc_onelong_internal(edgelist, V(graph)$likelihood, args) + 1
+    mcmc_onelong_internal(edgelist, V(graph)$likelihood, module_size, start, end) + 1
   ret <-
-    mcmc(matrix(res, ncol = module_size, byrow = T),
-         V(graph)$name,
-         V(graph)$likelihood)
+    mcmc(matrix(res, ncol = module_size, byrow = T), V(graph)$name)
   return(ret)
 }
 
@@ -248,141 +177,14 @@ mcmc_onelong <- function(graph, module_size, start, end) {
 #' @param start Starting with this iteration, we write down all states of the Markov process.
 #' @param end Number of iterations.
 #' @return Named frequency vector.
-#' @seealso \code{\link{mcmc_onelong}, \link{mcmc_subgraph}, \link{mcmc_sample}}
+#' @seealso \code{\link{mcmc_onelong}, \link{sample_subgraph}, \link{mcmc_sample}}
 #' @import igraph
 #' @export
 mcmc_onelong_frequency <- function(graph, module_size, start, end) {
   check_arguments(graph, module_size, end)
   edgelist <- as_edgelist(graph, names = F) - 1
-  args <- list(module_size = module_size,
-               start = start,
-               end = end)
   res <-
-    mcmc_onelong_frequency_internal(edgelist, V(graph)$likelihood, args)
+    mcmc_onelong_frequency_internal(edgelist, V(graph)$likelihood, module_size, start, end)
   names(res) <- V(graph)$name
   return(res)
-}
-
-
-
-#' Vertex probability.
-#'
-#' Accurate estimate of vertex probability using all connected subgraphs.
-#'
-#' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
-#' @return Named vector of probabilites.
-#' @details Time complexity of method is \strong{exponential}. Use it only for the graphs of size less than 30.
-#' @seealso \code{\link{get_prob}}
-#' @import igraph
-#' @export
-real_prob <- function(graph) {
-  edgelist <- as_edgelist(graph, names = F) - 1
-
-  res <- real_prob_internal(edgelist, V(graph)$likelihood)
-  names(res) <- V(graph)$name
-  return(res)
-}
-
-
-
-#' Frequency of vertecies.
-#'
-#' Calculates the frequency of occurences of vertices in matrix object.
-#'
-#' @param mcmcObj Object of type MCMC.
-#' @param inds Index numbers of rows involved in the calculation.
-#' @return Named vector of frequency.
-#' @seealso \code{\link{get_prob}}
-#' @import igraph
-#' @export
-get_frequency <-
-  function(mcmcObj, inds = seq_len(nrow(mcmcObj$mat))) {
-    freq <- colSums(mcmcObj$mat[inds,])
-    names(freq) <- mcmcObj$name
-    return(freq)
-  }
-
-
-
-#' Ranking vertices.
-#'
-#' Ranking vertices according to the score.
-#'
-#' @param graph An object of type \code{igraph}.
-#' @param q score.
-#' @param size The initial size.
-#' @return Named rank vector.
-#' @seealso \code{\link{get_reverse_rank}}
-#' @export
-get_rank <- function(graph, q, size) {
-  ret <- integer(gorder(graph))
-  names(ret) <- V(graph)$name
-
-  sorted_q <- names(sort(q))
-  comps <-
-    components(induced_subgraph(graph, V(graph)[sorted_q[seq_len(size)]]))
-  best_comp_id <- order(comps$csize, decreasing = T)[1]
-  bc <- names(which(comps$membership == best_comp_id))
-  best <- bc[1]
-  ret[bc] <- 1
-  i <- 1
-  while (size + i <= gorder(graph)) {
-    comps <-
-      components(induced_subgraph(graph, V(graph)[sorted_q[seq_len(size + i)]]))
-    bc_new <-
-      names(which(comps$membership == comps$membership[best]))
-    i <- i + 1
-    ret[setdiff(bc_new, bc)] <- max(ret) + 1
-    bc <- bc_new
-  }
-  ret
-}
-
-
-
-#' Ranking vertices.
-#'
-#' Ranking vertices according to the score.
-#'
-#' @param graph An object of type \code{igraph}.
-#' @param q score.
-#' @return Named rank vector.
-#' @seealso \code{\link{get_rank}}
-#' @export
-get_reverse_rank <- function(graph, q) {
-  ret <- integer(gorder(graph))
-  names(ret) <- V(graph)$name
-
-  sorted_q <- names(sort(q, decreasing = T))
-  cur_id <- seq_along(sorted_q)
-  i <- 1
-  while (length(cur_id) != 1) {
-    comps <-
-      components(induced_subgraph(graph, V(graph)[sorted_q[cur_id[-1]]]))
-    best_comp_id <- order(comps$csize, decreasing = T)[1]
-    bc <- names(which(comps$membership == best_comp_id))
-    cur_new_id <- which(sorted_q %in% bc)
-    ret[sorted_q[setdiff(cur_id, cur_new_id)]] <- i
-    cur_id <- sort(cur_new_id)
-    i <- i + 1
-  }
-  ret[sorted_q[cur_id]] <- i
-  i + 1 - ret
-}
-
-
-
-#' Set likelihood.
-#'
-#' Set likelihood attribute to vertices of graph using pval attribute.
-#'
-#' @param graph An object of type \code{igraph}.
-#' @return igraph object.
-#' @import igraph
-#' @import BioNet
-#' @export
-set_likelihood <- function(graph, fdr) {
-  fb <- fitBumModel(V(graph)$pval, plot = FALSE)
-  V(graph)$likelihood <- exp(scoreFunction(fb = fb, fdr = fdr))
-  graph
 }

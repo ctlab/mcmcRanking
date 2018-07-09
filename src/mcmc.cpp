@@ -227,7 +227,7 @@ namespace mcmc {
         return likelihoods;
     }
 
-    vector<char> Graph::sample_iteration(vector<vector<unsigned>> module, size_t module_size, size_t times, size_t end) {
+    vector<char> Graph::sample_iteration(vector<vector<unsigned>> module, size_t times, size_t end) {
         vector<char> ret(order * times, false);
         for (size_t i = 0; i < times; ++i) {
             Rcpp::checkUserInterrupt();

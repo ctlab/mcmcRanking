@@ -5,8 +5,7 @@
 \title{Set of connected subgraphs from uniform distribution.}
 \usage{
 mcmc_sample(graph, module_size = NULL, times = NULL, previous_mcmc = NULL,
-  iter, fixed_size = TRUE, fun = function(x) x, nproc = 0,
-  BPPARAM = NULL, granularity = 10)
+  niter, exp_lh, fixed_size = FALSE)
 }
 \arguments{
 \item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
@@ -17,7 +16,7 @@ mcmc_sample(graph, module_size = NULL, times = NULL, previous_mcmc = NULL,
 
 \item{previous_mcmc}{Object of type MCMC.}
 
-\item{iter}{Number of iterations.}
+\item{niter}{Number of iterations.}
 }
 \value{
 Object of type MCMC.
@@ -33,5 +32,5 @@ x <- mcmc_sample(graph = graph, module_size = 5, iter = 10, times = 4)
 matrix(x$name[x$mat], nrow(x$mat))
 }
 \seealso{
-\code{\link{mcmc_subgraph}, \link{mcmc_onelong}}
+\code{\link{sample_subgraph}, \link{mcmc_onelong}}
 }
