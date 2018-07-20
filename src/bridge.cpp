@@ -6,15 +6,6 @@ using namespace Rcpp;
 using namespace std;
 using mcmc::Graph;
 
-vector<vector<unsigned>> adj_list(IntegerMatrix edgelist, size_t gorder){
-  vector<vector<unsigned>> edges(gorder);
-  for(int i = 0; i < edgelist.nrow(); ++i){
-    edges[edgelist(i, 0)].push_back(edgelist(i, 1));
-    edges[edgelist(i, 1)].push_back(edgelist(i, 0));
-  }
-  return edges;
-}
-
 // [[Rcpp::export]]
 LogicalVector sample_subgraph_internal(IntegerMatrix edgelist, int gorder, int module_size, size_t niter) {
   vector<double> nodes(gorder, 1);

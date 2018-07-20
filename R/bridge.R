@@ -3,9 +3,11 @@ mcmc <- function(mat, name) {
   if (!is.matrix(mat))
     stop("mat must be matrix.")
   if (!is.logical(mat))
-    stop("mat mus be boolean vector.")
+    stop("mat must be boolean vector.")
   if (!is.character(name))
     stop("name must be character vector.")
+  if(ncol(mat) != length(name))
+    stop("Number of columns in mat is not equal to size of name.")
   structure(list(mat = mat,
                  name = name), class = "MCMC")
 }
@@ -13,7 +15,7 @@ mcmc <- function(mat, name) {
 
 
 check_arguments <- function(graph, module_size, niter) {
-  if (module_size > gorder(graph) || module_size < 1)
+  if (module_size > gorder(graph) || module_size < 0)
     stop("Required module size must be positive and not greather than graph size.")
   if (niter < 0)
     stop("number of iteration must be positive a number.")
@@ -36,8 +38,6 @@ check_arguments <- function(graph, module_size, niter) {
 #' @export
 sample_subgraph <- function(graph, module_size, niter) {
   check_arguments(graph, module_size, niter)
-  if (module_size == 0)
-    return(c())
   edgelist <- as_edgelist(graph, names = F) - 1
   res <-
     sample_subgraph_internal(edgelist, gorder(graph), module_size, niter)
@@ -50,34 +50,22 @@ sample_subgraph <- function(graph, module_size, niter) {
 sample_llh <-
   function(graph,
            module_size = NULL,
-           start_module = NULL,
            niter,
            exp_lh = 1,
            fixed_size = FALSE) {
-    if (!xor(is.null(module_size) &&
-             is.null(times),
-             is.null(start_module))) {
-      stop("One of the arguments module_size and times or start_module must be set.")
-    }
-
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = F) - 1
 
-    if (!is.null(start_module)) {
-      module_size <- sum(start_module[1, ])
-    } else{
-      start_module <-
-        t(sample_subgraph_internal(edgelist, gorder(graph), module_size, 1))
-    }
+    start_module <-
+      t(sample_subgraph_internal(edgelist, gorder(graph), module_size, 1))
 
-    res1 <-
+    llhs <-
       sample_llh_internal(edgelist,
                           V(graph)$likelihood ^ exp_lh,
                           niter,
                           fixed_size,
                           start_module)
-    names(res1) <- seq_len(niter)
-    return(res1)
+    return(setNames(llhs, seq_len(niter)))
   }
 
 
@@ -105,7 +93,7 @@ mcmc_sample <-
            times = NULL,
            previous_mcmc = NULL,
            niter,
-           exp_lh,
+           exp_lh = 1,
            fixed_size = FALSE) {
     if (!xor(is.null(module_size) &&
              is.null(times),
@@ -116,14 +104,12 @@ mcmc_sample <-
       if (class(previous_mcmc) != "MCMC")
         stop("previous_mcmc must be type of \"MCMC\"")
       start_module <- previous_mcmc$mat
+      module_size <- sum(start_module[1,])
     }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = F) - 1
 
-    if (!is.null(previous_mcmc)) {
-      module_size <- sum(start_module[1,])
-      times <- nrow(start_module)
-    } else{
+    if (is.null(previous_mcmc)) {
       start_module <- t(replicate(
         times,
         sample_subgraph_internal(edgelist, gorder(graph), module_size, 1)

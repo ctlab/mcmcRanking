@@ -21,6 +21,9 @@ namespace mcmc {
     }
 
     vector<unsigned> Graph::random_subgraph(size_t size) {
+        if(size == 0){
+          return vector<unsigned>();
+        }
         unordered_set<unsigned> sg;
         HSA candidates(order);
         size_t ind = uniform_int_distribution<>(0, order - 1)(gen);
@@ -141,6 +144,8 @@ namespace mcmc {
 
     bool Graph::next_iteration(){
         if(fixed_size){
+            if(inner.size() == 0 && fixed_size)
+                return true;
             if(inner.size() == order){
                 return false;
             }
@@ -219,7 +224,7 @@ namespace mcmc {
         initialize_module(module);
         for(size_t i = 0; i < end; ++i){
             next_iteration();
-            likelihoods[i] = 1;
+            likelihoods[i] = 0;
             for(unsigned x : inner.get_all()){
                 likelihoods[i] += log(nodes[x]);
             }

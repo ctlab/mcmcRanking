@@ -22,11 +22,10 @@ repetition_depth <- function(x) {
 #' @export
 get_frequency <-
   function(mcmcObj, inds = seq_len(nrow(mcmcObj$mat))) {
-    freq <- colSums(mcmcObj$mat[inds, ])
+    freq <- colSums(mcmcObj$mat[inds, , drop = FALSE])
     names(freq) <- mcmcObj$name
     return(freq)
   }
-
 
 
 #' Set likelihood.

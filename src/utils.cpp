@@ -5,6 +5,15 @@
 using namespace Rcpp;
 using namespace std;
 
+vector<vector<unsigned>> adj_list(IntegerMatrix edgelist, size_t gorder){
+  vector<vector<unsigned>> edges(gorder);
+  for(int i = 0; i < edgelist.nrow(); ++i){
+    edges[edgelist(i, 0)].push_back(edgelist(i, 1));
+    edges[edgelist(i, 1)].push_back(edgelist(i, 0));
+  }
+  return edges;
+}
+
 bool is_connected(vector<vector<unsigned>> edges, bool from_inner[]) {
   int n = edges.size();
   vector<bool> used(n, false);
