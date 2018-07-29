@@ -81,12 +81,6 @@ sample_llh <-
 #' @seealso \code{\link{sample_subgraph}, \link{mcmc_onelong}}
 #' @import igraph
 #' @export
-#' @examples
-#' graph <- barabasi.game(20, 1.2, 2, directed = F)
-#' V(graph)$name <- letters[1:20]
-#' V(graph)$likelihood <- 1
-#' x <- mcmc_sample(graph = graph, module_size = 5, iter = 10, times = 4)
-#' matrix(x$name[x$mat], nrow(x$mat))
 mcmc_sample <-
   function(graph,
            module_size = NULL,

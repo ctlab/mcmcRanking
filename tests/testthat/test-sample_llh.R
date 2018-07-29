@@ -26,7 +26,7 @@ test_that("sample_llh works", {
       niter = 2e3,
       fixed_size = T
     )
-  expect_gte(sum(tail(x, 1e3) == log(1e6)), 999)
+  expect_gte(sum(tail(x, 1e3) == log(1e6)), 950)
 
   # must return vector of zeros
   x <-
