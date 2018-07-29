@@ -24,13 +24,6 @@ Object of type MCMC.
 \description{
 Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC) method.
 }
-\examples{
-graph <- barabasi.game(20, 1.2, 2, directed = F)
-V(graph)$name <- letters[1:20]
-V(graph)$likelihood <- 1
-x <- mcmc_sample(graph = graph, module_size = 5, iter = 10, times = 4)
-matrix(x$name[x$mat], nrow(x$mat))
-}
 \seealso{
 \code{\link{sample_subgraph}, \link{mcmc_onelong}}
 }
