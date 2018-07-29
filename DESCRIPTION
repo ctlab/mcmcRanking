@@ -11,10 +11,12 @@ SystemRequirements: C++11
 Encoding: UTF-8
 LazyData: true
 Imports:
-  igraph,
-  Rcpp
+    igraph,
+    Rcpp,
+    BioNet
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
+biocViews:
 Suggests: 
     testthat,
     knitr,

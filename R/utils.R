@@ -35,10 +35,12 @@ get_frequency <-
 #' @param graph An object of type \code{igraph}.
 #' @return igraph object.
 #' @import igraph
-#' @import BioNet
+#' @importFrom BioNet fitBumModel scoreFunction
 #' @export
 set_likelihood <- function(graph, fdr) {
-  fb <- fitBumModel(V(graph)$pval, plot = FALSE)
+  pvals <- V(graph)$pval
+  names(pvals) <- V(graph)$name
+  fb <- fitBumModel(pvals, plot = FALSE)
   V(graph)$likelihood <- exp(scoreFunction(fb = fb, fdr = fdr))
   graph
 }
