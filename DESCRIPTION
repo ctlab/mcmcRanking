@@ -4,7 +4,7 @@ Title: Tool To Solve The Active Module Problem
 Version: 0.1.0
 Authors@R: person("Javlon", "Isomurodov", email = "isomurodov@rain.ifmo.ru",
     role = c("aut", "cre"))
-Description: Tool for estimate probabilities of veritces being in active
+Description: Tool for estimate probabilities of vertices being in active
     subgraph using its likelihoods.
 License: MIT + file LICENSE
 SystemRequirements: C++11
@@ -20,6 +20,10 @@ Imports:
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 biocViews:
+    GraphAndNetwork,
+    NetworkEnrichment,
+    GeneExpression,
+    DifferentialExpression
 Suggests: 
     testthat,
     knitr,
