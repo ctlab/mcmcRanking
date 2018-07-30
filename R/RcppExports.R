@@ -33,6 +33,8 @@ real_prob_internal <- function(edgelist, likelihood) {
 #'
 #' Sums every time only two smallest numbers.
 #' This allows calculate the sum of numbers accurate enough.
+#'
+#' @param v Vector of numeric values.
 #' @export
 accurate_sum <- function(v) {
     .Call('_mcmcRanking_accurate_sum', PACKAGE = 'mcmcRanking', v)

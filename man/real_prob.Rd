@@ -10,14 +10,11 @@ real_prob(graph)
 \item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
 }
 \value{
-Named vector of probabilites.
+Named vector of probabilities.
 }
 \description{
 Accurate estimate of vertex probability using all connected subgraphs.
 }
 \details{
 Time complexity of method is \strong{exponential}. Use it only for the graphs of size less than 30.
-}
-\seealso{
-\code{\link{get_prob}}
 }

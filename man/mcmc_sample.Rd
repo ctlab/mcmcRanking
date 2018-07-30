@@ -17,6 +17,10 @@ mcmc_sample(graph, module_size = NULL, times = NULL, previous_mcmc = NULL,
 \item{previous_mcmc}{Object of type MCMC.}
 
 \item{niter}{Number of iterations.}
+
+\item{exp_lh}{The exponent likelihood values to be raised to.}
+
+\item{fixed_size}{\code{TRUE} if the module size is fixed.}
 }
 \value{
 Object of type MCMC.

@@ -6,6 +6,9 @@
 \usage{
 accurate_sum(v)
 }
+\arguments{
+\item{v}{Vector of numeric values.}
+}
 \description{
 Sums every time only two smallest numbers.
 This allows calculate the sum of numbers accurate enough.

@@ -1,3 +1,10 @@
+#' Number of runs of iterative likelihood increase of vertices.
+#'
+#' Running MCMC with likelihood weights on vertices can cause to get stuck in locally
+#' good vertices, thereby finding locally significant solutions.
+#' So, we will iteratively increase vertex weights and this function calculates number of necessary iterations.
+#'
+#' @param x According to this value repetition depth calculates.
 #' @export
 repetition_depth <- function(x) {
   d <- 0
@@ -10,14 +17,13 @@ repetition_depth <- function(x) {
 
 
 
-#' Frequency of vertecies.
+#' Frequency of vertices.
 #'
-#' Calculates the frequency of occurences of vertices in matrix object.
+#' Calculates the frequency of occurrences of vertices in matrix object.
 #'
 #' @param mcmcObj Object of type MCMC.
 #' @param inds Index numbers of rows involved in the calculation.
 #' @return Named vector of frequency.
-#' @seealso \code{\link{get_prob}}
 #' @import igraph
 #' @export
 get_frequency <-
@@ -33,6 +39,7 @@ get_frequency <-
 #' Set likelihood attribute to vertices of graph using pval attribute.
 #'
 #' @param graph An object of type \code{igraph}.
+#' @param fdr Numeric constant, from the false discovery rate a p-value threshold is calculated.
 #' @return igraph object.
 #' @import igraph
 #' @importFrom BioNet fitBumModel scoreFunction
@@ -52,9 +59,8 @@ set_likelihood <- function(graph, fdr) {
 #' Accurate estimate of vertex probability using all connected subgraphs.
 #'
 #' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
-#' @return Named vector of probabilites.
+#' @return Named vector of probabilities.
 #' @details Time complexity of method is \strong{exponential}. Use it only for the graphs of size less than 30.
-#' @seealso \code{\link{get_prob}}
 #' @import igraph
 #' @export
 real_prob <- function(graph) {

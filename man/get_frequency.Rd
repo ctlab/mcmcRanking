@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{get_frequency}
 \alias{get_frequency}
-\title{Frequency of vertecies.}
+\title{Frequency of vertices.}
 \usage{
 get_frequency(mcmcObj, inds = seq_len(nrow(mcmcObj$mat)))
 }
@@ -15,8 +15,5 @@ get_frequency(mcmcObj, inds = seq_len(nrow(mcmcObj$mat)))
 Named vector of frequency.
 }
 \description{
-Calculates the frequency of occurences of vertices in matrix object.
-}
-\seealso{
-\code{\link{get_prob}}
+Calculates the frequency of occurrences of vertices in matrix object.
 }

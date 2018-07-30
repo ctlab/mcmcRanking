@@ -92,7 +92,7 @@ g
 ```
 Running with likelihood weights on vertices can cause to get stuck in locally good vertices, thereby finding locally significant solutions.
 So, we will iteratively increase vertex weights.
-`repetition_depth` function calculates number of iteration, where it finds smallest number $n$ where $2^n$-th root of maximum likelihood devided minimum likelihood value less than $4$.
+`repetition_depth` function calculates number of iteration, where it finds smallest number $n$ where $2^n$-th root of maximum likelihood divided minimum likelihood value less than $4$.
 ```{r message=FALSE}
 depth <- repetition_depth(max(V(g)$likelihood)/min(V(g)$likelihood))
 depth
@@ -106,11 +106,11 @@ plot(x=names(y), y = y, type = 'l',
      xlab = "iteration number", ylab = "log-likelihood")
 ```
 
-Plot shows that log-liekelihood value stabilizes after about $2 \cdot 10^4$ iterations. Thus we can estimate *MCMC* mixing time as $2 \cdot 10^4$ iterations.
+Plot shows that log-likelihood value stabilizes after about $2 \cdot 10^4$ iterations. Thus we can estimate *MCMC* mixing time as $2 \cdot 10^4$ iterations.
 
 ## Calculating the probability and ranking
 
-We found out how many iteration enough for convergence of *MCMC* method. Below function `mcmc_sample` iterativly runs *MCMC* with different likelihood values. We sample $10^3$ subgraphs using *MCMC*.
+We found out how many iteration enough for convergence of *MCMC* method. Below function `mcmc_sample` iteratively runs *MCMC* with different likelihood values. We sample $10^3$ subgraphs using *MCMC*.
 
 ```{r message=FALSE, eval=FALSE}
 z <- mcmc_sample(graph = g, module_size = 1, times = 1e3, niter = 2e4, exp_lh = 1/2^(depth:0))

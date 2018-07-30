@@ -6,7 +6,7 @@
 \alias{mcmcRanking-package}
 \title{The mcmcRanking package}
 \description{
-Tool for estimate probabilities of veritces being in active subgraph using its likelihoods.
+Tool for estimate probabilities of vertices being in active subgraph using its likelihoods.
 }
 \author{
 Javlon Isomurodov <isomurodov@rain.ifmo.ru>

@@ -72,6 +72,8 @@ NumericVector real_prob_internal(IntegerMatrix edgelist, NumericVector likelihoo
 //'
 //' Sums every time only two smallest numbers.
 //' This allows calculate the sum of numbers accurate enough.
+//'
+//' @param v Vector of numeric values.
 //' @export
 // [[Rcpp::export]]
 NumericVector accurate_sum(NumericVector v){

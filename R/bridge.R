@@ -1,3 +1,9 @@
+#' MCMC class constructor
+#'
+#' MCMC data structure contains information about subgraph.
+#'
+#' @param mat A boolean matrix object where every row defines a subgraph.
+#' @param name A character vector contains names of graph vertices.
 #' @export
 mcmc <- function(mat, name) {
   if (!is.matrix(mat))
@@ -46,7 +52,17 @@ sample_subgraph <- function(graph, module_size, niter) {
 
 
 
+#' Generates log-likelihood values during one MCMC run.
+#'
+#' Generates log-likelihood values during one MCMC run for analyzing behavior of subgraph.
+#'
+#' @inheritParams sample_subgraph
+#' @param exp_lh The exponent likelihood values to be raised to.
+#' @param fixed_size \code{TRUE} if the module size is fixed.
+#' @return Named vector where names are number of iteration.
+#' @importFrom stats setNames
 #' @export
+#'
 sample_llh <-
   function(graph,
            module_size = NULL,
@@ -74,7 +90,7 @@ sample_llh <-
 #'
 #' Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC) method.
 #'
-#' @inheritParams sample_subgraph
+#' @inheritParams sample_llh
 #' @param times Number of subgraphs.
 #' @param previous_mcmc Object of type MCMC.
 #' @return Object of type MCMC.

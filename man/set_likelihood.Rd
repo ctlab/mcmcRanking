@@ -8,6 +8,8 @@ set_likelihood(graph, fdr)
 }
 \arguments{
 \item{graph}{An object of type \code{igraph}.}
+
+\item{fdr}{Numeric constant, from the false discovery rate a p-value threshold is calculated.}
 }
 \value{
 igraph object.
