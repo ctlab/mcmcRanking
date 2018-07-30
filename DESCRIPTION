@@ -13,10 +13,7 @@ LazyData: true
 Imports:
     igraph,
     Rcpp,
-    BioNet,
-    DLBCL,
-    genefilter,
-    impute
+    BioNet
 LinkingTo: Rcpp
 RoxygenNote: 6.0.1
 biocViews:
@@ -28,5 +25,8 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    covr
+    covr,
+    DLBCL,
+    genefilter,
+    impute
 VignetteBuilder: knitr
