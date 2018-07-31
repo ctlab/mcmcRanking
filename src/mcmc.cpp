@@ -142,7 +142,47 @@ namespace mcmc {
         }
     }
 
-    bool Graph::next_iteration(){
+    vector<unsigned> Graph::get_non_cut_points (int v){
+        int timer = 0;
+        bool used[order];
+        bool is_cut_point[order];
+        memset(used, 0, sizeof used);
+        memset(is_cut_point, 0, sizeof is_cut_point);
+        int tin[order];
+        int fup[order];
+        cut_points_dfs (v, -1, timer, used, tin, fup, is_cut_point);
+        vector<unsigned> non_cut_points;
+        for(unsigned x : inner.get_all()){
+            if(!is_cut_point[x]){
+                non_cut_points.push_back(x);
+            }
+        }
+        return non_cut_points;
+    }
+
+    void Graph::cut_points_dfs (int v, int p, int &timer, bool used[], int tin[], int fup[], bool is_cut_point[]) {
+        used[v] = true;
+        tin[v] = timer++;
+        fup[v] = timer;
+        int children = 0;
+        for (unsigned to : edges[v]) {
+            if (to == p || !inner.contains(to))
+                continue;
+            if (used[to]){
+                fup[v] = min (fup[v], tin[to]);
+            }else {
+                cut_points_dfs (to, v, timer, used, tin, fup, is_cut_point);
+                fup[v] = min (fup[v], fup[to]);
+                if (fup[to] >= tin[v] && p != -1)
+                    is_cut_point[v] = true;
+                ++children;
+            }
+        }
+        if (p == -1 && children > 1)
+            is_cut_point[v] = true;
+    }
+
+    bool Graph::next_iteration(const vector<unsigned>& non_cut_points = vector<unsigned>()){
         if(fixed_size){
             if(inner.size() == 0 && fixed_size)
                 return true;
@@ -176,9 +216,9 @@ namespace mcmc {
             update_neighbours(cand, false);
             return true;
         }else{
-            bool erase = unirealdis(gen) < (1.0 * inner.size()) / (inner.size() + outer.size());
+            bool erase = unirealdis(gen) < (1.0 * non_cut_points.size()) / (non_cut_points.size() + outer.size());
             unsigned cand = erase
-                ? inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen))
+                ? non_cut_points[uniform_int_distribution<>(0, non_cut_points.size() - 1)(gen)]
                 : outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
             if(erase){
                 inner.erase(cand);
@@ -237,8 +277,16 @@ namespace mcmc {
         for (size_t i = 0; i < times; ++i) {
             Rcpp::checkUserInterrupt();
             initialize_module(module[i]);
+            vector<unsigned> non_cut_points;
+            bool is_changed = true;
             for (size_t j = 0; j < end; ++j) {
-                next_iteration();
+                if(is_changed){
+                    if(inner.size() == 0)
+                        non_cut_points.clear();
+                    else
+                        non_cut_points = get_non_cut_points(inner.get(0));
+                }
+                is_changed = fixed_size ? next_iteration() : next_iteration(non_cut_points);
             }
             for (unsigned x : inner.get_all()) {
                 ret[x + i * order] = true;

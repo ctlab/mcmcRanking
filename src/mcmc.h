@@ -32,7 +32,7 @@ namespace mcmc {
 
         bool is_connected();
 
-        bool next_iteration();
+        bool next_iteration(const vector<unsigned>& non_cut_points);
 
         void initialize_module(vector<unsigned> nodes);
 
@@ -49,6 +49,10 @@ namespace mcmc {
         vector<char> onelong_iteration(size_t start, size_t end);
 
         vector<unsigned> onelong_iteration_frequency(size_t start, size_t end);
+
+        vector<unsigned> get_non_cut_points (int v);
+
+        void cut_points_dfs (int v, int p, int &timer, bool used[], int tin[], int fup[], bool is_cut_point[]);
     };
 
 }
