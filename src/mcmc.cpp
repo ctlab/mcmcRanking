@@ -151,6 +151,10 @@ namespace mcmc {
             }
             unsigned cand_in = inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen));
             unsigned cand_out = outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
+            double gen_p = unirealdis(gen);
+            double p = (nodes[cand_out] * outer.size()) / (nodes[cand_in] * (outer.size() - edges[cand_in].size() + 1));
+            if(gen_p >= p)
+                return false;
             inner.swap(cand_in, cand_out);
             if (!is_connected()) {
                 inner.swap(cand_out, cand_in);
@@ -159,8 +163,8 @@ namespace mcmc {
             unsigned cur_size_outer = outer.size();
             update_outer_nodes(cand_in, cand_out);
             unsigned new_size_outer = outer.size();
-            double p = (nodes[cand_out] * cur_size_outer) / (nodes[cand_in] * new_size_outer);
-            if (unirealdis(gen) < p) {
+            p = (nodes[cand_out] * cur_size_outer) / (nodes[cand_in] * new_size_outer);
+            if (gen_p < p) {
                 return true;
             }
             inner.swap(cand_out, cand_in);
