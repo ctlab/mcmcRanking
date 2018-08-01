@@ -166,44 +166,53 @@ namespace mcmc {
             inner.swap(cand_out, cand_in);
             update_outer_nodes(cand_out, cand_in);
             return false;
-        }else if(inner.size() == 0){
-            unsigned cand = uniform_int_distribution<>(0, order - 1)(gen);
-            double p = nodes[cand] * order / (1 + edges[cand].size());
-            if(unirealdis(gen) >= p){
-                return false;
-            }
-            inner.insert(cand);
-            update_neighbours(cand, false);
-            return true;
         }else{
-            bool erase = unirealdis(gen) < (1.0 * inner.size()) / (inner.size() + outer.size());
-            unsigned cand = erase
-                ? inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen))
-                : outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
+            bool erase = unirealdis(gen) < (1.0 * inner.size()) /
+                (inner.size() == 0 ? order : inner.size() + outer.size());
+            unsigned cand = erase ?
+                inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen)) :
+                outer.size() == 0 ?
+                    uniform_int_distribution<>(0, order - 1)(gen) :
+                    outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
+            double gen_p = unirealdis(gen);
             if(erase){
+                double p = (inner.size() + outer.size())/
+                    (nodes[cand] * ( inner.size() == 0 ? order : inner.size() + outer.size() - edges[cand].size()));
+                if(gen_p >= p){
+                    return false;
+                }
                 inner.erase(cand);
                 if (!is_connected()) {
                     inner.insert(cand);
                     return false;
                 }
                 if(inner.size() != 0)
-                  outer.insert(cand);
+                    outer.insert(cand);
             }else{
-                outer.erase(cand);
+                double p = nodes[cand] * ( inner.size() == 0 ? order / (1 + edges[cand].size()) : 1);
+                if(gen_p >= p){
+                    return false;
+                }
+                if(inner.size() != 0)
+                    outer.erase(cand);
                 inner.insert(cand);
             }
             unsigned cur_size_outer = outer.size();
             update_neighbours(cand, erase);
             unsigned new_size_outer = outer.size();
-            double p = ((erase ? 1 / nodes[cand] : nodes[cand]) * (cur_size_outer + inner.size() + (int)erase)) / (new_size_outer + inner.size());
-            if (unirealdis(gen) < p) {
+            double p = ((erase ? 1 / nodes[cand] : nodes[cand]) *
+                        (inner.size() == 1 && !erase ? order : cur_size_outer + inner.size() + (int)erase)) /
+                        (inner.size() == 0 && erase ? order : new_size_outer + inner.size());
+            if (gen_p < p) {
                 return true;
             }
             if(erase){
                 inner.insert(cand);
-                outer.erase(cand);
+                if(inner.size() != 1)
+                    outer.erase(cand);
             }else{
-                outer.insert(cand);
+                if(inner.size() != 1)
+                    outer.insert(cand);
                 inner.erase(cand);
             }
             update_neighbours(cand, !erase);
