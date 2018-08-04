@@ -4,8 +4,8 @@
 \alias{mcmc_sample}
 \title{Set of connected subgraphs from uniform distribution.}
 \usage{
-mcmc_sample(graph, module_size = NULL, times = NULL, previous_mcmc = NULL,
-  niter, exp_lh = 1, fixed_size = FALSE)
+mcmc_sample(graph, module_size = NULL, times = NULL,
+  previous_mcmc = NULL, niter, exp_lh = 1, fixed_size = FALSE)
 }
 \arguments{
 \item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
