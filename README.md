@@ -21,5 +21,14 @@ You can install mcmcRanking from github with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("javlon/mcmcRanking")
+devtools::install_github("ctlab/mcmcRanking")
 ```
+
+## Illustration
+
+An animation of the MCMC algorithm performing. Vertices are colored
+depending on its likelihood, burgundy and gray colors corresponds to
+high and low likelihoods respectively. Yellow subgraph is an active
+module.
+
+<a href="https://gist.github.com/javlon/36d0ade4be626a3fbb8cc34ee1ac1d69"><img src="https://gist.githubusercontent.com/javlon/36d0ade4be626a3fbb8cc34ee1ac1d69/raw/836b53ae53e1d7f61cdc2bd119f0698c8a50ddf1/mcmc_sample.gif" width="630" height="630"/></a>
