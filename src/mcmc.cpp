@@ -6,14 +6,14 @@
 
 namespace mcmc {
     Graph::Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size)
-        :order(nodes.size()), nodes(nodes), edges(edges), inner(order), outer(order), fixed_size(fixed_size) {
+        :order(nodes.size()), nodes(nodes), edges(edges), inner(order), outer(order), in_nei_c(order, 0), fixed_size(fixed_size) {
         random_device rd;
         gen = mt19937(rd());
         unirealdis = uniform_real_distribution<>(0, 1);
     }
 
     Graph::Graph(Rcpp::NumericVector nodes, vector<vector<unsigned>> edges, bool fixed_size)
-        :order(nodes.size()), edges(edges), inner(order), outer(order), fixed_size(fixed_size) {
+        :order(nodes.size()), edges(edges), inner(order), outer(order), in_nei_c(order, 0), fixed_size(fixed_size) {
         this->nodes = vector<double> (nodes.begin(), nodes.end());
         random_device rd;
         gen = mt19937(rd());
@@ -51,11 +51,13 @@ namespace mcmc {
     void Graph::initialize_module(vector<unsigned> nodes) {
         inner.clear();
         outer.clear();
+        std::fill(in_nei_c.begin(), in_nei_c.end(), 0);
         for(unsigned node : nodes){
             inner.insert(node);
         }
         for (size_t i = 0; i < inner.size(); ++i) {
             for (unsigned neighbour : edges[inner.get(i)]) {
+                in_nei_c[neighbour]++;
                 if((!inner.contains(neighbour)) && (!outer.contains(neighbour))){
                     outer.insert(neighbour);
                 }
@@ -119,23 +121,18 @@ namespace mcmc {
     void Graph::update_neighbours(unsigned v, bool is_erased) {
         if(is_erased){
             for (unsigned neighbour : edges[v]) {
-                if (inner.contains(neighbour) || !outer.contains(neighbour)) {
+                in_nei_c[neighbour]--;
+                if (inner.contains(neighbour)) {
                     continue;
                 }
-                bool erase = true;
-                for (size_t j = 0; j < edges[neighbour].size(); ++j) {
-                    if (inner.contains(edges[neighbour][j])) {
-                        erase = false;
-                        break;
-                    }
-                }
-                if(erase){
+                if(in_nei_c[neighbour] == 0){
                     outer.erase(neighbour);
                 }
             }
         }else{
             for (unsigned neighbour : edges[v]) {
-                if (!inner.contains(neighbour) && !outer.contains(neighbour)) {
+                in_nei_c[neighbour]++;
+                if(in_nei_c[neighbour] == 1 && !inner.contains(neighbour)){
                     outer.insert(neighbour);
                 }
             }

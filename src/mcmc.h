@@ -18,6 +18,8 @@ namespace mcmc {
         HSA inner;
         HSA outer;
 
+        vector<size_t> in_nei_c;
+
         mt19937 gen;
         uniform_real_distribution<> unirealdis;
 
