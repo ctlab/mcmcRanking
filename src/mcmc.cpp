@@ -152,7 +152,8 @@ namespace mcmc {
             unsigned cand_in = inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen));
             unsigned cand_out = outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
             double gen_p = unirealdis(gen);
-            double p = (nodes[cand_out] * outer.size()) / (nodes[cand_in] * (outer.size() - edges[cand_in].size() + 1));
+            double p = (nodes[cand_out] * outer.size()) / nodes[cand_in] *
+                       (outer.size() < edges[cand_in].size() ? 1 : outer.size() - edges[cand_in].size() + 1);
             if(gen_p >= p)
                 return false;
             inner.swap(cand_in, cand_out);
@@ -171,18 +172,26 @@ namespace mcmc {
             update_outer_nodes(cand_out, cand_in);
             return false;
         }else{
-            bool erase = unirealdis(gen) < (1.0 * inner.size()) /
-                (inner.size() == 0 ? order : inner.size() + outer.size());
-            unsigned cand = erase ?
-                inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen)) :
-                outer.size() == 0 ?
-                    uniform_int_distribution<>(0, order - 1)(gen) :
-                    outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
+            unsigned cur_in_out_size = inner.size() == 0 ? order : outer.size() + inner.size();
+            bool erase = unirealdis(gen) < (1.0 * inner.size()) / cur_in_out_size;
+            unsigned cand;
+            if(erase) {
+                cand = inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen));
+            }else {
+                cand = outer.size() == 0 ?
+                       uniform_int_distribution<>(0, order - 1)(gen) :
+                       outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
+            }
             double gen_p = unirealdis(gen);
             if(erase){
-                double p = (inner.size() + outer.size())/
-                    (nodes[cand] * ( inner.size() == 0 ? order : inner.size() + outer.size() - edges[cand].size()));
-                if(gen_p >= p){
+                int new_in_out_size = inner.size() + outer.size() - edges[cand].size();
+                if (inner.size() == 0) {
+                    new_in_out_size = order;
+                } else if (inner.size() + outer.size() <= edges[cand].size()) {
+                    new_in_out_size = 1;
+                }
+                double p = (inner.size() + outer.size()) / (nodes[cand] * new_in_out_size);
+                if(gen_p >= p) {
                     return false;
                 }
                 inner.erase(cand);
@@ -193,7 +202,7 @@ namespace mcmc {
                 if(inner.size() != 0)
                     outer.insert(cand);
             }else{
-                double p = nodes[cand] * ( inner.size() == 0 ? order / (1 + edges[cand].size()) : 1);
+                double p = nodes[cand] * (inner.size() == 0 ? 1.0 * order / (1 + edges[cand].size()) : 1);
                 if(gen_p >= p){
                     return false;
                 }
@@ -201,12 +210,9 @@ namespace mcmc {
                     outer.erase(cand);
                 inner.insert(cand);
             }
-            unsigned cur_size_outer = outer.size();
             update_neighbours(cand, erase);
-            unsigned new_size_outer = outer.size();
-            double p = ((erase ? 1 / nodes[cand] : nodes[cand]) *
-                        (inner.size() == 1 && !erase ? order : cur_size_outer + inner.size() + (int)erase)) /
-                        (inner.size() == 0 && erase ? order : new_size_outer + inner.size());
+            unsigned new_in_out_size = inner.size() == 0 ? order : outer.size() + inner.size();
+            double p = (erase ? 1 / nodes[cand] : nodes[cand]) * (1.0 * cur_in_out_size / new_in_out_size );
             if (gen_p < p) {
                 return true;
             }
