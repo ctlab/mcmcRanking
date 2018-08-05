@@ -55,6 +55,28 @@ test_that("mcmc_sample works", {
       fixed_size = T
     )
   expect_identical(sum(get_frequency(x)), 50 * 3)
+
+  V(g)$likelihood <- seq(1, 7)
+  previous_mcmc <-
+    mcmc(mat = matrix(c(T, T, T, T, F, F, F), nrow = 1), name = V(g)$name)
+  expect_is(mcmc_sample(
+    graph = g,
+    previous_mcmc = previous_mcmc,
+    niter = 1e3
+  ),
+  "MCMC")
+
+  g <- make_ring(7)
+  V(g)$name <- letters[1:7]
+  V(g)$likelihood <- 10 ^ seq(-3, 3)
+  x <-
+    mcmc_sample(
+      graph = g,
+      module_size = 0,
+      times = 100,
+      niter = 100
+    )
+  expect_true(all(get_frequency(x)[c('f', 'g')] > 95))
 })
 
 test_that("module must change in one step", {
@@ -76,7 +98,8 @@ test_that("module must change in one step", {
   g <- graph_from_atlas(48)
   V(g)$name <- letters[1:5]
   V(g)$likelihood <- c(3, 3, 2, 3, 2)
-  x <- mcmc(mat = matrix(c(F, F, T, F, T), nrow = 1), name = V(g)$name)
+  x <-
+    mcmc(mat = matrix(c(F, F, T, F, T), nrow = 1), name = V(g)$name)
   y <-
     mcmc_sample(
       graph = g,
