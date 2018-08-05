@@ -120,10 +120,12 @@ mcmc_sample <-
     edgelist <- as_edgelist(graph, names = F) - 1
 
     if (is.null(previous_mcmc)) {
-      start_module <- t(replicate(
-        times,
-        sample_subgraph_internal(edgelist, gorder(graph), module_size, 1)
-      ))
+      start_module <-
+        matrix(unlist(replicate(
+          times,
+          sample_subgraph_internal(edgelist, gorder(graph), module_size, 1),
+          simplify = F
+        )), nrow = times, byrow = T)
     }
 
     for (i in seq_along(exp_lh)) {
