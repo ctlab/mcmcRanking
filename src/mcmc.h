@@ -9,6 +9,7 @@
 
 namespace mcmc {
     using namespace std;
+
     class Graph {
         bool fixed_size;
         size_t order;

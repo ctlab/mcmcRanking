@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include <vector>
+
 using namespace Rcpp;
 using namespace std;
 

@@ -12,7 +12,7 @@ mcmc <- function(mat, name) {
     stop("mat must be boolean vector.")
   if (!is.character(name))
     stop("name must be character vector.")
-  if(ncol(mat) != length(name))
+  if (ncol(mat) != length(name))
     stop("Number of columns in mat is not equal to size of name.")
   structure(list(mat = mat,
                  name = name), class = "MCMC")
@@ -114,7 +114,7 @@ mcmc_sample <-
       if (class(previous_mcmc) != "MCMC")
         stop("previous_mcmc must be type of \"MCMC\"")
       start_module <- previous_mcmc$mat
-      module_size <- sum(start_module[1,])
+      module_size <- sum(start_module[1, ])
     }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = F) - 1
