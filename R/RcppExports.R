@@ -25,18 +25,3 @@ probabilistic_rank_internal <- function(edgelist, df_nodes) {
     .Call('_mcmcRanking_probabilistic_rank_internal', PACKAGE = 'mcmcRanking', edgelist, df_nodes)
 }
 
-real_prob_internal <- function(edgelist, likelihood) {
-    .Call('_mcmcRanking_real_prob_internal', PACKAGE = 'mcmcRanking', edgelist, likelihood)
-}
-
-#' Accurate sum of numbers
-#'
-#' Sums every time only two smallest numbers.
-#' This allows calculate the sum of numbers accurate enough.
-#'
-#' @param v Vector of numeric values.
-#' @export
-accurate_sum <- function(v) {
-    .Call('_mcmcRanking_accurate_sum', PACKAGE = 'mcmcRanking', v)
-}
-

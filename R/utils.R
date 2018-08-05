@@ -51,21 +51,3 @@ set_likelihood <- function(graph, fdr) {
   V(graph)$likelihood <- exp(scoreFunction(fb = fb, fdr = fdr))
   graph
 }
-
-
-
-#' Vertex probability.
-#'
-#' Accurate estimate of vertex probability using all connected subgraphs.
-#'
-#' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
-#' @return Named vector of probabilities.
-#' @details Time complexity of method is \strong{exponential}. Use it only for the graphs of size less than 30.
-#' @import igraph
-#' @export
-real_prob <- function(graph) {
-  edgelist <- as_edgelist(graph, names = F) - 1
-  res <- real_prob_internal(edgelist, V(graph)$likelihood)
-  names(res) <- V(graph)$name
-  return(res)
-}

@@ -91,29 +91,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// real_prob_internal
-NumericVector real_prob_internal(IntegerMatrix edgelist, NumericVector likelihood);
-RcppExport SEXP _mcmcRanking_real_prob_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type likelihood(likelihoodSEXP);
-    rcpp_result_gen = Rcpp::wrap(real_prob_internal(edgelist, likelihood));
-    return rcpp_result_gen;
-END_RCPP
-}
-// accurate_sum
-NumericVector accurate_sum(NumericVector v);
-RcppExport SEXP _mcmcRanking_accurate_sum(SEXP vSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type v(vSEXP);
-    rcpp_result_gen = Rcpp::wrap(accurate_sum(v));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_mcmcRanking_sample_subgraph_internal", (DL_FUNC) &_mcmcRanking_sample_subgraph_internal, 4},
@@ -122,8 +99,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_mcmcRanking_mcmc_onelong_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_internal, 5},
     {"_mcmcRanking_mcmc_onelong_frequency_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_frequency_internal, 5},
     {"_mcmcRanking_probabilistic_rank_internal", (DL_FUNC) &_mcmcRanking_probabilistic_rank_internal, 2},
-    {"_mcmcRanking_real_prob_internal", (DL_FUNC) &_mcmcRanking_real_prob_internal, 2},
-    {"_mcmcRanking_accurate_sum", (DL_FUNC) &_mcmcRanking_accurate_sum, 1},
     {NULL, NULL, 0}
 };
 
