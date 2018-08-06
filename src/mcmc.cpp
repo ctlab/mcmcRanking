@@ -6,16 +6,16 @@
 
 namespace mcmc {
     Graph::Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size)
-            : order(nodes.size()), nodes(nodes), edges(edges), inner(order), outer(order), in_nei_c(order, 0),
-              fixed_size(fixed_size) {
+            : fixed_size(fixed_size), order(nodes.size()), nodes(nodes), edges(edges), inner(order), outer(order),
+              in_nei_c(order, 0) {
         random_device rd;
         gen = mt19937(rd());
         unirealdis = uniform_real_distribution<>(0, 1);
     }
 
     Graph::Graph(Rcpp::NumericVector nodes, vector<vector<unsigned>> edges, bool fixed_size)
-            : order(nodes.size()), edges(edges), inner(order), outer(order), in_nei_c(order, 0),
-              fixed_size(fixed_size) {
+            : fixed_size(fixed_size), order(nodes.size()), edges(edges), inner(order), outer(order),
+              in_nei_c(order, 0) {
         this->nodes = vector<double>(nodes.begin(), nodes.end());
         random_device rd;
         gen = mt19937(rd());
