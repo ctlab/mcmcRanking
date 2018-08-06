@@ -5,6 +5,8 @@
 
 [![Travis-CI Build
 Status](https://travis-ci.org/ctlab/mcmcRanking.svg?branch=master)](https://travis-ci.org/ctlab/mcmcRanking)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/ctlab/mcmcRanking?branch=master&svg=true)](https://ci.appveyor.com/project/ctlab/mcmcRanking)
 [![Coverage
 status](https://codecov.io/gh/ctlab/mcmcRanking/branch/master/graph/badge.svg)](https://codecov.io/github/ctlab/mcmcRanking?branch=master)
 
