@@ -17,10 +17,10 @@ test_that("probabilistic_rank works", {
   x <- probabilistic_rank(g, q)
   expect_equivalent(x[letters[seq_len(7)]], c(2, 3, 4, 5, 6, 7, 1))
 
-  q <- c(0.8, 0.8, 0.6, 0.2, 0.2, 0.4, 1)
+  q <- c(0.85, 0.75, 0.6, 0.15, 0.25, 0.4, 1)
   names(q) <- V(g)$name
   x <- probabilistic_rank(g, q)
-  expect_equivalent(x[letters[seq_len(7)]], c(6, 5, 4, 2, 1, 3, 7))
+  expect_equivalent(x[letters[seq_len(7)]], c(6, 5, 4, 1, 2, 3, 7))
 
   g <- graph_from_atlas(14)
   V(g)$name <- letters[seq_len(4)]
