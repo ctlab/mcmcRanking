@@ -79,13 +79,12 @@ namespace mcmc {
             unsigned v = q.front();
             q.pop();
             for (unsigned to : edges[v]) {
-                if (!inner.contains(to)) {
-                    continue;
-                }
-                unsigned u = inner.get_index(to);
-                if (!used[u]) {
-                    used[u] = true;
-                    q.push(to);
+                if (inner.contains(to)) {
+                    unsigned u = inner.get_index(to);
+                    if (!used[u]) {
+                        used[u] = true;
+                        q.push(to);
+                    }
                 }
             }
         }
