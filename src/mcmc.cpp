@@ -223,11 +223,11 @@ namespace mcmc {
         }
     }
 
-    vector<unsigned> Graph::get_inner_nodes() {
+    vector<size_t> Graph::get_inner_nodes() {
         return inner.get_all();
     }
 
-    vector<unsigned> Graph::get_outer_nodes() {
+    vector<size_t> Graph::get_outer_nodes() {
         return outer.get_all();
     }
 

@@ -8,29 +8,29 @@ namespace mcmc {
     using namespace std;
 
     class HSA {
-        unordered_map<unsigned, size_t> map;
-        vector<unsigned> elements;
+        vector<size_t> map;
+        vector<size_t> elements;
         vector<bool> contain;
     public:
         HSA(size_t size);
+
+        void insert(size_t el);
+
+        void erase(size_t el);
+
+        bool contains(size_t el);
+
+        void swap(size_t el, size_t new_el);
 
         void clear();
 
         size_t size();
 
-        unsigned get(size_t ind);
+        size_t get(size_t ind);
 
-        size_t get_index(unsigned v);
+        size_t get_index(size_t el);
 
-        vector<unsigned> get_all();
-
-        bool contains(unsigned el);
-
-        void insert(unsigned el);
-
-        void erase(unsigned el);
-
-        void swap(unsigned el, unsigned new_el);
+        vector<size_t> get_all();
     };
 }
 

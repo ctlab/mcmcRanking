@@ -41,9 +41,9 @@ namespace mcmc {
 
         vector<unsigned> random_subgraph(size_t size);
 
-        vector<unsigned> get_inner_nodes();
+        vector<size_t> get_inner_nodes();
 
-        vector<unsigned> get_outer_nodes();
+        vector<size_t> get_outer_nodes();
 
         vector<double> sample_llh(vector<unsigned> module, size_t end);
 
