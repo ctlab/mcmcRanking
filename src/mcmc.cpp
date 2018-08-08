@@ -117,19 +117,18 @@ namespace mcmc {
     void Graph::update_neighbours(unsigned v, bool is_erased) {
         if (is_erased) {
             for (unsigned neighbour : edges[v]) {
-                in_nei_c[neighbour]--;
-                if (inner.contains(neighbour)) {
-                    continue;
-                }
-                if (in_nei_c[neighbour] == 0) {
-                    outer.erase(neighbour);
+                if (--in_nei_c[neighbour] == 0) {
+                    if (!inner.contains(neighbour)) {
+                        outer.erase(neighbour);
+                    }
                 }
             }
         } else {
             for (unsigned neighbour : edges[v]) {
-                in_nei_c[neighbour]++;
-                if (in_nei_c[neighbour] == 1 && !inner.contains(neighbour)) {
-                    outer.insert(neighbour);
+                if (in_nei_c[neighbour]++ == 0) {
+                    if (!inner.contains(neighbour)) {
+                        outer.insert(neighbour);
+                    }
                 }
             }
         }
