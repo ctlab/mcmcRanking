@@ -70,25 +70,27 @@ namespace mcmc {
     bool Graph::is_connected() {
         if (inner.size() == 0)
             return true;
-        vector<char> used(order, false);
+        vector<char> used(inner.size(), false);
         queue<unsigned> q;
-        int el = inner.get(uniform_int_distribution<>(0, inner.size() - 1)(gen));
-        used[el] = true;
+        int el = inner.get(0);
+        used[0] = true;
         q.push(el);
         while (!q.empty()) {
             unsigned v = q.front();
             q.pop();
             for (unsigned to : edges[v]) {
-                if (!used[to]) {
-                    used[to] = true;
-                    if (inner.contains(to)) {
-                        q.push(to);
-                    }
+                if (!inner.contains(to)) {
+                    continue;
+                }
+                unsigned u = inner.get_index(to);
+                if (!used[u]) {
+                    used[u] = true;
+                    q.push(to);
                 }
             }
         }
         for (size_t i = 0; i < inner.size(); ++i) {
-            if (!used[inner.get(i)]) {
+            if (!used[i]) {
                 return false;
             }
         }
