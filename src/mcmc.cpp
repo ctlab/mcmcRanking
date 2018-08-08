@@ -99,23 +99,17 @@ namespace mcmc {
         outer.swap(cand_out, cand_in);
 
         for (unsigned neighbour : edges[cand_out]) {
-            if (!inner.contains(neighbour) && !outer.contains(neighbour)) {
-                outer.insert(neighbour);
+            if (in_nei_c[neighbour]++ == 0 && neighbour != cand_in) {
+                if (!inner.contains(neighbour)) {
+                    outer.insert(neighbour);
+                }
             }
         }
         for (unsigned neighbour : edges[cand_in]) {
-            if (inner.contains(neighbour) || !outer.contains(neighbour)) {
-                continue;
-            }
-            bool erase = true;
-            for (size_t j = 0; j < edges[neighbour].size(); ++j) {
-                if (inner.contains(edges[neighbour][j])) {
-                    erase = false;
-                    break;
+            if (--in_nei_c[neighbour] == 0 && neighbour != cand_out) {
+                if (!inner.contains(neighbour)) {
+                    outer.erase(neighbour);
                 }
-            }
-            if (erase) {
-                outer.erase(neighbour);
             }
         }
     }
@@ -143,8 +137,9 @@ namespace mcmc {
 
     bool Graph::next_iteration() {
         if (fixed_size) {
-            if (inner.size() == 0 && fixed_size)
+            if (inner.size() == 0) {
                 return true;
+            }
             if (inner.size() == order) {
                 return false;
             }
