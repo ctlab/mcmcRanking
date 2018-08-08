@@ -79,8 +79,8 @@ namespace mcmc {
             unsigned v = q.front();
             q.pop();
             for (unsigned to : edges[v]) {
-                if (inner.contains(to)) {
-                    unsigned u = inner.get_index(to);
+                unsigned u = inner.get_index(to);
+                if(u != -1) {
                     if (!used[u]) {
                         used[u] = true;
                         q.push(to);

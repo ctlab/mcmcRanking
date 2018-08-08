@@ -2,7 +2,6 @@
 #define MCMC_RANKING_HSA_H
 
 #include <vector>
-#include <unordered_map>
 
 namespace mcmc {
     using namespace std;

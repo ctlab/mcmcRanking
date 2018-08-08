@@ -1,7 +1,7 @@
 #include "mcmc.h"
 
 namespace mcmc {
-    HSA::HSA(size_t size) : map(size), elements(), contain(size, false) {
+    HSA::HSA(size_t size) : map(size, -1), elements(), contain(size, false) {
     }
 
     void HSA::insert(size_t el) {
@@ -15,9 +15,10 @@ namespace mcmc {
             throw std::invalid_argument("erasing non-existing element of a HSA");
         }
         size_t ind = map[el];
-        contain[el] = false;
         elements[ind] = elements[elements.size() - 1];
         map[elements[ind]] = ind;
+        map[el] = -1;
+        contain[el] = false;
         elements.pop_back();
     }
 
@@ -27,13 +28,14 @@ namespace mcmc {
 
     void HSA::swap(size_t el, size_t new_el) {
         map[new_el] = map[el];
+        map[el] = -1;
         elements[map[new_el]] = new_el;
         contain[el] = false;
         contain[new_el] = true;
     }
 
     void HSA::clear() {
-        fill(map.begin(), map.end(), 0);
+        fill(map.begin(), map.end(), -1);
         elements.clear();
         fill(contain.begin(), contain.end(), false);
     }
