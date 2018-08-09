@@ -78,7 +78,7 @@ test_that("mcmc_sample works", {
       times = 100,
       niter = 100
     )
-  expect_true(all(get_frequency(x)[c('f', 'g')] > 95))
+  expect_true(all(get_frequency(x)[c("f", "g")] > 95))
 })
 
 test_that("module must change in one step", {

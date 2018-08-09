@@ -24,4 +24,3 @@ mcmc_onelong_frequency_internal <- function(edgelist, likelihood, module_size, s
 probabilistic_rank_internal <- function(edgelist, df_nodes) {
     .Call('_mcmcRanking_probabilistic_rank_internal', PACKAGE = 'mcmcRanking', edgelist, df_nodes)
 }
-
