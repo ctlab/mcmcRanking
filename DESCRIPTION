@@ -7,6 +7,8 @@ Authors@R: person("Javlon", "Isomurodov", email = "isomurodov@rain.ifmo.ru",
 Description: Tool for estimate probabilities of vertices being in active
     subgraph using its likelihoods.
 License: MIT + file LICENSE
+URL: https://github.com/ctlab/mcmcRanking
+BugReports: https://github.com/ctlab/mcmcRanking/issues
 Imports: 
     BioNet,
     igraph,
