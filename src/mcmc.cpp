@@ -7,7 +7,7 @@
 namespace mcmc {
     Graph::Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size)
             : fixed_size(fixed_size), order(nodes.size()), nodes(nodes), edges(edges), inner(order), outer(order),
-              in_nei_c(order, 0) {
+              in_nei_c(order, 0), neis(order, unordered_set<size_t>()) {
         random_device rd;
         gen = mt19937(rd());
         unirealdis = uniform_real_distribution<>(0, 1);
@@ -15,7 +15,7 @@ namespace mcmc {
 
     Graph::Graph(Rcpp::NumericVector nodes, vector<vector<unsigned>> edges, bool fixed_size)
             : fixed_size(fixed_size), order(nodes.size()), edges(edges), inner(order), outer(order),
-              in_nei_c(order, 0) {
+              in_nei_c(order, 0), neis(order, unordered_set<size_t>()) {
         this->nodes = vector<double>(nodes.begin(), nodes.end());
         random_device rd;
         gen = mt19937(rd());
@@ -54,13 +54,19 @@ namespace mcmc {
         inner.clear();
         outer.clear();
         std::fill(in_nei_c.begin(), in_nei_c.end(), 0);
+        for (auto &x : neis) {
+            x.clear();
+        }
         for (unsigned node : nodes) {
             inner.insert(node);
         }
         for (size_t i = 0; i < inner.size(); ++i) {
-            for (unsigned neighbour : edges[inner.get(i)]) {
+            unsigned v = inner.get(i);
+            for (unsigned neighbour : edges[v]) {
                 in_nei_c[neighbour]++;
-                if ((!inner.contains(neighbour)) && (!outer.contains(neighbour))) {
+                if (inner.contains(neighbour)) {
+                    neis[v].insert(neighbour);
+                } else if (!outer.contains(neighbour)) {
                     outer.insert(neighbour);
                 }
             }
@@ -78,7 +84,7 @@ namespace mcmc {
         while (!q.empty()) {
             unsigned v = q.front();
             q.pop();
-            for (unsigned to : edges[v]) {
+            for (auto &to : neis[v]) {
                 unsigned u = inner.get_index(to);
                 if(u != -1) {
                     if (!used[u]) {
@@ -115,8 +121,28 @@ namespace mcmc {
         }
     }
 
+    void Graph::inner_update(unsigned v, bool is_erased) {
+        if (is_erased) {
+            inner.erase(v);
+            for (auto &neighbour : neis[v]) {
+                neis[neighbour].erase(v);
+            }
+            neis[v].clear();
+        } else {
+            inner.insert(v);
+            for (unsigned neighbour : edges[v]) {
+                if (inner.contains(neighbour)) {
+                    neis[v].insert(neighbour);
+                    neis[neighbour].insert(v);
+                }
+            }
+        }
+    }
+
     void Graph::update_neighbours(unsigned v, bool is_erased) {
         if (is_erased) {
+            if (inner.size() != 0)
+                outer.insert(v);
             for (unsigned neighbour : edges[v]) {
                 if (--in_nei_c[neighbour] == 0) {
                     if (!inner.contains(neighbour)) {
@@ -125,6 +151,8 @@ namespace mcmc {
                 }
             }
         } else {
+            if (inner.size() != 1)
+                outer.erase(v);
             for (unsigned neighbour : edges[v]) {
                 if (in_nei_c[neighbour]++ == 0) {
                     if (!inner.contains(neighbour)) {
@@ -150,9 +178,11 @@ namespace mcmc {
                        (outer.size() < edges[cand_in].size() ? 1 : outer.size() - edges[cand_in].size() + 1);
             if (gen_p >= p)
                 return false;
-            inner.swap(cand_in, cand_out);
+            inner_update(cand_in, true);
+            inner_update(cand_out, false);
             if (!is_connected()) {
-                inner.swap(cand_out, cand_in);
+                inner_update(cand_out, true);
+                inner_update(cand_in, false);
                 return false;
             }
             unsigned cur_size_outer = outer.size();
@@ -162,7 +192,8 @@ namespace mcmc {
             if (gen_p < p) {
                 return true;
             }
-            inner.swap(cand_out, cand_in);
+            inner_update(cand_out, true);
+            inner_update(cand_in, false);
             update_outer_nodes(cand_out, cand_in);
             return false;
         } else {
@@ -188,21 +219,17 @@ namespace mcmc {
                 if (gen_p >= p) {
                     return false;
                 }
-                inner.erase(cand);
+                inner_update(cand, erase);
                 if (!is_connected()) {
-                    inner.insert(cand);
+                    inner_update(cand, !erase);
                     return false;
                 }
-                if (inner.size() != 0)
-                    outer.insert(cand);
             } else {
                 double p = nodes[cand] * (inner.size() == 0 ? 1.0 * order / (1 + edges[cand].size()) : 1);
                 if (gen_p >= p) {
                     return false;
                 }
-                if (inner.size() != 0)
-                    outer.erase(cand);
-                inner.insert(cand);
+                inner_update(cand, erase);
             }
             update_neighbours(cand, erase);
             unsigned new_in_out_size = inner.size() == 0 ? order : outer.size() + inner.size();
@@ -210,15 +237,7 @@ namespace mcmc {
             if (gen_p < p) {
                 return true;
             }
-            if (erase) {
-                inner.insert(cand);
-                if (inner.size() != 1)
-                    outer.erase(cand);
-            } else {
-                if (inner.size() != 1)
-                    outer.insert(cand);
-                inner.erase(cand);
-            }
+            inner_update(cand, !erase);
             update_neighbours(cand, !erase);
             return false;
         }

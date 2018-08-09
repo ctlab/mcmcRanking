@@ -4,6 +4,7 @@
 #include <random>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include "hsa.h"
 #include <Rcpp.h>
 
@@ -20,6 +21,7 @@ namespace mcmc {
         HSA outer;
 
         vector<size_t> in_nei_c;
+        vector<unordered_set<size_t>> neis;
 
         mt19937 gen;
         uniform_real_distribution<> unirealdis;
@@ -27,6 +29,8 @@ namespace mcmc {
         void update_outer_nodes(unsigned cand_in, unsigned cand_out);
 
         void update_neighbours(unsigned v, bool is_erased);
+
+        void inner_update(unsigned v, bool is_erased);
 
     public:
         Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size);
