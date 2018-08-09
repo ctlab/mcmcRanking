@@ -86,7 +86,7 @@ namespace mcmc {
             q.pop();
             for (auto &to : neis[v]) {
                 unsigned u = inner.get_index(to);
-                if(u != -1) {
+                if (u != -1) {
                     if (!used[u]) {
                         used[u] = true;
                         q.push(to);
@@ -175,7 +175,8 @@ namespace mcmc {
             unsigned cand_out = outer.get(uniform_int_distribution<>(0, outer.size() - 1)(gen));
             double gen_p = unirealdis(gen);
             double p = (nodes[cand_out] * outer.size()) / nodes[cand_in] *
-                       (outer.size() < edges[cand_in].size() ? 1 : outer.size() - edges[cand_in].size() + 1);
+                       (outer.size() <= edges[cand_in].size() - in_nei_c[cand_in] ?
+                        1 : outer.size() - edges[cand_in].size() + in_nei_c[cand_in]);
             if (gen_p >= p)
                 return false;
             inner_update(cand_in, true);
@@ -209,13 +210,13 @@ namespace mcmc {
             }
             double gen_p = unirealdis(gen);
             if (erase) {
-                int new_in_out_size = inner.size() + outer.size() - edges[cand].size();
-                if (inner.size() == 0) {
+                int new_in_out_size = inner.size() + outer.size() - edges[cand].size() + in_nei_c[cand];
+                if (inner.size() == 1) {
                     new_in_out_size = order;
-                } else if (inner.size() + outer.size() <= edges[cand].size()) {
+                } else if (cur_in_out_size <= edges[cand].size() - in_nei_c[cand]) {
                     new_in_out_size = 1;
                 }
-                double p = (inner.size() + outer.size()) / (nodes[cand] * new_in_out_size);
+                double p = cur_in_out_size / (nodes[cand] * new_in_out_size);
                 if (gen_p >= p) {
                     return false;
                 }
