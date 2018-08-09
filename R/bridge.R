@@ -44,7 +44,7 @@ check_arguments <- function(graph, module_size, niter) {
 #' @export
 sample_subgraph <- function(graph, module_size, niter) {
   check_arguments(graph, module_size, niter)
-  edgelist <- as_edgelist(graph, names = F) - 1
+  edgelist <- as_edgelist(graph, names = FALSE) - 1
   res <-
     sample_subgraph_internal(edgelist, gorder(graph), module_size, niter)
   return(V(graph)$name[which(res)])
@@ -70,7 +70,7 @@ sample_llh <-
            exp_lh = 1,
            fixed_size = FALSE) {
     check_arguments(graph, module_size, niter)
-    edgelist <- as_edgelist(graph, names = F) - 1
+    edgelist <- as_edgelist(graph, names = FALSE) - 1
 
     start_module <-
       t(sample_subgraph_internal(edgelist, gorder(graph), module_size, 1))
@@ -117,26 +117,24 @@ mcmc_sample <-
       module_size <- sum(start_module[1, ])
     }
     check_arguments(graph, module_size, niter)
-    edgelist <- as_edgelist(graph, names = F) - 1
+    edgelist <- as_edgelist(graph, names = FALSE) - 1
 
     if (is.null(previous_mcmc)) {
       start_module <-
         matrix(unlist(replicate(
           times,
           sample_subgraph_internal(edgelist, gorder(graph), module_size, 1),
-          simplify = F
-        )), nrow = times, byrow = T)
+          simplify = FALSE
+        )), nrow = times, byrow = TRUE)
     }
-
     for (i in seq_along(exp_lh)) {
       res1 <- mcmc_sample_internal(edgelist,
                                    V(graph)$likelihood ^ exp_lh[i],
                                    fixed_size,
                                    niter,
                                    start_module)
-      start_module <-  matrix(res1, ncol = gorder(graph), byrow = T)
+      start_module <-  matrix(res1, ncol = gorder(graph), byrow = TRUE)
     }
-
     return(mcmc(start_module, V(graph)$name))
   }
 
@@ -156,11 +154,11 @@ mcmc_sample <-
 #' @export
 mcmc_onelong <- function(graph, module_size, start, end) {
   check_arguments(graph, module_size, end)
-  edgelist <- as_edgelist(graph, names = F) - 1
+  edgelist <- as_edgelist(graph, names = FALSE) - 1
   res <-
     mcmc_onelong_internal(edgelist, V(graph)$likelihood, module_size, start, end) + 1
   ret <-
-    mcmc(matrix(res, ncol = module_size, byrow = T), V(graph)$name)
+    mcmc(matrix(res, ncol = module_size, byrow = TRUE), V(graph)$name)
   return(ret)
 }
 
@@ -180,7 +178,7 @@ mcmc_onelong <- function(graph, module_size, start, end) {
 #' @export
 mcmc_onelong_frequency <- function(graph, module_size, start, end) {
   check_arguments(graph, module_size, end)
-  edgelist <- as_edgelist(graph, names = F) - 1
+  edgelist <- as_edgelist(graph, names = FALSE) - 1
   res <-
     mcmc_onelong_frequency_internal(edgelist, V(graph)$likelihood, module_size, start, end)
   names(res) <- V(graph)$name

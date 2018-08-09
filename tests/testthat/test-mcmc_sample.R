@@ -52,13 +52,15 @@ test_that("mcmc_sample works", {
       times = 50,
       niter = 100,
       exp_lh = 0,
-      fixed_size = T
+      fixed_size = TRUE
     )
   expect_identical(sum(get_frequency(x)), 50 * 3)
 
   V(g)$likelihood <- seq(1, 7)
   previous_mcmc <-
-    mcmc(mat = matrix(c(T, T, T, T, F, F, F), nrow = 1), name = V(g)$name)
+    mcmc(mat = matrix(c(
+      TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE
+    ), nrow = 1), name = V(g)$name)
   expect_is(mcmc_sample(
     graph = g,
     previous_mcmc = previous_mcmc,
@@ -84,14 +86,14 @@ test_that("module must change in one step", {
   V(g)$name <- letters[1:6]
   V(g)$likelihood <- rep(1, 6)
   x <-
-    mcmc(mat = matrix(c(T, T, T, F, F, F), nrow = 1), name = V(g)$name)
+    mcmc(mat = matrix(c(TRUE, TRUE, TRUE, FALSE, FALSE, FALSE), nrow = 1), name = V(g)$name)
   y <-
     mcmc_sample(
       graph = g,
       previous_mcmc = x,
       niter = 1,
       exp_lh = 1,
-      fixed_size = T
+      fixed_size = TRUE
     )
   expect_true(any(get_frequency(x) != get_frequency(y)))
 
@@ -99,14 +101,14 @@ test_that("module must change in one step", {
   V(g)$name <- letters[1:5]
   V(g)$likelihood <- c(3, 3, 2, 3, 2)
   x <-
-    mcmc(mat = matrix(c(F, F, T, F, T), nrow = 1), name = V(g)$name)
+    mcmc(mat = matrix(c(FALSE, FALSE, TRUE, FALSE, TRUE), nrow = 1), name = V(g)$name)
   y <-
     mcmc_sample(
       graph = g,
       previous_mcmc = x,
       niter = 1,
       exp_lh = 1,
-      fixed_size = T
+      fixed_size = TRUE
     )
   expect_true(any(get_frequency(x) != get_frequency(y)))
 })
@@ -116,14 +118,14 @@ test_that("not reachable vertecies", {
   V(g)$name <- letters[1:6]
   V(g)$likelihood <- 10 ^ c(8, 4, 8, 8, 8, 0)
   x <-
-    mcmc(mat = matrix(c(F, F, F, F, F, T), nrow = 1), name = V(g)$name)
+    mcmc(mat = matrix(c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE), nrow = 1), name = V(g)$name)
   x <-
     mcmc_sample(
       graph = g,
       previous_mcmc = x,
       niter = 1,
       exp_lh = 1,
-      fixed_size = T
+      fixed_size = TRUE
     )
   expect_identical(sum(get_frequency(x)[letters[c(1, 3, 4, 5)]]), 0)
 
@@ -131,14 +133,14 @@ test_that("not reachable vertecies", {
   V(g)$name <- letters[1:6]
   V(g)$likelihood <- 10 ^ c(0, 0, 0, 2, 2, 2)
   x <-
-    mcmc(mat = matrix(c(T, T, T, F, F, F), nrow = 1), name = V(g)$name)
+    mcmc(mat = matrix(c(TRUE, TRUE, TRUE, FALSE, FALSE, FALSE), nrow = 1), name = V(g)$name)
   x <-
     mcmc_sample(
       graph = g,
       previous_mcmc = x,
       niter = 1,
       exp_lh = 1,
-      fixed_size = T
+      fixed_size = TRUE
     )
   expect_identical(sum(get_frequency(x)[letters[c(5, 6)]]), 0)
 })
@@ -154,7 +156,7 @@ test_that("probabilities of vertices close to the real probability", {
       times = 1e4,
       niter = 10,
       exp_lh = 1,
-      fixed_size = T
+      fixed_size = TRUE
     )
   expect_lt(max(abs(get_frequency(x) / 1e4 - c(5, 8, 9) / 11)), 0.015)
 
@@ -168,7 +170,7 @@ test_that("probabilities of vertices close to the real probability", {
   #     times = 1e4,
   #     niter = 100,
   #     exp_lh = 1,
-  #     fixed_size = T
+  #     fixed_size = TRUE
   #   )
   # expect_lt(max(abs(
   #   get_frequency(x) / 1e4 - c(6, 8, 9, 6, 8, 9) / 23
@@ -181,7 +183,7 @@ test_that("probabilities of vertices close to the real probability", {
       times = 1e4,
       niter = 100,
       exp_lh = 1,
-      fixed_size = T
+      fixed_size = TRUE
     )
   expect_lt(max(abs(
     get_frequency(x) / 1e4 - c(16, 8, 9, 16, 8, 9) / 22
@@ -195,7 +197,7 @@ test_that("probabilities of vertices close to the real probability", {
       times = 1e4,
       niter = 100,
       exp_lh = 1,
-      fixed_size = T
+      fixed_size = TRUE
     )
   expect_lt(max(abs(
     get_frequency(x) / 1e4 - c(60, 24, 15, 60, 24, 15) / 66

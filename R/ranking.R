@@ -9,7 +9,7 @@
 #' @import igraph
 #' @export
 probabilistic_rank <- function(graph, q) {
-  edgelist <- as_edgelist(graph, names = F) - 1
+  edgelist <- as_edgelist(graph, names = FALSE) - 1
   nodes <-
     data.frame(name = as.vector(V(graph)) - 1, q = q[V(graph)$name])
   res <- probabilistic_rank_internal(edgelist, nodes)
