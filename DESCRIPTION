@@ -10,6 +10,7 @@ License: MIT + file LICENSE
 URL: https://github.com/ctlab/mcmcRanking
 BugReports: https://github.com/ctlab/mcmcRanking/issues
 Imports: 
+    stats,
     BioNet,
     igraph,
     Rcpp
