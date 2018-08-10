@@ -9,6 +9,9 @@ repetition_depth(x)
 \arguments{
 \item{x}{According to this value repetition depth calculates.}
 }
+\value{
+A number of runs.
+}
 \description{
 Running MCMC with likelihood weights on vertices can cause to get stuck in locally
 good vertices, thereby finding locally significant solutions.

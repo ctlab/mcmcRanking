@@ -7,7 +7,7 @@
 sample_subgraph(graph, module_size, niter)
 }
 \arguments{
-\item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
+\item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
 
 \item{module_size}{The size of subgraph.}
 

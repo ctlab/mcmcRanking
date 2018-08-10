@@ -8,7 +8,7 @@ sample_llh(graph, module_size = NULL, niter, exp_lh = 1,
   fixed_size = FALSE)
 }
 \arguments{
-\item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
+\item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
 
 \item{module_size}{The size of subgraph.}
 
@@ -19,7 +19,7 @@ sample_llh(graph, module_size = NULL, niter, exp_lh = 1,
 \item{fixed_size}{\code{TRUE} if the module size is fixed.}
 }
 \value{
-Named vector where names are number of iteration.
+A named vector of likelihoods where names are number of iteration.
 }
 \description{
 Generates log-likelihood values during one MCMC run for analyzing behavior of subgraph.

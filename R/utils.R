@@ -5,6 +5,7 @@
 #' So, we will iteratively increase vertex weights and this function calculates number of necessary iterations.
 #'
 #' @param x According to this value repetition depth calculates.
+#' @return A number of runs.
 #' @export
 repetition_depth <- function(x) {
   d <- 0
@@ -21,9 +22,9 @@ repetition_depth <- function(x) {
 #'
 #' Calculates the frequency of occurrences of vertices in matrix object.
 #'
-#' @param mcmcObj Object of type MCMC.
+#' @param mcmcObj Object of class MCMC.
 #' @param inds Index numbers of rows involved in the calculation.
-#' @return Named vector of frequency.
+#' @return A named vector of frequency.
 #' @import igraph
 #' @export
 get_frequency <-
@@ -36,11 +37,11 @@ get_frequency <-
 
 #' Set likelihood.
 #'
-#' Set likelihood attribute to vertices of graph using pval attribute.
+#' Set \emph{likelihood} vertex attribute to an \code{igraph} graph using pval vertex attribute.
 #'
-#' @param graph An object of type \code{igraph}.
+#' @param graph An \code{igraph} graph.
 #' @param fdr Numeric constant, from the false discovery rate a p-value threshold is calculated.
-#' @return igraph object.
+#' @return An \code{igraph} graph with \emph{likelihood} vertex atribute.
 #' @import igraph
 #' @importFrom BioNet fitBumModel scoreFunction
 #' @export

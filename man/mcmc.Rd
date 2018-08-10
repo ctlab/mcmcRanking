@@ -11,6 +11,9 @@ mcmc(mat, name)
 
 \item{name}{A character vector contains names of graph vertices.}
 }
+\value{
+Object of class MCMC.
+}
 \description{
 MCMC data structure contains information about subgraph.
 }

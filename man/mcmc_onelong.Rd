@@ -2,12 +2,12 @@
 % Please edit documentation in R/bridge.R
 \name{mcmc_onelong}
 \alias{mcmc_onelong}
-\title{Set of connected subgraphs.}
+\title{Sampling set of connected subgraphs by likelihood value.}
 \usage{
 mcmc_onelong(graph, module_size, start, end)
 }
 \arguments{
-\item{graph}{An object of type \code{igraph} with \code{lieklihood} field in vertices.}
+\item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
 
 \item{module_size}{The size of subgraph.}
 
@@ -16,7 +16,7 @@ mcmc_onelong(graph, module_size, start, end)
 \item{end}{Number of iterations.}
 }
 \value{
-Object of type MCMC.
+Object of class MCMC.
 }
 \description{
 Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.

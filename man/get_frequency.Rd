@@ -7,12 +7,12 @@
 get_frequency(mcmcObj, inds = seq_len(nrow(mcmcObj$mat)))
 }
 \arguments{
-\item{mcmcObj}{Object of type MCMC.}
+\item{mcmcObj}{Object of class MCMC.}
 
 \item{inds}{Index numbers of rows involved in the calculation.}
 }
 \value{
-Named vector of frequency.
+A named vector of frequency.
 }
 \description{
 Calculates the frequency of occurrences of vertices in matrix object.

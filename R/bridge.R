@@ -4,14 +4,15 @@
 #'
 #' @param mat A boolean matrix object where every row defines a subgraph.
 #' @param name A character vector contains names of graph vertices.
+#' @return Object of class MCMC.
 #' @export
 mcmc <- function(mat, name) {
   if (!is.matrix(mat))
-    stop("mat must be matrix.")
+    stop("mat must be a matrix.")
   if (!is.logical(mat))
-    stop("mat must be boolean vector.")
+    stop("mat must be a boolean vector.")
   if (!is.character(name))
-    stop("name must be character vector.")
+    stop("name must be a character vector.")
   if (ncol(mat) != length(name))
     stop("Number of columns in mat is not equal to size of name.")
   structure(list(mat = mat,
@@ -22,11 +23,11 @@ mcmc <- function(mat, name) {
 
 check_arguments <- function(graph, module_size, niter) {
   if (module_size > gorder(graph) || module_size < 0)
-    stop("Required module size must be positive and not greather than graph size.")
+    stop("Required module size must be non-negative and not greather than graph size.")
   if (niter < 0)
-    stop("number of iteration must be positive a number.")
+    stop("Number of iteration must be a non-negative number.")
   if (!("name" %in% vertex_attr_names(graph)))
-    stop("graph must have 'name' attribute on vertices.")
+    stop("graph must have \"name\" attribute on vertices.")
 }
 
 
@@ -35,7 +36,7 @@ check_arguments <- function(graph, module_size, niter) {
 #'
 #' Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
 #'
-#' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
+#' @param graph An \code{igraph} graph with \code{lieklihood} vertex attribute.
 #' @param module_size The size of subgraph.
 #' @param niter Number of iterations.
 #' @return Vector of vertex names of connected subgraph.
@@ -59,10 +60,9 @@ sample_subgraph <- function(graph, module_size, niter) {
 #' @inheritParams sample_subgraph
 #' @param exp_lh The exponent likelihood values to be raised to.
 #' @param fixed_size \code{TRUE} if the module size is fixed.
-#' @return Named vector where names are number of iteration.
+#' @return A named vector of likelihoods where names are number of iteration.
 #' @importFrom stats setNames
 #' @export
-#'
 sample_llh <-
   function(graph,
            module_size = NULL,
@@ -86,15 +86,15 @@ sample_llh <-
 
 
 
-#' Set of connected subgraphs from uniform distribution.
+#' Sampling set of connected subgraphs by likelihood value.
 #'
 #' Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC) method.
 #'
 #' @inheritParams sample_llh
-#' @param times Number of subgraphs.
-#' @param previous_mcmc Object of type MCMC.
-#' @return Object of type MCMC.
-#' @seealso \code{\link{sample_subgraph}, \link{mcmc_onelong}}
+#' @param times A number of subgraphs.
+#' @param previous_mcmc Object of class MCMC.
+#' @return Object of class MCMC.
+#' @seealso \code{\link{sample_llh}, \link{sample_subgraph}, \link{mcmc_onelong}}
 #' @import igraph
 #' @export
 mcmc_sample <-
@@ -112,20 +112,22 @@ mcmc_sample <-
     }
     if (!is.null(previous_mcmc)) {
       if (class(previous_mcmc) != "MCMC")
-        stop("previous_mcmc must be type of \"MCMC\"")
+        stop("previous_mcmc must be class of \"MCMC\"")
       start_module <- previous_mcmc$mat
-      module_size <- sum(start_module[1, ])
+      module_size <- sum(start_module[1,])
     }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
 
     if (is.null(previous_mcmc)) {
       start_module <-
-        matrix(unlist(replicate(
-          times,
-          sample_subgraph_internal(edgelist, gorder(graph), module_size, 1),
-          simplify = FALSE
-        )), nrow = times, byrow = TRUE)
+        matrix(unlist(
+          replicate(
+            times,
+            sample_subgraph_internal(edgelist, gorder(graph), module_size, 1),
+            simplify = FALSE
+          )
+        ), nrow = times, byrow = TRUE)
     }
     for (i in seq_along(exp_lh)) {
       res1 <- mcmc_sample_internal(edgelist,
@@ -133,22 +135,23 @@ mcmc_sample <-
                                    fixed_size,
                                    niter,
                                    start_module)
-      start_module <-  matrix(res1, ncol = gorder(graph), byrow = TRUE)
+      start_module <-
+        matrix(res1, ncol = gorder(graph), byrow = TRUE)
     }
     return(mcmc(start_module, V(graph)$name))
   }
 
 
 
-#' Set of connected subgraphs.
+#' Sampling set of connected subgraphs by likelihood value.
 #'
 #' Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
 #'
-#' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
+#' @param graph An \code{igraph} graph with \code{lieklihood} vertex attribute.
 #' @param module_size The size of subgraph.
 #' @param start Starting with this iteration, we write down all states of the Markov process.
 #' @param end Number of iterations.
-#' @return Object of type MCMC.
+#' @return Object of class MCMC.
 #' @seealso \code{\link{sample_subgraph}, \link{mcmc_sample}}
 #' @import igraph
 #' @export
@@ -164,15 +167,12 @@ mcmc_onelong <- function(graph, module_size, start, end) {
 
 
 
-#' Frequency of vertices.
+#' Frequency of vertices using one long run in MCMC.
 #'
 #' The frequency of occurrence of vertices in one long run of method Markov chain Monte Carlo (MCMC).
 #'
-#' @param graph An object of type \code{igraph} with \code{lieklihood} field in vertices.
-#' @param module_size The size of subgraph.
-#' @param start Starting with this iteration, we write down all states of the Markov process.
-#' @param end Number of iterations.
-#' @return Named frequency vector.
+#' @inheritParams mcmc_onelong
+#' @return A named frequency vector.
 #' @seealso \code{\link{mcmc_onelong}, \link{sample_subgraph}, \link{mcmc_sample}}
 #' @import igraph
 #' @export
