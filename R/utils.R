@@ -41,7 +41,7 @@ get_frequency <-
 #'
 #' @param graph An \code{igraph} graph.
 #' @param fdr Numeric constant, from the false discovery rate a p-value threshold is calculated.
-#' @return An \code{igraph} graph with \emph{likelihood} vertex atribute.
+#' @return An \code{igraph} graph with \emph{likelihood} vertex attribute.
 #' @import igraph
 #' @importFrom BioNet fitBumModel scoreFunction
 #' @export
