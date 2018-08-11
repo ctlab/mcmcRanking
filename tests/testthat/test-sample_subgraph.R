@@ -9,6 +9,10 @@ test_that("bad call", {
     module_size = 5,
     niter = 1
   ))
+
+  g <- graph(c(1, 2, 2, 1, 2, 2, 1, 3), directed = FALSE)
+  V(g)$name <- letters[1:3]
+  expect_error(sample_subgraph(g, 1, 1))
 })
 
 test_that("sample_subgraph works", {

@@ -28,6 +28,9 @@ check_arguments <- function(graph, module_size, niter) {
     stop("Number of iteration must be a non-negative number.")
   if (!("name" %in% vertex_attr_names(graph)))
     stop("graph must have \"name\" attribute on vertices.")
+  if(!is_simple(graph)){
+    stop("A simple graph is expected.\nSimple graphs are graphs which do not contain loop and multiple edges.")
+  }
 }
 
 
