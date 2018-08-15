@@ -49,13 +49,13 @@ LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelih
 }
 
 // [[Rcpp::export]]
-IntegerVector
+LogicalVector
 mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, int module_size, size_t start, size_t end) {
     Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), true);
     vector<unsigned> module = g.random_subgraph(module_size);
     g.initialize_module(module);
     vector<char> ret = g.onelong_iteration(start, end);
-    return IntegerVector(ret.begin(), ret.end());
+    return LogicalVector(ret.begin(), ret.end());
 }
 
 // [[Rcpp::export]]

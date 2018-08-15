@@ -170,13 +170,18 @@ mcmc_sample <-
 #' @seealso \code{\link{sample_subgraph}, \link{mcmc_sample}}
 #' @import igraph
 #' @export
+#' @examples
+#' data(exampleGraph)
+#' x <- mcmc_onelong(exampleGraph, 50, 1e4, 2e4)
+#' freq <- get_frequency(x)
+#' tail(sort(freq))
 mcmc_onelong <- function(graph, module_size, start, end) {
   check_arguments(graph, module_size, end)
   edgelist <- as_edgelist(graph, names = FALSE) - 1
   res <-
-    mcmc_onelong_internal(edgelist, V(graph)$likelihood, module_size, start, end) + 1
+    mcmc_onelong_internal(edgelist, V(graph)$likelihood, module_size, start, end)
   ret <-
-    mcmc(matrix(res, ncol = module_size, byrow = TRUE), V(graph)$name)
+    mcmc(matrix(res, ncol = gorder(graph), byrow = TRUE), V(graph)$name)
   return(ret)
 }
 

@@ -50,7 +50,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // mcmc_onelong_internal
-IntegerVector mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, int module_size, size_t start, size_t end);
+LogicalVector mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, int module_size, size_t start, size_t end);
 RcppExport SEXP _mcmcRanking_mcmc_onelong_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP module_sizeSEXP, SEXP startSEXP, SEXP endSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

@@ -9,6 +9,7 @@
 #' @import igraph
 #' @export
 #' @examples
+#' library(igraph)
 #' data(exampleGraph)
 #' rank <- probabilistic_rank(exampleGraph, V(exampleGraph)$q)
 #' head(rank)
