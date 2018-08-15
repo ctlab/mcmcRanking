@@ -8,6 +8,10 @@
 #' @seealso \code{\link{mcmc_sample}}
 #' @import igraph
 #' @export
+#' @examples
+#' data(exampleGraph)
+#' rank <- probabilistic_rank(exampleGraph, V(exampleGraph)$q)
+#' head(rank)
 probabilistic_rank <- function(graph, q) {
   edgelist <- as_edgelist(graph, names = FALSE) - 1
   nodes <-

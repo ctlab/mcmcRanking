@@ -21,6 +21,12 @@ Object of class MCMC.
 \description{
 Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
 }
+\examples{
+data(exampleGraph)
+x <- mcmc_onelong(exampleGraph, 50, 1e4, 2e4)
+freq <- get_freq(x)
+tail(sort(freq))
+}
 \seealso{
 \code{\link{sample_subgraph}, \link{mcmc_sample}}
 }

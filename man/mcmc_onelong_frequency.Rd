@@ -21,6 +21,11 @@ A named frequency vector.
 \description{
 The frequency of occurrence of vertices in one long run of method Markov chain Monte Carlo (MCMC).
 }
+\examples{
+data(exampleGraph)
+freq <- mcmc_onelong_frequency(exampleGraph, 50, 1e4, 2e4)
+tail(sort(freq), 60)
+}
 \seealso{
 \code{\link{mcmc_onelong}, \link{sample_subgraph}, \link{mcmc_sample}}
 }

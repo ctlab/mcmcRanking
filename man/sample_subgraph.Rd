@@ -19,6 +19,10 @@ Vector of vertex names of connected subgraph.
 \description{
 Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
 }
+\examples{
+data(exampleGraph)
+sample_subgraph(exampleGraph, 10, 1e4)
+}
 \seealso{
 \code{\link{mcmc_sample}, \link{mcmc_onelong}}
 }

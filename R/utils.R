@@ -7,6 +7,9 @@
 #' @param x According to this value repetition depth calculates.
 #' @return A number of runs.
 #' @export
+#' @examples
+#' repetition_depth(16)
+#' repetition_depth(81)
 repetition_depth <- function(x) {
   d <- 0
   while (x > 4) {
@@ -27,6 +30,11 @@ repetition_depth <- function(x) {
 #' @return A named vector of frequency.
 #' @import igraph
 #' @export
+#' @examples
+#' data(exampleGraph)
+#' x <- mcmc_sample(exampleGraph, module_size = 0, times = 1e3, niter = 100)
+#' freq <- get_frequency(x)
+#' tail(sort(freq))
 get_frequency <-
   function(mcmcObj, inds = seq_len(nrow(mcmcObj$mat))) {
     freq <- colSums(mcmcObj$mat[inds, , drop = FALSE])
@@ -45,6 +53,9 @@ get_frequency <-
 #' @import igraph
 #' @importFrom BioNet fitBumModel scoreFunction
 #' @export
+#' @examples
+#' data(exampleGraph)
+#' set_likelihood(exampleGraph, 1e-7)
 set_likelihood <- function(graph, fdr) {
   pvals <- V(graph)$pval
   names(pvals) <- V(graph)$name

@@ -24,3 +24,8 @@ A named vector of likelihoods where names are number of iteration.
 \description{
 Generates log-likelihood values during one MCMC run for analyzing behavior of subgraph.
 }
+\examples{
+data(exampleGraph)
+llhs <- sample_llh(exampleGraph, 0, 1e5)
+tail(llhs)
+}

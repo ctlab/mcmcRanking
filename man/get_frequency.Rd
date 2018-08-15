@@ -17,3 +17,9 @@ A named vector of frequency.
 \description{
 Calculates the frequency of occurrences of vertices in matrix object.
 }
+\examples{
+data(exampleGraph)
+x <- mcmc_sample(exampleGraph, module_size = 0, times = 1e3, niter = 100)
+freq <- get_frequency(x)
+tail(sort(freq))
+}

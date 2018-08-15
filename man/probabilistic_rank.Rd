@@ -17,6 +17,11 @@ ranking.
 \description{
 Heuristic ranking maximizing the area under the ROC curve.
 }
+\examples{
+data(exampleGraph)
+rank <- probabilistic_rank(exampleGraph, V(exampleGraph)$q)
+head(rank)
+}
 \seealso{
 \code{\link{mcmc_sample}}
 }

@@ -17,3 +17,7 @@ An \code{igraph} graph with \emph{likelihood} vertex attribute.
 \description{
 Set \emph{likelihood} vertex attribute to an \code{igraph} graph using pval vertex attribute.
 }
+\examples{
+data(exampleGraph)
+set_likelihood(exampleGraph, 1e-7)
+}

@@ -28,6 +28,12 @@ Object of class MCMC.
 \description{
 Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC) method.
 }
+\examples{
+data(exampleGraph)
+x <- mcmc_sample(exampleGraph, module_size = 0, times = 1e3, niter = 100)
+freq <- get_frequency(x)
+tail(sort(freq))
+}
 \seealso{
 \code{\link{sample_llh}, \link{sample_subgraph}, \link{mcmc_onelong}}
 }

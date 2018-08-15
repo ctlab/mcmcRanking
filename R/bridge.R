@@ -46,6 +46,9 @@ check_arguments <- function(graph, module_size, niter) {
 #' @seealso \code{\link{mcmc_sample}, \link{mcmc_onelong}}
 #' @import igraph
 #' @export
+#' @examples
+#' data(exampleGraph)
+#' sample_subgraph(exampleGraph, 10, 1e4)
 sample_subgraph <- function(graph, module_size, niter) {
   check_arguments(graph, module_size, niter)
   edgelist <- as_edgelist(graph, names = FALSE) - 1
@@ -66,6 +69,10 @@ sample_subgraph <- function(graph, module_size, niter) {
 #' @return A named vector of likelihoods where names are number of iteration.
 #' @importFrom stats setNames
 #' @export
+#' @examples
+#' data(exampleGraph)
+#' llhs <- sample_llh(exampleGraph, 0, 1e5)
+#' tail(llhs)
 sample_llh <-
   function(graph,
            module_size = NULL,
@@ -100,6 +107,11 @@ sample_llh <-
 #' @seealso \code{\link{sample_llh}, \link{sample_subgraph}, \link{mcmc_onelong}}
 #' @import igraph
 #' @export
+#' @examples
+#' data(exampleGraph)
+#' x <- mcmc_sample(exampleGraph, module_size = 0, times = 1e3, niter = 100)
+#' freq <- get_frequency(x)
+#' tail(sort(freq))
 mcmc_sample <-
   function(graph,
            module_size = NULL,
@@ -179,6 +191,10 @@ mcmc_onelong <- function(graph, module_size, start, end) {
 #' @seealso \code{\link{mcmc_onelong}, \link{sample_subgraph}, \link{mcmc_sample}}
 #' @import igraph
 #' @export
+#' @examples
+#' data(exampleGraph)
+#' freq <- mcmc_onelong_frequency(exampleGraph, 50, 1e4, 2e4)
+#' tail(sort(freq), 60)
 mcmc_onelong_frequency <- function(graph, module_size, start, end) {
   check_arguments(graph, module_size, end)
   edgelist <- as_edgelist(graph, names = FALSE) - 1
