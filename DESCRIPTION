@@ -9,11 +9,13 @@ Description: Tool for estimate probabilities of vertices being in active
 License: MIT + file LICENSE
 URL: https://github.com/ctlab/mcmcRanking
 BugReports: https://github.com/ctlab/mcmcRanking/issues
+Depends: 
+    R (>= 2.10)
 Imports: 
-    stats,
     BioNet,
     igraph,
-    Rcpp
+    Rcpp,
+    stats
 Suggests: 
     covr,
     DLBCL,

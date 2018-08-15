@@ -35,4 +35,4 @@ V(exampleGraph)$q <- (times - get_frequency(z)) / times
 
 V(exampleGraph)$r <- probabilistic_rank(graph = exampleGraph, q = V(exampleGraph)$q)
 
-devtools::use_data(exampleGraph, overwrite = TRUE)
+devtools::use_data(exampleGraph, overwrite = TRUE, compress = "xz")
