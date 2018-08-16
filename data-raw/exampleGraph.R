@@ -31,8 +31,10 @@ z <-
     exp_lh = 1 / 2 ^ (depth:0)
   )
 
-V(exampleGraph)$q <- (times - get_frequency(z)) / times
+q <- (times - get_frequency(z)) / times
+V(exampleGraph)$q <- q[V(exampleGraph)$name]
 
-V(exampleGraph)$r <- probabilistic_rank(graph = exampleGraph, q = V(exampleGraph)$q)
+r <- probabilistic_rank(graph = exampleGraph, q = q)
+V(exampleGraph)$r <- r[V(exampleGraph)$name]
 
 devtools::use_data(exampleGraph, overwrite = TRUE, compress = "xz")
