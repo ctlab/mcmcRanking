@@ -4,7 +4,8 @@
 \alias{mcmc_onelong_frequency}
 \title{Frequency of vertices using one long run in MCMC.}
 \usage{
-mcmc_onelong_frequency(graph, module_size, start, end)
+mcmc_onelong_frequency(graph, module_size, start, niter,
+  fixed_size = FALSE)
 }
 \arguments{
 \item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
@@ -13,7 +14,9 @@ mcmc_onelong_frequency(graph, module_size, start, end)
 
 \item{start}{Starting with this iteration, we write down all states of the Markov process.}
 
-\item{end}{Number of iterations.}
+\item{niter}{Number of iterations.}
+
+\item{fixed_size}{\code{TRUE} if the module size is fixed.}
 }
 \value{
 A named frequency vector.

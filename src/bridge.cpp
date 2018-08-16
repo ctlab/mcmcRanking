@@ -11,7 +11,7 @@ using mcmc::Graph;
 LogicalVector sample_subgraph_internal(IntegerMatrix edgelist, int gorder, int module_size, size_t niter) {
     vector<double> nodes(gorder, 1);
     Graph g = Graph(nodes, adj_list(edgelist, gorder), true);
-    vector<vector<unsigned>> module;
+    vector <vector<unsigned>> module;
     module.push_back(g.random_subgraph(module_size));
     vector<char> ret = g.sample_iteration(module, 1, niter);
     return LogicalVector(ret.begin(), ret.end());
@@ -35,7 +35,7 @@ NumericVector sample_llh_internal(IntegerMatrix edgelist, NumericVector likeliho
 LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, size_t niter,
                                    LogicalMatrix start_module) {
     Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), fixed_size);
-    vector<vector<unsigned>> module;
+    vector <vector<unsigned>> module;
     for (int i = 0; i < start_module.nrow(); ++i) {
         module.push_back(vector<unsigned>());
         for (int j = 0; j < start_module.ncol(); ++j) {
@@ -50,21 +50,22 @@ LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelih
 
 // [[Rcpp::export]]
 LogicalVector
-mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, int module_size, size_t start, size_t end) {
-    Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), true);
+mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size, size_t start,
+                      size_t niter) {
+    Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), fixed_size);
     vector<unsigned> module = g.random_subgraph(module_size);
     g.initialize_module(module);
-    vector<char> ret = g.onelong_iteration(start, end);
+    vector<char> ret = g.onelong_iteration(start, niter);
     return LogicalVector(ret.begin(), ret.end());
 }
 
 // [[Rcpp::export]]
 IntegerVector
-mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood, int module_size, size_t start,
-                                size_t end) {
-    Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), true);
+mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size,
+                                size_t start, size_t niter) {
+    Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), fixed_size);
     vector<unsigned> module = g.random_subgraph(module_size);
     g.initialize_module(module);
-    vector<unsigned> ret = g.onelong_iteration_frequency(start, end);
+    vector<unsigned> ret = g.onelong_iteration_frequency(start, niter);
     return IntegerVector(ret.begin(), ret.end());
 }

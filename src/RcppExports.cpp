@@ -50,32 +50,34 @@ BEGIN_RCPP
 END_RCPP
 }
 // mcmc_onelong_internal
-LogicalVector mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, int module_size, size_t start, size_t end);
-RcppExport SEXP _mcmcRanking_mcmc_onelong_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP module_sizeSEXP, SEXP startSEXP, SEXP endSEXP) {
+LogicalVector mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size, size_t start, size_t niter);
+RcppExport SEXP _mcmcRanking_mcmc_onelong_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP fixed_sizeSEXP, SEXP module_sizeSEXP, SEXP startSEXP, SEXP niterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type likelihood(likelihoodSEXP);
+    Rcpp::traits::input_parameter< bool >::type fixed_size(fixed_sizeSEXP);
     Rcpp::traits::input_parameter< int >::type module_size(module_sizeSEXP);
     Rcpp::traits::input_parameter< size_t >::type start(startSEXP);
-    Rcpp::traits::input_parameter< size_t >::type end(endSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_internal(edgelist, likelihood, module_size, start, end));
+    Rcpp::traits::input_parameter< size_t >::type niter(niterSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_internal(edgelist, likelihood, fixed_size, module_size, start, niter));
     return rcpp_result_gen;
 END_RCPP
 }
 // mcmc_onelong_frequency_internal
-IntegerVector mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood, int module_size, size_t start, size_t end);
-RcppExport SEXP _mcmcRanking_mcmc_onelong_frequency_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP module_sizeSEXP, SEXP startSEXP, SEXP endSEXP) {
+IntegerVector mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size, size_t start, size_t niter);
+RcppExport SEXP _mcmcRanking_mcmc_onelong_frequency_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP fixed_sizeSEXP, SEXP module_sizeSEXP, SEXP startSEXP, SEXP niterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< IntegerMatrix >::type edgelist(edgelistSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type likelihood(likelihoodSEXP);
+    Rcpp::traits::input_parameter< bool >::type fixed_size(fixed_sizeSEXP);
     Rcpp::traits::input_parameter< int >::type module_size(module_sizeSEXP);
     Rcpp::traits::input_parameter< size_t >::type start(startSEXP);
-    Rcpp::traits::input_parameter< size_t >::type end(endSEXP);
-    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_frequency_internal(edgelist, likelihood, module_size, start, end));
+    Rcpp::traits::input_parameter< size_t >::type niter(niterSEXP);
+    rcpp_result_gen = Rcpp::wrap(mcmc_onelong_frequency_internal(edgelist, likelihood, fixed_size, module_size, start, niter));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -96,8 +98,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_mcmcRanking_sample_subgraph_internal", (DL_FUNC) &_mcmcRanking_sample_subgraph_internal, 4},
     {"_mcmcRanking_sample_llh_internal", (DL_FUNC) &_mcmcRanking_sample_llh_internal, 5},
     {"_mcmcRanking_mcmc_sample_internal", (DL_FUNC) &_mcmcRanking_mcmc_sample_internal, 5},
-    {"_mcmcRanking_mcmc_onelong_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_internal, 5},
-    {"_mcmcRanking_mcmc_onelong_frequency_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_frequency_internal, 5},
+    {"_mcmcRanking_mcmc_onelong_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_internal, 6},
+    {"_mcmcRanking_mcmc_onelong_frequency_internal", (DL_FUNC) &_mcmcRanking_mcmc_onelong_frequency_internal, 6},
     {"_mcmcRanking_probabilistic_rank_internal", (DL_FUNC) &_mcmcRanking_probabilistic_rank_internal, 2},
     {NULL, NULL, 0}
 };

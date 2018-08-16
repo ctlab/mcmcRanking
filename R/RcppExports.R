@@ -13,12 +13,12 @@ mcmc_sample_internal <- function(edgelist, likelihood, fixed_size, niter, start_
     .Call('_mcmcRanking_mcmc_sample_internal', PACKAGE = 'mcmcRanking', edgelist, likelihood, fixed_size, niter, start_module)
 }
 
-mcmc_onelong_internal <- function(edgelist, likelihood, module_size, start, end) {
-    .Call('_mcmcRanking_mcmc_onelong_internal', PACKAGE = 'mcmcRanking', edgelist, likelihood, module_size, start, end)
+mcmc_onelong_internal <- function(edgelist, likelihood, fixed_size, module_size, start, niter) {
+    .Call('_mcmcRanking_mcmc_onelong_internal', PACKAGE = 'mcmcRanking', edgelist, likelihood, fixed_size, module_size, start, niter)
 }
 
-mcmc_onelong_frequency_internal <- function(edgelist, likelihood, module_size, start, end) {
-    .Call('_mcmcRanking_mcmc_onelong_frequency_internal', PACKAGE = 'mcmcRanking', edgelist, likelihood, module_size, start, end)
+mcmc_onelong_frequency_internal <- function(edgelist, likelihood, fixed_size, module_size, start, niter) {
+    .Call('_mcmcRanking_mcmc_onelong_frequency_internal', PACKAGE = 'mcmcRanking', edgelist, likelihood, fixed_size, module_size, start, niter)
 }
 
 probabilistic_rank_internal <- function(edgelist, df_nodes) {

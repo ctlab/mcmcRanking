@@ -4,7 +4,7 @@
 \alias{mcmc_onelong}
 \title{Sampling set of connected subgraphs by likelihood value.}
 \usage{
-mcmc_onelong(graph, module_size, start, end)
+mcmc_onelong(graph, module_size, start, niter, fixed_size = FALSE)
 }
 \arguments{
 \item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
@@ -13,7 +13,9 @@ mcmc_onelong(graph, module_size, start, end)
 
 \item{start}{Starting with this iteration, we write down all states of the Markov process.}
 
-\item{end}{Number of iterations.}
+\item{niter}{Number of iterations.}
+
+\item{fixed_size}{\code{TRUE} if the module size is fixed.}
 }
 \value{
 Object of class MCMC.

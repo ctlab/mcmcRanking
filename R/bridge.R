@@ -165,7 +165,8 @@ mcmc_sample <-
 #' @param graph An \code{igraph} graph with \code{lieklihood} vertex attribute.
 #' @param module_size The size of subgraph.
 #' @param start Starting with this iteration, we write down all states of the Markov process.
-#' @param end Number of iterations.
+#' @param niter Number of iterations.
+#' @param fixed_size \code{TRUE} if the module size is fixed.
 #' @return Object of class MCMC.
 #' @seealso \code{\link{sample_subgraph}, \link{mcmc_sample}}
 #' @import igraph
@@ -175,11 +176,11 @@ mcmc_sample <-
 #' x <- mcmc_onelong(exampleGraph, 50, 1e4, 2e4)
 #' freq <- get_frequency(x)
 #' tail(sort(freq))
-mcmc_onelong <- function(graph, module_size, start, end) {
-  check_arguments(graph, module_size, end)
+mcmc_onelong <- function(graph, module_size, start, niter, fixed_size = FALSE) {
+  check_arguments(graph, module_size, niter)
   edgelist <- as_edgelist(graph, names = FALSE) - 1
   res <-
-    mcmc_onelong_internal(edgelist, V(graph)$likelihood, module_size, start, end)
+    mcmc_onelong_internal(edgelist, V(graph)$likelihood, fixed_size, module_size, start, niter)
   ret <-
     mcmc(matrix(res, ncol = gorder(graph), byrow = TRUE), V(graph)$name)
   return(ret)
@@ -200,11 +201,11 @@ mcmc_onelong <- function(graph, module_size, start, end) {
 #' data(exampleGraph)
 #' freq <- mcmc_onelong_frequency(exampleGraph, 50, 1e4, 2e4)
 #' tail(sort(freq), 60)
-mcmc_onelong_frequency <- function(graph, module_size, start, end) {
-  check_arguments(graph, module_size, end)
+mcmc_onelong_frequency <- function(graph, module_size, start, niter, fixed_size = FALSE) {
+  check_arguments(graph, module_size, niter)
   edgelist <- as_edgelist(graph, names = FALSE) - 1
   res <-
-    mcmc_onelong_frequency_internal(edgelist, V(graph)$likelihood, module_size, start, end)
+    mcmc_onelong_frequency_internal(edgelist, V(graph)$likelihood, fixed_size, module_size, start, niter)
   names(res) <- V(graph)$name
   return(res)
 }
