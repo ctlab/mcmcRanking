@@ -4,8 +4,8 @@
 \alias{mcmc_sample}
 \title{Sampling set of connected subgraphs by likelihood value.}
 \usage{
-mcmc_sample(graph, module_size = NULL, times = NULL,
-  previous_mcmc = NULL, niter, exp_lh = 1, fixed_size = FALSE)
+mcmc_sample(graph, module_size, times, niter, previous_mcmc, exp_lh = 1,
+  fixed_size = FALSE)
 }
 \arguments{
 \item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
@@ -14,9 +14,9 @@ mcmc_sample(graph, module_size = NULL, times = NULL,
 
 \item{times}{A number of subgraphs.}
 
-\item{previous_mcmc}{Object of class MCMC.}
-
 \item{niter}{Number of iterations.}
+
+\item{previous_mcmc}{Object of class MCMC.}
 
 \item{exp_lh}{The exponent likelihood values to be raised to.}
 

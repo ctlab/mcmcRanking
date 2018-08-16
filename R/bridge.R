@@ -75,7 +75,7 @@ sample_subgraph <- function(graph, module_size, niter) {
 #' tail(llhs)
 sample_llh <-
   function(graph,
-           module_size = NULL,
+           module_size,
            niter,
            exp_lh = 1,
            fixed_size = FALSE) {
@@ -114,27 +114,27 @@ sample_llh <-
 #' tail(sort(freq))
 mcmc_sample <-
   function(graph,
-           module_size = NULL,
-           times = NULL,
-           previous_mcmc = NULL,
+           module_size,
+           times,
            niter,
+           previous_mcmc,
            exp_lh = 1,
            fixed_size = FALSE) {
-    if (!xor(is.null(module_size) &&
-             is.null(times),
-             is.null(previous_mcmc))) {
+    if (!xor(missing(module_size) &&
+             missing(times),
+             missing(previous_mcmc))) {
       stop("One of the arguments module_size and times or previous_mcmc must be set.")
     }
-    if (!is.null(previous_mcmc)) {
+    if (!missing(previous_mcmc)) {
       if (class(previous_mcmc) != "MCMC")
         stop("previous_mcmc must be class of \"MCMC\"")
       start_module <- previous_mcmc$mat
-      module_size <- sum(start_module[1,])
+      module_size <- sum(start_module[1, ])
     }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
 
-    if (is.null(previous_mcmc)) {
+    if (missing(previous_mcmc)) {
       start_module <-
         matrix(unlist(
           replicate(
