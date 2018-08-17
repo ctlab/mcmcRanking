@@ -97,6 +97,25 @@ IntegerVector probabilistic_rank_internal(IntegerMatrix edgelist, DataFrame df_n
                 break;
             }
         }
+        size_t ind = -1;
+        for(int i = 0; i < n; ++i){
+            if(ranked[i])
+                continue;
+            if(ind == -1) {
+                ind = i;
+            } else if(nodes[i] >= nodes[ind]) {
+                if (nodes[i] == nodes[ind] && is_cut_point[i]) {
+                    continue;
+                }
+                ind = i;
+            }
+        }
+        if(!is_cut_point[ind]){
+            ranked[ind] = not_ranked_n--;
+            sum_p = sum_p - (1 - nodes[ind]);
+            sum_q =  sum_q - nodes[ind];
+            continue;
+        }
         for (int i = 0; i < n; ++i) {
             if (ranked[i])
                 continue;
