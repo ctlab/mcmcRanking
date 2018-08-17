@@ -2,29 +2,35 @@
 #include <vector>
 #include "utils.h"
 #include "mcmc.h"
+#include "hsa.h"
 
 using namespace Rcpp;
 using namespace std;
-using mcmc::Graph;
+using namespace mcmc;
 
 
-void dfs(unsigned i, vector<vector<unsigned>> &edges, vector<unsigned> &new_comp, vector<bool> &used) {
-    used[i] = true;
+void
+dfs(unsigned i, vector <vector<unsigned>> &edges, vector<unsigned> &new_comp, vector<char> &used, HSA &not_ranked) {
+    used[not_ranked.get_index(i)] = true;
     new_comp.push_back(i);
-    for (unsigned x : edges[i])
-        if (!used[x])
-            dfs(x, edges, new_comp, used);
+    for (unsigned x : edges[i]) {
+        size_t ind_x = not_ranked.get_index(x);
+        if (ind_x == -1)
+            continue;
+        if (!used[ind_x])
+            dfs(x, edges, new_comp, used, not_ranked);
+    }
 }
 
 
-void cut_points_dfs(int v, int p, int &timer, vector<vector<unsigned>> &edges, vector<unsigned> &ranked, bool used[],
-                    int tin[], int fup[], bool is_cut_point[]) {
+void
+cut_points_dfs(int v, int p, int &timer, vector <vector<unsigned>> &edges, vector<unsigned> &ranked, vector<char> &used,
+               int tin[], int fup[], vector<char> &is_cut_point) {
     used[v] = true;
     tin[v] = timer++;
     fup[v] = timer;
     int children = 0;
-    for (size_t i = 0; i < edges[v].size(); ++i) {
-        int to = edges[v][i];
+    for (unsigned to : edges[v]) {
         if (to == p || ranked[to])
             continue;
         if (used[to]) {
@@ -41,17 +47,30 @@ void cut_points_dfs(int v, int p, int &timer, vector<vector<unsigned>> &edges, v
         is_cut_point[v] = true;
 }
 
+vector<char> cut_points_dfs(int v, vector <vector<unsigned>> &edges, vector<unsigned> &ranked) {
+    size_t n = edges.size();
+    vector<char> is_cut_point(n, false);
+    vector<char> used(n, false);
+    int tin[n];
+    int fup[n];
+    int timer = 0;
+    cut_points_dfs(v, -1, timer, edges, ranked, used, tin, fup, is_cut_point);
+    return is_cut_point;
+}
 
 bool
-get_best_comp(vector<vector<unsigned>> &edges, vector<double> &nodes, vector<unsigned> &ranked, vector<unsigned> &comp,
-              vector<unsigned> &to_remove, int i) {
-    vector<bool> used(ranked.begin(), ranked.end());
-    used[i] = true;
+get_best_comp(vector <vector<unsigned>> &edges, vector<double> &nodes, HSA &not_ranked,
+              vector<unsigned> &comp, vector<unsigned> &to_remove, int i) {
+    vector<char> used(not_ranked.size(), false);
+    used[not_ranked.get_index(i)] = true;
     to_remove.push_back(i);
     for (int j = 0; j < nodes.size(); ++j) {
-        if (!used[j]) {
+        size_t ind_j = not_ranked.get_index(j);
+        if (ind_j == -1)
+            continue;
+        if (!used[ind_j]) {
             vector<unsigned> new_comp;
-            dfs(j, edges, new_comp, used);
+            dfs(j, edges, new_comp, used, not_ranked);
             if (new_comp.size() > comp.size())
                 comp.swap(new_comp);
             for (unsigned x : new_comp) {
@@ -69,10 +88,14 @@ IntegerVector probabilistic_rank_internal(IntegerMatrix edgelist, DataFrame df_n
     NumericVector q = df_nodes["q"];
     unsigned n = q.size();
     vector<double> nodes(q.begin(), q.end());
-    vector<vector<unsigned>> edges = adj_list(edgelist, n);
+    vector <vector<unsigned>> edges = adj_list(edgelist, n);
 
     vector<unsigned> ranked(n, 0);
-    unsigned not_ranked_n = n;
+
+    HSA not_ranked(n);
+    for (size_t i = 0; i < n; ++i) {
+        not_ranked.insert(i);
+    }
 
     double sum_p = 0;
     for (double x : nodes)
@@ -80,51 +103,36 @@ IntegerVector probabilistic_rank_internal(IntegerMatrix edgelist, DataFrame df_n
     double sum_q = n - sum_p;
 
     unsigned cand_remove = 0;
-    while (not_ranked_n != 0) {
+    while (not_ranked.size() != 0) {
         double best_q = sum_q;
         double best_p = -1;
 
-        bool used[n];
-        bool is_cut_point[n];
-        memset(used, 0, sizeof used);
-        memset(is_cut_point, 0, sizeof is_cut_point);
-        int tin[n];
-        int fup[n];
-        int timer = 0;
-        for (int i : edges[cand_remove]) {
-            if (!ranked[i]) {
-                cut_points_dfs(i, -1, timer, edges, ranked, used, tin, fup, is_cut_point);
-                break;
-            }
-        }
-        size_t ind = -1;
-        for(int i = 0; i < n; ++i){
-            if(ranked[i])
-                continue;
-            if(ind == -1) {
-                ind = i;
-            } else if(nodes[i] >= nodes[ind]) {
+        size_t nr_v = not_ranked.get(0);
+        vector<char> is_cut_point = cut_points_dfs(nr_v, edges, ranked);
+
+        size_t ind = nr_v;
+        for (size_t i : not_ranked.get_all()) {
+            if (nodes[i] >= nodes[ind]) {
                 if (nodes[i] == nodes[ind] && is_cut_point[i]) {
                     continue;
                 }
                 ind = i;
             }
         }
-        if(!is_cut_point[ind]){
-            ranked[ind] = not_ranked_n--;
-            sum_p = sum_p - (1 - nodes[ind]);
-            sum_q =  sum_q - nodes[ind];
+        if (!is_cut_point[ind]) {
+            ranked[ind] = not_ranked.size();
+            not_ranked.erase(ind);
+            sum_p -= 1 - nodes[ind];
+            sum_q -= nodes[ind];
             continue;
         }
-        for (int i = 0; i < n; ++i) {
-            if (ranked[i])
-                continue;
+        for (size_t i : not_ranked.get_all()) {
             double cur_p;
             double cur_q;
             if (is_cut_point[i]) {
                 vector<unsigned> comp;
                 vector<unsigned> to_remove;
-                if (get_best_comp(edges, nodes, ranked, comp, to_remove, i))
+                if (get_best_comp(edges, nodes, not_ranked, comp, to_remove, i))
                     continue;
                 cur_p = 0;
                 for (unsigned x : comp)
@@ -145,13 +153,15 @@ IntegerVector probabilistic_rank_internal(IntegerMatrix edgelist, DataFrame df_n
         if (is_cut_point[cand_remove]) {
             vector<unsigned> comp;
             vector<unsigned> to_remove;
-            get_best_comp(edges, nodes, ranked, comp, to_remove, cand_remove);
+            get_best_comp(edges, nodes, not_ranked, comp, to_remove, cand_remove);
+            unsigned rank_all = not_ranked.size();
             for (unsigned x : to_remove) {
-                ranked[x] = not_ranked_n;
+                ranked[x] = rank_all;
+                not_ranked.erase(x);
             }
-            not_ranked_n -= to_remove.size();
         } else {
-            ranked[cand_remove] = not_ranked_n--;
+            ranked[cand_remove] = not_ranked.size();
+            not_ranked.erase(cand_remove);
         }
         sum_p = best_p;
         sum_q = best_q;
