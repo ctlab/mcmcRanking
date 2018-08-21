@@ -13,9 +13,10 @@ repetition_depth(x)
 A number of runs.
 }
 \description{
-Running MCMC with likelihood weights on vertices can cause to get stuck in locally
-good vertices, thereby finding locally significant solutions.
-So, we will iteratively increase vertex weights and this function calculates number of necessary iterations.
+Running MCMC with likelihood weights on vertices can cause to get stuck in
+locally good vertices, thereby finding locally significant solutions. So, we
+will iteratively increase vertex weights and this function calculates number
+of necessary iterations.
 }
 \examples{
 repetition_depth(16)

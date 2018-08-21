@@ -21,7 +21,8 @@ sample_llh(graph, module_size, niter, exp_lh = 1, fixed_size = FALSE)
 A named vector of likelihoods where names are number of iteration.
 }
 \description{
-Generates log-likelihood values during one MCMC run for analyzing behavior of subgraph.
+Generates log-likelihood values during one MCMC run for analyzing behavior of
+subgraph.
 }
 \examples{
 data(exampleGraph)

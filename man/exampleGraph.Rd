@@ -10,9 +10,11 @@
 \item{geneID}{Gene ID.}
 \item{geneSymbol}{Gene symbol.}
 \item{pval}{P-value derived from differential expression.}
-\item{likelihood}{Likelihood of vertex derived from \code{set_likelihood} function with \code{fdr=1e-7.}}
+\item{likelihood}{Likelihood of vertex derived from \code{set_likelihood}
+  function with \code{fdr=1e-7.}}
 \item{q}{Probability of not belonging vertex to an active module.}
-\item{r}{Rank of vertex derived from \code{probabilistic_rank} function using its \code{q}.}
+\item{r}{Rank of vertex derived from \code{probabilistic_rank} function using
+  its \code{q}.}
 }}
 \usage{
 exampleGraph

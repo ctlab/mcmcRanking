@@ -11,7 +11,8 @@ mcmc_onelong(graph, module_size, start, niter, fixed_size = FALSE)
 
 \item{module_size}{The size of subgraph.}
 
-\item{start}{Starting with this iteration, we write down all states of the Markov process.}
+\item{start}{Starting with this iteration, we write down all states of the
+Markov process.}
 
 \item{niter}{Number of iterations.}
 

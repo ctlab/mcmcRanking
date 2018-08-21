@@ -1,8 +1,9 @@
 #' Number of runs of iterative likelihood increase of vertices.
 #'
-#' Running MCMC with likelihood weights on vertices can cause to get stuck in locally
-#' good vertices, thereby finding locally significant solutions.
-#' So, we will iteratively increase vertex weights and this function calculates number of necessary iterations.
+#' Running MCMC with likelihood weights on vertices can cause to get stuck in
+#' locally good vertices, thereby finding locally significant solutions. So, we
+#' will iteratively increase vertex weights and this function calculates number
+#' of necessary iterations.
 #'
 #' @param x According to this value repetition depth calculates.
 #' @return A number of runs.
@@ -44,10 +45,12 @@ get_frequency <-
 
 #' Set likelihood.
 #'
-#' Set \emph{likelihood} vertex attribute to an \code{igraph} graph using pval vertex attribute.
+#' Set \emph{likelihood} vertex attribute to an \code{igraph} graph using pval
+#' vertex attribute.
 #'
 #' @param graph An \code{igraph} graph.
-#' @param fdr Numeric constant, from the false discovery rate a p-value threshold is calculated.
+#' @param fdr Numeric constant, from the false discovery rate a p-value
+#'   threshold is calculated.
 #' @return An \code{igraph} graph with \emph{likelihood} vertex attribute.
 #' @importFrom igraph V V<-
 #' @importFrom BioNet fitBumModel scoreFunction

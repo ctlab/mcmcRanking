@@ -113,7 +113,14 @@ Plot shows that log-likelihood value stabilizes after about $2 \cdot 10^4$ itera
 We found out how many iteration enough for convergence of *MCMC* method. Below function `mcmc_sample` iteratively runs *MCMC* with different likelihood values. We sample $10^3$ subgraphs using *MCMC*.
 
 ```{r message=FALSE, eval=FALSE}
-z <- mcmc_sample(graph = g, module_size = 0, times = 1e3, niter = 2e4, exp_lh = 1/2^(depth:0))
+z <-
+  mcmc_sample(
+  graph = g,
+  module_size = 0,
+  times = 1e3,
+  niter = 2e4,
+  exp_lh = 1 / 2 ^ (depth:0)
+  )
 ```
 
 After running *MCMC*, we calculate probability of gene and connectivity preserving ranking. To increase the accuracy of the probability, increase the number of runs or parameter `times`.  
@@ -142,9 +149,17 @@ Now, we have a vertex probabilities. It allows us to estimate FDR for any subgra
 data("exampleGraph")
 g <- exampleGraph
 par(mar = c(0,0,0,0))
-meanq <- sapply(seq_len(gorder(g)), function(i) mean(V(g)$q[which(V(g)$r <= i)]))
+meanq <-
+  sapply(seq_len(gorder(g)), function(i)
+  mean(V(g)$q[which(V(g)$r <= i)]))
 rank <- tail(which(meanq <= 0.15), 1)
 subg <- induced_subgraph(g, which(V(g)$r <= rank))
 cols <- colorRampPalette(c("gold","gray"))(rank)
-plot(subg, vertex.label=V(subg)$geneSymbol, vertex.size = 10, vertex.label.cex=0.75, vertex.color=cols[V(subg)$r])
+plot(
+  subg,
+  vertex.label = V(subg)$geneSymbol,
+  vertex.size = 10,
+  vertex.label.cex = 0.75,
+  vertex.color = cols[V(subg)$r]
+  )
 ```

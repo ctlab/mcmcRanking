@@ -19,7 +19,8 @@ exampleGraph <- simplify(graph_from_graphnel(network))
 V(exampleGraph)$pval <- ttest.pval[V(exampleGraph)$name]
 exampleGraph <- set_likelihood(graph = exampleGraph, fdr = 1e-7)
 
-depth <- repetition_depth(max(V(exampleGraph)$likelihood) / min(V(exampleGraph)$likelihood))
+depth <- repetition_depth(max(V(exampleGraph)$likelihood)
+                          / min(V(exampleGraph)$likelihood))
 
 times <- 1e3
 z <-

@@ -9,13 +9,15 @@ set_likelihood(graph, fdr)
 \arguments{
 \item{graph}{An \code{igraph} graph.}
 
-\item{fdr}{Numeric constant, from the false discovery rate a p-value threshold is calculated.}
+\item{fdr}{Numeric constant, from the false discovery rate a p-value
+threshold is calculated.}
 }
 \value{
 An \code{igraph} graph with \emph{likelihood} vertex attribute.
 }
 \description{
-Set \emph{likelihood} vertex attribute to an \code{igraph} graph using pval vertex attribute.
+Set \emph{likelihood} vertex attribute to an \code{igraph} graph using pval
+vertex attribute.
 }
 \examples{
 data(exampleGraph)

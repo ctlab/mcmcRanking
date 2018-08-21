@@ -26,7 +26,8 @@ mcmc_sample(graph, module_size, times, niter, previous_mcmc, exp_lh = 1,
 Object of class MCMC.
 }
 \description{
-Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC) method.
+Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC)
+method.
 }
 \examples{
 data(exampleGraph)
@@ -35,5 +36,6 @@ freq <- get_frequency(x)
 tail(sort(freq))
 }
 \seealso{
-\code{\link{sample_llh}, \link{sample_subgraph}, \link{mcmc_onelong}}
+\code{\link{sample_llh}, \link{sample_subgraph},
+  \link{mcmc_onelong}}
 }
