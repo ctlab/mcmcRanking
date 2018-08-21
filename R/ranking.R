@@ -6,7 +6,7 @@
 #' @param q Vector of probabilities of vertices to not belong to active module.
 #' @return ranking.
 #' @seealso \code{\link{mcmc_sample}}
-#' @import igraph
+#' @importFrom  igraph as_edgelist V
 #' @export
 #' @examples
 #' library(igraph)

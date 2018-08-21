@@ -28,7 +28,6 @@ repetition_depth <- function(x) {
 #' @param mcmcObj Object of class MCMC.
 #' @param inds Index numbers of rows involved in the calculation.
 #' @return A named vector of frequency.
-#' @import igraph
 #' @export
 #' @examples
 #' data(exampleGraph)
@@ -50,7 +49,7 @@ get_frequency <-
 #' @param graph An \code{igraph} graph.
 #' @param fdr Numeric constant, from the false discovery rate a p-value threshold is calculated.
 #' @return An \code{igraph} graph with \emph{likelihood} vertex attribute.
-#' @import igraph
+#' @importFrom igraph V V<-
 #' @importFrom BioNet fitBumModel scoreFunction
 #' @export
 #' @examples

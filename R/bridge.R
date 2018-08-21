@@ -20,7 +20,7 @@ mcmc <- function(mat, name) {
 }
 
 
-
+#' @importFrom igraph gorder vertex_attr_names is_simple
 check_arguments <- function(graph, module_size, niter) {
   if (module_size > gorder(graph) || module_size < 0)
     stop("Required module size must be non-negative and not greather than graph size.")
@@ -44,7 +44,7 @@ check_arguments <- function(graph, module_size, niter) {
 #' @param niter Number of iterations.
 #' @return Vector of vertex names of connected subgraph.
 #' @seealso \code{\link{mcmc_sample}, \link{mcmc_onelong}}
-#' @import igraph
+#' @importFrom igraph as_edgelist gorder V
 #' @export
 #' @examples
 #' data(exampleGraph)
@@ -67,6 +67,7 @@ sample_subgraph <- function(graph, module_size, niter) {
 #' @param exp_lh The exponent likelihood values to be raised to.
 #' @param fixed_size \code{TRUE} if the module size is fixed.
 #' @return A named vector of likelihoods where names are number of iteration.
+#' @importFrom igraph as_edgelist gorder V
 #' @importFrom stats setNames
 #' @export
 #' @examples
@@ -105,7 +106,7 @@ sample_llh <-
 #' @param previous_mcmc Object of class MCMC.
 #' @return Object of class MCMC.
 #' @seealso \code{\link{sample_llh}, \link{sample_subgraph}, \link{mcmc_onelong}}
-#' @import igraph
+#' @importFrom igraph as_edgelist gorder V
 #' @export
 #' @examples
 #' data(exampleGraph)
@@ -169,7 +170,7 @@ mcmc_sample <-
 #' @param fixed_size \code{TRUE} if the module size is fixed.
 #' @return Object of class MCMC.
 #' @seealso \code{\link{sample_subgraph}, \link{mcmc_sample}}
-#' @import igraph
+#' @importFrom igraph as_edgelist gorder V
 #' @export
 #' @examples
 #' data(exampleGraph)
@@ -195,7 +196,7 @@ mcmc_onelong <- function(graph, module_size, start, niter, fixed_size = FALSE) {
 #' @inheritParams mcmc_onelong
 #' @return A named frequency vector.
 #' @seealso \code{\link{mcmc_onelong}, \link{sample_subgraph}, \link{mcmc_sample}}
-#' @import igraph
+#' @importFrom igraph as_edgelist V
 #' @export
 #' @examples
 #' data(exampleGraph)
