@@ -1,11 +1,9 @@
 #include <queue>
-#include <unordered_set>
 #include <cmath>
 #include "mcmc.h"
-#include <Rcpp.h>
 
 namespace mcmc {
-    Graph::Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size)
+    Graph::Graph(vector<double> nodes, vector <vector<unsigned>> edges, bool fixed_size)
             : fixed_size(fixed_size), order(nodes.size()), nodes(nodes), edges(edges), inner(order), outer(order),
               in_nei_c(order, 0), neis(order, unordered_set<size_t>()) {
         random_device rd;
@@ -13,7 +11,7 @@ namespace mcmc {
         unirealdis = uniform_real_distribution<>(0, 1);
     }
 
-    Graph::Graph(Rcpp::NumericVector nodes, vector<vector<unsigned>> edges, bool fixed_size)
+    Graph::Graph(Rcpp::NumericVector nodes, vector <vector<unsigned>> edges, bool fixed_size)
             : fixed_size(fixed_size), order(nodes.size()), edges(edges), inner(order), outer(order),
               in_nei_c(order, 0), neis(order, unordered_set<size_t>()) {
         this->nodes = vector<double>(nodes.begin(), nodes.end());
@@ -244,65 +242,11 @@ namespace mcmc {
         }
     }
 
-    vector<size_t> Graph::get_inner_nodes() {
+    vector <size_t> Graph::get_inner_nodes() {
         return inner.get_all();
     }
 
-    vector<size_t> Graph::get_outer_nodes() {
+    vector <size_t> Graph::get_outer_nodes() {
         return outer.get_all();
-    }
-
-    vector<double> Graph::sample_llh(vector<unsigned> module, size_t end) {
-        vector<double> likelihoods(end);
-        initialize_module(module);
-        for (size_t i = 0; i < end; ++i) {
-            next_iteration();
-            likelihoods[i] = 0;
-            for (unsigned x : inner.get_all()) {
-                likelihoods[i] += log(nodes[x]);
-            }
-        }
-        return likelihoods;
-    }
-
-    vector<char> Graph::sample_iteration(vector<vector<unsigned>> module, size_t times, size_t end) {
-        vector<char> ret(order * times, false);
-        for (size_t i = 0; i < times; ++i) {
-            Rcpp::checkUserInterrupt();
-            initialize_module(module[i]);
-            for (size_t j = 0; j < end; ++j) {
-                next_iteration();
-            }
-            for (unsigned x : inner.get_all()) {
-                ret[x + i * order] = true;
-            }
-        }
-        return ret;
-    }
-
-    vector<char> Graph::onelong_iteration(size_t start, size_t end) {
-        vector<char> ret(order * (end - start), false);
-        for (size_t i = 0; i < end; ++i) {
-            next_iteration();
-            if (i >= start) {
-                for (unsigned x : inner.get_all()) {
-                    ret[x + (i - start) * order] = true;
-                }
-            }
-        }
-        return ret;
-    }
-
-    vector<unsigned> Graph::onelong_iteration_frequency(size_t start, size_t end) {
-        vector<unsigned> ret(order, 0);
-        for (size_t i = 0; i < end; ++i) {
-            next_iteration();
-            if (i >= start) {
-                for (unsigned x : inner.get_all()) {
-                    ret[x]++;
-                }
-            }
-        }
-        return ret;
     }
 };

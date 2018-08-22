@@ -3,10 +3,9 @@
 
 #include <random>
 #include <vector>
-#include <unordered_map>
 #include <unordered_set>
-#include "hsa.h"
 #include <Rcpp.h>
+#include "hsa.h"
 
 namespace mcmc {
     using namespace std;
@@ -15,13 +14,13 @@ namespace mcmc {
         bool fixed_size;
         size_t order;
         vector<double> nodes;
-        vector<vector<unsigned>> edges;
+        vector <vector<unsigned>> edges;
 
         HSA inner;
         HSA outer;
 
-        vector<size_t> in_nei_c;
-        vector<unordered_set<size_t>> neis;
+        vector <size_t> in_nei_c;
+        vector <unordered_set<size_t>> neis;
 
         mt19937 gen;
         uniform_real_distribution<> unirealdis;
@@ -33,9 +32,9 @@ namespace mcmc {
         void inner_update(unsigned v, bool is_erased);
 
     public:
-        Graph(vector<double> nodes, vector<vector<unsigned>> edges, bool fixed_size);
+        Graph(vector<double> nodes, vector <vector<unsigned>> edges, bool fixed_size);
 
-        Graph(Rcpp::NumericVector nodes, vector<vector<unsigned>> edges, bool fixed_size);
+        Graph(Rcpp::NumericVector nodes, vector <vector<unsigned>> edges, bool fixed_size);
 
         bool is_connected();
 
@@ -45,17 +44,9 @@ namespace mcmc {
 
         vector<unsigned> random_subgraph(size_t size);
 
-        vector<size_t> get_inner_nodes();
+        vector <size_t> get_inner_nodes();
 
-        vector<size_t> get_outer_nodes();
-
-        vector<double> sample_llh(vector<unsigned> module, size_t end);
-
-        vector<char> sample_iteration(vector<vector<unsigned>> module, size_t module_size, size_t end);
-
-        vector<char> onelong_iteration(size_t start, size_t end);
-
-        vector<unsigned> onelong_iteration_frequency(size_t start, size_t end);
+        vector <size_t> get_outer_nodes();
     };
 
 }

@@ -11,10 +11,15 @@ using mcmc::Graph;
 LogicalVector sample_subgraph_internal(IntegerMatrix edgelist, int gorder, int module_size, size_t niter) {
     vector<double> nodes(gorder, 1);
     Graph g = Graph(nodes, adj_list(edgelist, gorder), true);
-    vector <vector<unsigned>> module;
-    module.push_back(g.random_subgraph(module_size));
-    vector<char> ret = g.sample_iteration(module, 1, niter);
-    return LogicalVector(ret.begin(), ret.end());
+    g.initialize_module(g.random_subgraph(module_size));
+    for (size_t i = 0; i < niter; ++i) {
+        g.next_iteration();
+    }
+    LogicalVector ret(gorder, false);
+    for (size_t x : g.get_inner_nodes()) {
+        ret[x] = true;
+    }
+    return ret;
 }
 
 // [[Rcpp::export]]
@@ -27,25 +32,41 @@ NumericVector sample_llh_internal(IntegerMatrix edgelist, NumericVector likeliho
             module.push_back(j);
         }
     }
-    vector<double> ret = g.sample_llh(module, niter);
-    return NumericVector(ret.begin(), ret.end());
+    g.initialize_module(module);
+    NumericVector llhs(niter, 0);
+    for (size_t i = 0; i < niter; ++i) {
+        g.next_iteration();
+        for (size_t x : g.get_inner_nodes()) {
+            llhs[i] += log(likelihood[x]);
+        }
+    }
+    return llhs;
 }
 
 // [[Rcpp::export]]
 LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, size_t niter,
                                    LogicalMatrix start_module) {
     Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), fixed_size);
-    vector <vector<unsigned>> module;
-    for (int i = 0; i < start_module.nrow(); ++i) {
-        module.push_back(vector<unsigned>());
-        for (int j = 0; j < start_module.ncol(); ++j) {
+    size_t order = likelihood.size();
+    unsigned times = start_module.nrow();
+    LogicalVector ret(order * times, false);
+    for (int i = 0; i < times; ++i) {
+        Rcpp::checkUserInterrupt();
+        vector<unsigned> module;
+        for (int j = 0; j < order; ++j) {
             if (start_module(i, j)) {
-                module[i].push_back(j);
+                module.push_back(j);
             }
         }
+        g.initialize_module(module);
+        for (size_t j = 0; j < niter; ++j) {
+            g.next_iteration();
+        }
+        for (size_t x : g.get_inner_nodes()) {
+            ret[x + i * order] = true;
+        }
     }
-    vector<char> ret = g.sample_iteration(module, module.size(), niter);
-    return LogicalVector(ret.begin(), ret.end());
+    return ret;
 }
 
 // [[Rcpp::export]]
@@ -53,10 +74,19 @@ LogicalVector
 mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size, size_t start,
                       size_t niter) {
     Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), fixed_size);
-    vector<unsigned> module = g.random_subgraph(module_size);
-    g.initialize_module(module);
-    vector<char> ret = g.onelong_iteration(start, niter);
-    return LogicalVector(ret.begin(), ret.end());
+    size_t order = likelihood.size();
+    g.initialize_module(g.random_subgraph(module_size));
+    LogicalVector ret(order * (niter - start), false);
+    for (size_t i = 0; i < niter; ++i) {
+        g.next_iteration();
+        if (i < start) {
+            continue;
+        }
+        for (size_t x : g.get_inner_nodes()) {
+            ret[x + (i - start) * order] = true;
+        }
+    }
+    return ret;
 }
 
 // [[Rcpp::export]]
@@ -64,8 +94,17 @@ IntegerVector
 mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size,
                                 size_t start, size_t niter) {
     Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), fixed_size);
-    vector<unsigned> module = g.random_subgraph(module_size);
-    g.initialize_module(module);
-    vector<unsigned> ret = g.onelong_iteration_frequency(start, niter);
-    return IntegerVector(ret.begin(), ret.end());
+    size_t order = likelihood.size();
+    g.initialize_module(g.random_subgraph(module_size));
+    IntegerVector ret(order, 0);
+    for (size_t i = 0; i < niter; ++i) {
+        g.next_iteration();
+        if (i < start) {
+            continue;
+        }
+        for (size_t x : g.get_inner_nodes()) {
+            ret[x]++;
+        }
+    }
+    return ret;
 }
