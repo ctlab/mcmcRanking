@@ -14,6 +14,9 @@ LogicalVector sample_subgraph_internal(IntegerMatrix edgelist, int gorder, int m
     g.initialize_module(g.random_subgraph(module_size));
     for (size_t i = 0; i < niter; ++i) {
         g.next_iteration();
+        if (niter % 10000 == 0) {
+            Rcpp::checkUserInterrupt();
+        }
     }
     LogicalVector ret(gorder, false);
     for (size_t x : g.get_inner_nodes()) {
@@ -36,6 +39,9 @@ NumericVector sample_llh_internal(IntegerMatrix edgelist, NumericVector likeliho
     NumericVector llhs(niter, 0);
     for (size_t i = 0; i < niter; ++i) {
         g.next_iteration();
+        if (niter % 10000 == 0) {
+            Rcpp::checkUserInterrupt();
+        }
         for (size_t x : g.get_inner_nodes()) {
             llhs[i] += log(likelihood[x]);
         }
@@ -51,7 +57,6 @@ LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelih
     unsigned times = start_module.nrow();
     LogicalVector ret(order * times, false);
     for (int i = 0; i < times; ++i) {
-        Rcpp::checkUserInterrupt();
         vector<unsigned> module;
         for (int j = 0; j < order; ++j) {
             if (start_module(i, j)) {
@@ -61,6 +66,9 @@ LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelih
         g.initialize_module(module);
         for (size_t j = 0; j < niter; ++j) {
             g.next_iteration();
+            if (niter % 10000 == 0) {
+                Rcpp::checkUserInterrupt();
+            }
         }
         for (size_t x : g.get_inner_nodes()) {
             ret[x + i * order] = true;
@@ -79,6 +87,9 @@ mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fix
     LogicalVector ret(order * (niter - start), false);
     for (size_t i = 0; i < niter; ++i) {
         g.next_iteration();
+        if (niter % 10000 == 0) {
+            Rcpp::checkUserInterrupt();
+        }
         if (i < start) {
             continue;
         }
@@ -99,6 +110,9 @@ mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood
     IntegerVector ret(order, 0);
     for (size_t i = 0; i < niter; ++i) {
         g.next_iteration();
+        if (niter % 10000 == 0) {
+            Rcpp::checkUserInterrupt();
+        }
         if (i < start) {
             continue;
         }
