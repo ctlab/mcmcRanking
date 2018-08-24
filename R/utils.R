@@ -29,6 +29,7 @@ repetition_depth <- function(x) {
 #' @param mcmcObj Object of class MCMC.
 #' @param inds Index numbers of rows involved in the calculation.
 #' @return A named vector of frequency.
+#' @seealso \code{\link{mcmc_sample}, \link{mcmc_onelong}}
 #' @export
 #' @examples
 #' data(exampleGraph)

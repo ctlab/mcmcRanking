@@ -107,7 +107,7 @@ sample_llh <-
 #' @param previous_mcmc Object of class MCMC.
 #' @return Object of class MCMC.
 #' @seealso \code{\link{sample_llh}, \link{sample_subgraph},
-#'   \link{mcmc_onelong}}
+#'   \link{mcmc_onelong}, \link{get_frequency}}
 #' @importFrom igraph as_edgelist gorder V
 #' @export
 #' @examples
@@ -172,7 +172,8 @@ mcmc_sample <-
 #' @param niter Number of iterations.
 #' @param fixed_size \code{TRUE} if the module size is fixed.
 #' @return Object of class MCMC.
-#' @seealso \code{\link{sample_subgraph}, \link{mcmc_sample}}
+#' @seealso \code{\link{sample_subgraph}, \link{mcmc_sample},
+#'   \link{get_frequency}}
 #' @importFrom igraph as_edgelist gorder V
 #' @export
 #' @examples

@@ -23,3 +23,6 @@ x <- mcmc_sample(exampleGraph, module_size = 0, times = 1e3, niter = 100)
 freq <- get_frequency(x)
 tail(sort(freq))
 }
+\seealso{
+\code{\link{mcmc_sample}, \link{mcmc_onelong}}
+}

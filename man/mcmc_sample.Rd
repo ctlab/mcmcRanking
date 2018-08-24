@@ -37,5 +37,5 @@ tail(sort(freq))
 }
 \seealso{
 \code{\link{sample_llh}, \link{sample_subgraph},
-  \link{mcmc_onelong}}
+  \link{mcmc_onelong}, \link{get_frequency}}
 }

@@ -31,5 +31,6 @@ freq <- get_frequency(x)
 tail(sort(freq))
 }
 \seealso{
-\code{\link{sample_subgraph}, \link{mcmc_sample}}
+\code{\link{sample_subgraph}, \link{mcmc_sample},
+  \link{get_frequency}}
 }
