@@ -28,8 +28,10 @@ check_arguments <- function(graph, module_size, niter) {
   if (!("name" %in% vertex_attr_names(graph)))
     stop("graph must have \"name\" attribute on vertices.")
   if (!is_simple(graph))
-    stop("A simple graph is expected.\nSimple graphs are graphs which do not
-         contain loop and multiple edges.")
+    stop(
+      "A simple graph is expected.\nSimple graphs are graphs which do not
+      contain loop and multiple edges."
+    )
 }
 
 
@@ -80,6 +82,9 @@ sample_llh <-
            niter,
            exp_lh = 1,
            fixed_size = FALSE) {
+    if (missing(module_size) && !fixed_size) {
+      module_size <- 0
+    }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
 
@@ -123,6 +128,9 @@ mcmc_sample <-
            previous_mcmc,
            exp_lh = 1,
            fixed_size = FALSE) {
+    if (missing(previous_mcmc) && missing(module_size) && !fixed_size) {
+      module_size <- 0
+    }
     if (!xor(missing(module_size) &&
              missing(times),
              missing(previous_mcmc))) {
@@ -132,7 +140,7 @@ mcmc_sample <-
       if (class(previous_mcmc) != "MCMC")
         stop("previous_mcmc must be class of \"MCMC\"")
       start_module <- previous_mcmc$mat
-      module_size <- sum(start_module[1, ])
+      module_size <- sum(start_module[1,])
     }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
@@ -187,6 +195,9 @@ mcmc_onelong <-
            start,
            niter,
            fixed_size = FALSE) {
+    if (missing(module_size) && !fixed_size) {
+      module_size <- 0
+    }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
     res <-
@@ -224,6 +235,9 @@ mcmc_onelong_frequency <-
            start,
            niter,
            fixed_size = FALSE) {
+    if (missing(module_size) && !fixed_size) {
+      module_size <- 0
+    }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
     res <-

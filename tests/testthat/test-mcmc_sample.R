@@ -22,11 +22,6 @@ test_that("bad call", {
   ))
   expect_error(mcmc_sample(
     graph = g,
-    times = 10,
-    niter = 100
-  ))
-  expect_error(mcmc_sample(
-    graph = g,
     module_size = 2,
     times = 10
   ))

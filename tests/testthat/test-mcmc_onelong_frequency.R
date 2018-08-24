@@ -22,11 +22,6 @@ test_that("bad call", {
   ))
   expect_error(mcmc_onelong_frequency(
     graph = g,
-    start = 50,
-    niter = 100
-  ))
-  expect_error(mcmc_onelong_frequency(
-    graph = g,
     module_size = 2,
     start = 50
   ))
