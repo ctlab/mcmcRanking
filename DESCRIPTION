@@ -14,6 +14,7 @@ Depends:
 Imports: 
     BioNet,
     igraph,
+    progress,
     Rcpp,
     stats
 Suggests: 
@@ -25,6 +26,7 @@ Suggests:
     rmarkdown,
     testthat
 LinkingTo: 
+    progress,
     Rcpp
 VignetteBuilder: knitr
 biocViews:
