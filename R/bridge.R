@@ -140,7 +140,7 @@ mcmc_sample <-
       if (class(previous_mcmc) != "MCMC")
         stop("previous_mcmc must be class of \"MCMC\"")
       start_module <- previous_mcmc$mat
-      module_size <- sum(start_module[1,])
+      module_size <- sum(start_module[1, ])
     }
     check_arguments(graph, module_size, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
@@ -155,15 +155,13 @@ mcmc_sample <-
           )
         ), nrow = times, byrow = TRUE)
     }
-    for (i in seq_along(exp_lh)) {
-      res1 <- mcmc_sample_internal(edgelist,
-                                   V(graph)$likelihood ^ exp_lh[i],
-                                   fixed_size,
-                                   niter,
-                                   start_module)
-      start_module <-
-        matrix(res1, ncol = gorder(graph), byrow = TRUE)
-    }
+    likelihoods <- outer(V(graph)$likelihood, exp_lh, "^")
+    res1 <- mcmc_sample_internal(edgelist,
+                                 likelihoods,
+                                 fixed_size,
+                                 niter,
+                                 start_module)
+    start_module <- matrix(res1, ncol = gorder(graph), byrow = TRUE)
     return(mcmc(start_module, V(graph)$name))
   }
 

@@ -20,6 +20,10 @@ namespace mcmc {
         unirealdis = uniform_real_distribution<>(0, 1);
     }
 
+    void Graph::set_nodes(Rcpp::NumericVector nodes) {
+        this->nodes = vector<double>(nodes.begin(), nodes.end());
+    }
+
     vector<unsigned> Graph::random_subgraph(size_t size) {
         if (size == 0) {
             return vector<unsigned>();

@@ -50,10 +50,10 @@ NumericVector sample_llh_internal(IntegerMatrix edgelist, NumericVector likeliho
 }
 
 // [[Rcpp::export]]
-LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, size_t niter,
+LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericMatrix likelihood, bool fixed_size, size_t niter,
                                    LogicalMatrix start_module) {
-    Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), fixed_size);
-    size_t order = likelihood.size();
+    Graph g = Graph((NumericVector) likelihood(_, 0), adj_list(edgelist, likelihood.nrow()), fixed_size);
+    size_t order = likelihood.nrow();
     unsigned times = start_module.nrow();
     LogicalVector ret(order * times, false);
     for (int i = 0; i < times; ++i) {
@@ -64,10 +64,13 @@ LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericVector likelih
             }
         }
         g.initialize_module(module);
-        for (size_t j = 0; j < niter; ++j) {
-            g.next_iteration();
-            if (niter % 10000 == 0) {
-                Rcpp::checkUserInterrupt();
+        for (int k = 0; k < likelihood.ncol(); ++k) {
+            g.set_nodes((NumericVector) likelihood(_, k));
+            for (size_t j = 0; j < niter; ++j) {
+                g.next_iteration();
+                if (niter % 10000 == 0) {
+                    Rcpp::checkUserInterrupt();
+                }
             }
         }
         for (size_t x : g.get_inner_nodes()) {

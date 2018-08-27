@@ -36,6 +36,8 @@ namespace mcmc {
 
         Graph(Rcpp::NumericVector nodes, vector <vector<unsigned>> edges, bool fixed_size);
 
+        void set_nodes(Rcpp::NumericVector nodes);
+
         bool is_connected();
 
         bool next_iteration();
