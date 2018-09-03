@@ -5,7 +5,7 @@
 \title{The frequency of occurrence of vertices in one long MCMC run.}
 \usage{
 mcmc_onelong_frequency(graph, subgraph_order, start, niter,
-  fixed_size = FALSE)
+  fixed_order = FALSE)
 }
 \arguments{
 \item{graph}{The original graph of class \code{igraph}.}
@@ -17,7 +17,7 @@ Markov process.}
 
 \item{niter}{Number of iterations the MCMC method will run.}
 
-\item{fixed_size}{Logical scalar. Whether to fix the module order.}
+\item{fixed_order}{Logical scalar. Whether to fix the subgraph order.}
 }
 \value{
 A named frequency vector.

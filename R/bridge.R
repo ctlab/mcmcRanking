@@ -70,7 +70,7 @@ sample_subgraph <- function(graph, subgraph_order, niter) {
 #'
 #' @inheritParams sample_subgraph
 #' @param exp_lh The power to which the likelihood values will be raised
-#' @param fixed_size Logical scalar. Whether to fix the module order.
+#' @param fixed_order Logical scalar. Whether to fix the subgraph order.
 #' @return A named vector of likelihoods where names are number of iteration.
 #' @importFrom igraph as_edgelist gorder V
 #' @importFrom stats setNames
@@ -84,8 +84,8 @@ sample_llh <-
            subgraph_order,
            niter,
            exp_lh = 1,
-           fixed_size = FALSE) {
-    if (missing(subgraph_order) && !fixed_size) {
+           fixed_order = FALSE) {
+    if (missing(subgraph_order) && !fixed_order) {
       subgraph_order <- 0
     }
     check_arguments(graph, subgraph_order, niter)
@@ -98,7 +98,7 @@ sample_llh <-
       sample_llh_internal(edgelist,
                           V(graph)$likelihood ^ exp_lh,
                           niter,
-                          fixed_size,
+                          fixed_order,
                           start_module)
     return(setNames(llhs, seq_len(niter)))
   }
@@ -130,8 +130,8 @@ mcmc_sample <-
            niter,
            previous_mcmc,
            exp_lh = 1,
-           fixed_size = FALSE) {
-    if (missing(previous_mcmc) && missing(subgraph_order) && !fixed_size) {
+           fixed_order = FALSE) {
+    if (missing(previous_mcmc) && missing(subgraph_order) && !fixed_order) {
       subgraph_order <- 0
     }
     if (!xor(missing(subgraph_order) &&
@@ -161,7 +161,7 @@ mcmc_sample <-
     likelihoods <- outer(V(graph)$likelihood, exp_lh, "^")
     res1 <- mcmc_sample_internal(edgelist,
                                  likelihoods,
-                                 fixed_size,
+                                 fixed_order,
                                  niter,
                                  start_module)
     start_module <- matrix(res1, ncol = gorder(graph), byrow = TRUE)
@@ -192,8 +192,8 @@ mcmc_onelong <-
            subgraph_order,
            start,
            niter,
-           fixed_size = FALSE) {
-    if (missing(subgraph_order) && !fixed_size) {
+           fixed_order = FALSE) {
+    if (missing(subgraph_order) && !fixed_order) {
       subgraph_order <- 0
     }
     check_arguments(graph, subgraph_order, niter)
@@ -201,7 +201,7 @@ mcmc_onelong <-
     res <-
       mcmc_onelong_internal(edgelist,
                             V(graph)$likelihood,
-                            fixed_size,
+                            fixed_order,
                             subgraph_order,
                             start,
                             niter)
@@ -232,8 +232,8 @@ mcmc_onelong_frequency <-
            subgraph_order,
            start,
            niter,
-           fixed_size = FALSE) {
-    if (missing(subgraph_order) && !fixed_size) {
+           fixed_order = FALSE) {
+    if (missing(subgraph_order) && !fixed_order) {
       subgraph_order <- 0
     }
     check_arguments(graph, subgraph_order, niter)
@@ -241,7 +241,7 @@ mcmc_onelong_frequency <-
     res <-
       mcmc_onelong_frequency_internal(edgelist,
                                       V(graph)$likelihood,
-                                      fixed_size,
+                                      fixed_order,
                                       subgraph_order,
                                       start,
                                       niter)

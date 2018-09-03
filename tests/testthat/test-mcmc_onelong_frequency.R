@@ -48,7 +48,7 @@ test_that("mcmc_sample works", {
     subgraph_order = 3,
     start = 50,
     niter = 100,
-    fixed_size = TRUE
+    fixed_order = TRUE
   )
   expect_identical(sum(freq), 150L)
 
@@ -61,7 +61,7 @@ test_that("mcmc_sample works", {
       subgraph_order = 2,
       start = 1e4,
       niter = 2e4,
-      fixed_size = TRUE
+      fixed_order = TRUE
     )
   p <- freq / 1e4
   expect_gte(p["a"], 84 / 89.25 - 0.05)

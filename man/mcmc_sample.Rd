@@ -5,7 +5,7 @@
 \title{Sample connected subgraphs by likelihood value.}
 \usage{
 mcmc_sample(graph, subgraph_order, times, niter, previous_mcmc,
-  exp_lh = 1, fixed_size = FALSE)
+  exp_lh = 1, fixed_order = FALSE)
 }
 \arguments{
 \item{graph}{The original graph of class \code{igraph}.}
@@ -20,7 +20,7 @@ mcmc_sample(graph, subgraph_order, times, niter, previous_mcmc,
 
 \item{exp_lh}{The power to which the likelihood values will be raised}
 
-\item{fixed_size}{Logical scalar. Whether to fix the module order.}
+\item{fixed_order}{Logical scalar. Whether to fix the subgraph order.}
 }
 \value{
 Object of class MCMC.

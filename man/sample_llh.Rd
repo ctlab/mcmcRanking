@@ -5,7 +5,7 @@
 \title{Sample log-likelihood values during one run.}
 \usage{
 sample_llh(graph, subgraph_order, niter, exp_lh = 1,
-  fixed_size = FALSE)
+  fixed_order = FALSE)
 }
 \arguments{
 \item{graph}{The original graph of class \code{igraph}.}
@@ -16,7 +16,7 @@ sample_llh(graph, subgraph_order, niter, exp_lh = 1,
 
 \item{exp_lh}{The power to which the likelihood values will be raised}
 
-\item{fixed_size}{Logical scalar. Whether to fix the module order.}
+\item{fixed_order}{Logical scalar. Whether to fix the subgraph order.}
 }
 \value{
 A named vector of likelihoods where names are number of iteration.

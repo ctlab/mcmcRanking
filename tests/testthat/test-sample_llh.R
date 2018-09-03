@@ -11,7 +11,7 @@ test_that("sample_llh works", {
       graph = g,
       subgraph_order = 2,
       niter = 100,
-      fixed_size = TRUE
+      fixed_order = TRUE
     )
   expect_length(x, 100)
   expect_true(all(x %in% log(c(2, 6, 12, 20, 5))))
@@ -24,7 +24,7 @@ test_that("sample_llh works", {
       graph = g,
       subgraph_order = 2,
       niter = 2e3,
-      fixed_size = TRUE
+      fixed_order = TRUE
     )
   expect_gte(sum(tail(x, 1e3) == log(1e6)), 950)
 
@@ -34,7 +34,7 @@ test_that("sample_llh works", {
       graph = g,
       subgraph_order = 0,
       niter = 100,
-      fixed_size = TRUE
+      fixed_order = TRUE
     )
   expect_true(all(x == rep(0, 100)))
 })
