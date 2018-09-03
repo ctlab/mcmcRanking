@@ -2,27 +2,30 @@
 % Please edit documentation in R/bridge.R
 \name{mcmc_onelong}
 \alias{mcmc_onelong}
-\title{Sampling set of connected subgraphs by likelihood value.}
+\title{Sample connected subgraphs by likelihood value during one long MCMC run.}
 \usage{
 mcmc_onelong(graph, subgraph_order, start, niter, fixed_size = FALSE)
 }
 \arguments{
-\item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
+\item{graph}{The original graph of class \code{igraph}.}
 
-\item{subgraph_order}{The size of subgraph.}
+\item{subgraph_order}{The order of subgraph.}
 
 \item{start}{Starting with this iteration, we write down all states of the
 Markov process.}
 
-\item{niter}{Number of iterations.}
+\item{niter}{Number of iterations the MCMC method will run.}
 
-\item{fixed_size}{\code{TRUE} if the module size is fixed.}
+\item{fixed_size}{Logical scalar. Whether to fix the module order.}
 }
 \value{
 Object of class MCMC.
 }
 \description{
 Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
+}
+\details{
+\code{graph} must contain vertex attribute \emph{likelihood}.
 }
 \examples{
 data(exampleGraph)
@@ -31,6 +34,6 @@ freq <- get_frequency(x)
 tail(sort(freq))
 }
 \seealso{
-\code{\link{sample_subgraph}, \link{mcmc_sample},
+\code{\link{mcmc_onelong_frequency}, \link{mcmc_sample},
   \link{get_frequency}}
 }

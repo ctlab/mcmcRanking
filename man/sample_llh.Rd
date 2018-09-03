@@ -2,28 +2,31 @@
 % Please edit documentation in R/bridge.R
 \name{sample_llh}
 \alias{sample_llh}
-\title{Generates log-likelihood values during one MCMC run.}
+\title{Sample log-likelihood values during one run.}
 \usage{
 sample_llh(graph, subgraph_order, niter, exp_lh = 1,
   fixed_size = FALSE)
 }
 \arguments{
-\item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
+\item{graph}{The original graph of class \code{igraph}.}
 
 \item{subgraph_order}{The order of subgraph.}
 
-\item{niter}{Number of iterations.}
+\item{niter}{Number of iterations the MCMC method will run.}
 
-\item{exp_lh}{The exponent likelihood values to be raised to.}
+\item{exp_lh}{The power to which the likelihood values will be raised}
 
-\item{fixed_size}{\code{TRUE} if the module size is fixed.}
+\item{fixed_size}{Logical scalar. Whether to fix the module order.}
 }
 \value{
 A named vector of likelihoods where names are number of iteration.
 }
 \description{
-Generates log-likelihood values during one MCMC run for analyzing behavior of
-subgraph.
+Generates log-likelihood values during one Markov chain Monte Carlo (MCMC)
+run for analyzing behavior of subgraph.
+}
+\details{
+\code{graph} must contain vertex attribute \emph{likelihood}.
 }
 \examples{
 data(exampleGraph)

@@ -36,15 +36,16 @@ check_arguments <- function(graph, subgraph_order, niter) {
 
 
 
-#' Connected subgraph from uniform distribution.
+#' Sample a connected subgraph from an uniform distribution.
 #'
-#' Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
+#' Generates a connected subgraph from an uniform distribution using Markov
+#' chain Monte Carlo (MCMC) method.
 #'
-#' @param graph An \code{igraph} graph with \code{lieklihood} vertex attribute.
+#' @param graph The original graph of class \code{igraph}.
 #' @param subgraph_order The order of subgraph.
-#' @param niter Number of iterations.
-#' @return Vector of vertex names of connected subgraph.
-#' @seealso \code{\link{mcmc_sample}, \link{mcmc_onelong}}
+#' @param niter Number of iterations the MCMC method will run.
+#' @return Character vector.
+#' @seealso \code{\link{mcmc_sample}}
 #' @importFrom igraph as_edgelist gorder V
 #' @export
 #' @examples
@@ -60,14 +61,16 @@ sample_subgraph <- function(graph, subgraph_order, niter) {
 
 
 
-#' Generates log-likelihood values during one MCMC run.
+#' Sample log-likelihood values during one run.
 #'
-#' Generates log-likelihood values during one MCMC run for analyzing behavior of
-#' subgraph.
+#' Generates log-likelihood values during one Markov chain Monte Carlo (MCMC)
+#' run for analyzing behavior of subgraph.
+#'
+#' \code{graph} must contain vertex attribute \emph{likelihood}.
 #'
 #' @inheritParams sample_subgraph
-#' @param exp_lh The exponent likelihood values to be raised to.
-#' @param fixed_size \code{TRUE} if the module size is fixed.
+#' @param exp_lh The power to which the likelihood values will be raised
+#' @param fixed_size Logical scalar. Whether to fix the module order.
 #' @return A named vector of likelihoods where names are number of iteration.
 #' @importFrom igraph as_edgelist gorder V
 #' @importFrom stats setNames
@@ -102,13 +105,13 @@ sample_llh <-
 
 
 
-#' Sampling set of connected subgraphs by likelihood value.
+#' Sample connected subgraphs by likelihood value.
 #'
 #' Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC)
 #' method.
 #'
-#' @inheritParams sample_llh
-#' @param times A number of subgraphs.
+#' @inherit sample_llh details params
+#' @param times A number of sampling subgraphs.
 #' @param previous_mcmc Object of class MCMC.
 #' @return Object of class MCMC.
 #' @seealso \code{\link{sample_llh}, \link{sample_subgraph},
@@ -167,18 +170,15 @@ mcmc_sample <-
 
 
 
-#' Sampling set of connected subgraphs by likelihood value.
+#' Sample connected subgraphs by likelihood value during one long MCMC run.
 #'
 #' Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
 #'
-#' @param graph An \code{igraph} graph with \code{lieklihood} vertex attribute.
-#' @param subgraph_order The size of subgraph.
+#' @inherit sample_llh details params
 #' @param start Starting with this iteration, we write down all states of the
 #'   Markov process.
-#' @param niter Number of iterations.
-#' @param fixed_size \code{TRUE} if the module size is fixed.
 #' @return Object of class MCMC.
-#' @seealso \code{\link{sample_subgraph}, \link{mcmc_sample},
+#' @seealso \code{\link{mcmc_onelong_frequency}, \link{mcmc_sample},
 #'   \link{get_frequency}}
 #' @importFrom igraph as_edgelist gorder V
 #' @export
@@ -212,7 +212,7 @@ mcmc_onelong <-
 
 
 
-#' Frequency of vertices using one long run in MCMC.
+#' The frequency of occurrence of vertices in one long MCMC run.
 #'
 #' The frequency of occurrence of vertices in one long run of method Markov
 #' chain Monte Carlo (MCMC).

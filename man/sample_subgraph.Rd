@@ -2,27 +2,28 @@
 % Please edit documentation in R/bridge.R
 \name{sample_subgraph}
 \alias{sample_subgraph}
-\title{Connected subgraph from uniform distribution.}
+\title{Sample a connected subgraph from an uniform distribution.}
 \usage{
 sample_subgraph(graph, subgraph_order, niter)
 }
 \arguments{
-\item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
+\item{graph}{The original graph of class \code{igraph}.}
 
 \item{subgraph_order}{The order of subgraph.}
 
-\item{niter}{Number of iterations.}
+\item{niter}{Number of iterations the MCMC method will run.}
 }
 \value{
-Vector of vertex names of connected subgraph.
+Character vector.
 }
 \description{
-Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
+Generates a connected subgraph from an uniform distribution using Markov
+chain Monte Carlo (MCMC) method.
 }
 \examples{
 data(exampleGraph)
 sample_subgraph(exampleGraph, 10, 1e4)
 }
 \seealso{
-\code{\link{mcmc_sample}, \link{mcmc_onelong}}
+\code{\link{mcmc_sample}}
 }

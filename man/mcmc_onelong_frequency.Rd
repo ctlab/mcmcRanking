@@ -2,22 +2,22 @@
 % Please edit documentation in R/bridge.R
 \name{mcmc_onelong_frequency}
 \alias{mcmc_onelong_frequency}
-\title{Frequency of vertices using one long run in MCMC.}
+\title{The frequency of occurrence of vertices in one long MCMC run.}
 \usage{
 mcmc_onelong_frequency(graph, subgraph_order, start, niter,
   fixed_size = FALSE)
 }
 \arguments{
-\item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
+\item{graph}{The original graph of class \code{igraph}.}
 
-\item{subgraph_order}{The size of subgraph.}
+\item{subgraph_order}{The order of subgraph.}
 
 \item{start}{Starting with this iteration, we write down all states of the
 Markov process.}
 
-\item{niter}{Number of iterations.}
+\item{niter}{Number of iterations the MCMC method will run.}
 
-\item{fixed_size}{\code{TRUE} if the module size is fixed.}
+\item{fixed_size}{Logical scalar. Whether to fix the module order.}
 }
 \value{
 A named frequency vector.

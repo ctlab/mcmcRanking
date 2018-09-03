@@ -2,25 +2,25 @@
 % Please edit documentation in R/bridge.R
 \name{mcmc_sample}
 \alias{mcmc_sample}
-\title{Sampling set of connected subgraphs by likelihood value.}
+\title{Sample connected subgraphs by likelihood value.}
 \usage{
 mcmc_sample(graph, subgraph_order, times, niter, previous_mcmc,
   exp_lh = 1, fixed_size = FALSE)
 }
 \arguments{
-\item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
+\item{graph}{The original graph of class \code{igraph}.}
 
 \item{subgraph_order}{The order of subgraph.}
 
-\item{times}{A number of subgraphs.}
+\item{times}{A number of sampling subgraphs.}
 
-\item{niter}{Number of iterations.}
+\item{niter}{Number of iterations the MCMC method will run.}
 
 \item{previous_mcmc}{Object of class MCMC.}
 
-\item{exp_lh}{The exponent likelihood values to be raised to.}
+\item{exp_lh}{The power to which the likelihood values will be raised}
 
-\item{fixed_size}{\code{TRUE} if the module size is fixed.}
+\item{fixed_size}{Logical scalar. Whether to fix the module order.}
 }
 \value{
 Object of class MCMC.
@@ -28,6 +28,9 @@ Object of class MCMC.
 \description{
 Generates set of independent subgraphs using Markov chain Monte Carlo (MCMC)
 method.
+}
+\details{
+\code{graph} must contain vertex attribute \emph{likelihood}.
 }
 \examples{
 data(exampleGraph)
