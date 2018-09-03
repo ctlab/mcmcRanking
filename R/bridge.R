@@ -20,9 +20,9 @@ mcmc <- function(mat, name) {
 
 
 #' @importFrom igraph gorder vertex_attr_names is_simple
-check_arguments <- function(graph, module_size, niter) {
-  if (module_size > gorder(graph) || module_size < 0)
-    stop("Module size must be non-negative and not greather than graph size.")
+check_arguments <- function(graph, subgraph_order, niter) {
+  if (subgraph_order > gorder(graph) || subgraph_order < 0)
+    stop("Subgraph order must be non-negative and not greather than graph order")
   if (niter < 0)
     stop("Number of iteration must be a non-negative number.")
   if (!("name" %in% vertex_attr_names(graph)))
@@ -41,7 +41,7 @@ check_arguments <- function(graph, module_size, niter) {
 #' Generates a connected subgraph using Markov chain Monte Carlo (MCMC) method.
 #'
 #' @param graph An \code{igraph} graph with \code{lieklihood} vertex attribute.
-#' @param module_size The size of subgraph.
+#' @param subgraph_order The order of subgraph.
 #' @param niter Number of iterations.
 #' @return Vector of vertex names of connected subgraph.
 #' @seealso \code{\link{mcmc_sample}, \link{mcmc_onelong}}
@@ -50,11 +50,11 @@ check_arguments <- function(graph, module_size, niter) {
 #' @examples
 #' data(exampleGraph)
 #' sample_subgraph(exampleGraph, 10, 1e4)
-sample_subgraph <- function(graph, module_size, niter) {
-  check_arguments(graph, module_size, niter)
+sample_subgraph <- function(graph, subgraph_order, niter) {
+  check_arguments(graph, subgraph_order, niter)
   edgelist <- as_edgelist(graph, names = FALSE) - 1
   res <-
-    sample_subgraph_internal(edgelist, gorder(graph), module_size, niter)
+    sample_subgraph_internal(edgelist, gorder(graph), subgraph_order, niter)
   return(V(graph)$name[which(res)])
 }
 
@@ -78,18 +78,18 @@ sample_subgraph <- function(graph, module_size, niter) {
 #' tail(llhs)
 sample_llh <-
   function(graph,
-           module_size,
+           subgraph_order,
            niter,
            exp_lh = 1,
            fixed_size = FALSE) {
-    if (missing(module_size) && !fixed_size) {
-      module_size <- 0
+    if (missing(subgraph_order) && !fixed_size) {
+      subgraph_order <- 0
     }
-    check_arguments(graph, module_size, niter)
+    check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
 
     start_module <-
-      t(sample_subgraph_internal(edgelist, gorder(graph), module_size, 1))
+      t(sample_subgraph_internal(edgelist, gorder(graph), subgraph_order, 1))
 
     llhs <-
       sample_llh_internal(edgelist,
@@ -117,32 +117,32 @@ sample_llh <-
 #' @export
 #' @examples
 #' data(exampleGraph)
-#' x <- mcmc_sample(exampleGraph, module_size = 0, times = 1e3, niter = 100)
+#' x <- mcmc_sample(exampleGraph, subgraph_order = 0, times = 1e3, niter = 100)
 #' freq <- get_frequency(x)
 #' tail(sort(freq))
 mcmc_sample <-
   function(graph,
-           module_size,
+           subgraph_order,
            times,
            niter,
            previous_mcmc,
            exp_lh = 1,
            fixed_size = FALSE) {
-    if (missing(previous_mcmc) && missing(module_size) && !fixed_size) {
-      module_size <- 0
+    if (missing(previous_mcmc) && missing(subgraph_order) && !fixed_size) {
+      subgraph_order <- 0
     }
-    if (!xor(missing(module_size) &&
+    if (!xor(missing(subgraph_order) &&
              missing(times),
              missing(previous_mcmc))) {
-      stop("module_size and times or previous_mcmc must be specified.")
+      stop("subgraph_order and times or previous_mcmc must be specified.")
     }
     if (!missing(previous_mcmc)) {
       if (class(previous_mcmc) != "MCMC")
         stop("previous_mcmc must be class of \"MCMC\"")
       start_module <- previous_mcmc$mat
-      module_size <- sum(start_module[1, ])
+      subgraph_order <- sum(start_module[1,])
     }
-    check_arguments(graph, module_size, niter)
+    check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
 
     if (missing(previous_mcmc)) {
@@ -150,7 +150,7 @@ mcmc_sample <-
         matrix(unlist(
           replicate(
             times,
-            sample_subgraph_internal(edgelist, gorder(graph), module_size, 1),
+            sample_subgraph_internal(edgelist, gorder(graph), subgraph_order, 1),
             simplify = FALSE
           )
         ), nrow = times, byrow = TRUE)
@@ -172,7 +172,7 @@ mcmc_sample <-
 #' Generates set of subgraphs using Markov chain Monte Carlo (MCMC) method.
 #'
 #' @param graph An \code{igraph} graph with \code{lieklihood} vertex attribute.
-#' @param module_size The size of subgraph.
+#' @param subgraph_order The size of subgraph.
 #' @param start Starting with this iteration, we write down all states of the
 #'   Markov process.
 #' @param niter Number of iterations.
@@ -189,20 +189,20 @@ mcmc_sample <-
 #' tail(sort(freq))
 mcmc_onelong <-
   function(graph,
-           module_size,
+           subgraph_order,
            start,
            niter,
            fixed_size = FALSE) {
-    if (missing(module_size) && !fixed_size) {
-      module_size <- 0
+    if (missing(subgraph_order) && !fixed_size) {
+      subgraph_order <- 0
     }
-    check_arguments(graph, module_size, niter)
+    check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
     res <-
       mcmc_onelong_internal(edgelist,
                             V(graph)$likelihood,
                             fixed_size,
-                            module_size,
+                            subgraph_order,
                             start,
                             niter)
     ret <-
@@ -229,20 +229,20 @@ mcmc_onelong <-
 #' tail(sort(freq), 60)
 mcmc_onelong_frequency <-
   function(graph,
-           module_size,
+           subgraph_order,
            start,
            niter,
            fixed_size = FALSE) {
-    if (missing(module_size) && !fixed_size) {
-      module_size <- 0
+    if (missing(subgraph_order) && !fixed_size) {
+      subgraph_order <- 0
     }
-    check_arguments(graph, module_size, niter)
+    check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
     res <-
       mcmc_onelong_frequency_internal(edgelist,
                                       V(graph)$likelihood,
                                       fixed_size,
-                                      module_size,
+                                      subgraph_order,
                                       start,
                                       niter)
     names(res) <- V(graph)$name

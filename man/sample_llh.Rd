@@ -4,12 +4,13 @@
 \alias{sample_llh}
 \title{Generates log-likelihood values during one MCMC run.}
 \usage{
-sample_llh(graph, module_size, niter, exp_lh = 1, fixed_size = FALSE)
+sample_llh(graph, subgraph_order, niter, exp_lh = 1,
+  fixed_size = FALSE)
 }
 \arguments{
 \item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
 
-\item{module_size}{The size of subgraph.}
+\item{subgraph_order}{The order of subgraph.}
 
 \item{niter}{Number of iterations.}
 

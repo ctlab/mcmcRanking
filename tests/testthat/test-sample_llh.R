@@ -9,7 +9,7 @@ test_that("sample_llh works", {
   x <-
     sample_llh(
       graph = g,
-      module_size = 2,
+      subgraph_order = 2,
       niter = 100,
       fixed_size = TRUE
     )
@@ -22,7 +22,7 @@ test_that("sample_llh works", {
   x <-
     sample_llh(
       graph = g,
-      module_size = 2,
+      subgraph_order = 2,
       niter = 2e3,
       fixed_size = TRUE
     )
@@ -32,7 +32,7 @@ test_that("sample_llh works", {
   x <-
     sample_llh(
       graph = g,
-      module_size = 0,
+      subgraph_order = 0,
       niter = 100,
       fixed_size = TRUE
     )

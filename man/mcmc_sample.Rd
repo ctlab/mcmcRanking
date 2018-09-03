@@ -4,13 +4,13 @@
 \alias{mcmc_sample}
 \title{Sampling set of connected subgraphs by likelihood value.}
 \usage{
-mcmc_sample(graph, module_size, times, niter, previous_mcmc, exp_lh = 1,
-  fixed_size = FALSE)
+mcmc_sample(graph, subgraph_order, times, niter, previous_mcmc,
+  exp_lh = 1, fixed_size = FALSE)
 }
 \arguments{
 \item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
 
-\item{module_size}{The size of subgraph.}
+\item{subgraph_order}{The order of subgraph.}
 
 \item{times}{A number of subgraphs.}
 
@@ -31,7 +31,7 @@ method.
 }
 \examples{
 data(exampleGraph)
-x <- mcmc_sample(exampleGraph, module_size = 0, times = 1e3, niter = 100)
+x <- mcmc_sample(exampleGraph, subgraph_order = 0, times = 1e3, niter = 100)
 freq <- get_frequency(x)
 tail(sort(freq))
 }

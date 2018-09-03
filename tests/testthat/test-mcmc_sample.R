@@ -6,7 +6,7 @@ test_that("bad call", {
   g <- make_full_graph(4)
   expect_error(mcmc_sample(
     graph = g,
-    module_size = 2,
+    subgraph_order = 2,
     times = 5,
     niter = 10
   ))
@@ -17,19 +17,19 @@ test_that("bad call", {
   expect_error(mcmc_sample(graph = g, niter = 100))
   expect_error(mcmc_sample(
     graph = g,
-    module_size = 2,
+    subgraph_order = 2,
     niter = 100
   ))
   expect_error(mcmc_sample(
     graph = g,
-    module_size = 2,
+    subgraph_order = 2,
     times = 10
   ))
 
   prvs_mcmc <-
     mcmc_sample(
       graph = g,
-      module_size = 2,
+      subgraph_order = 2,
       times = 5,
       niter = 100
     )
@@ -43,7 +43,7 @@ test_that("mcmc_sample works", {
   x <-
     mcmc_sample(
       graph = g,
-      module_size = 3,
+      subgraph_order = 3,
       times = 50,
       niter = 100,
       exp_lh = 0,
@@ -68,7 +68,7 @@ test_that("mcmc_sample works", {
   x <-
     mcmc_sample(
       graph = g,
-      module_size = 0,
+      subgraph_order = 0,
       times = 100,
       niter = 100
     )
@@ -147,7 +147,7 @@ test_that("probabilities of vertices close to the real probability", {
   x <-
     mcmc_sample(
       graph = g,
-      module_size = 2,
+      subgraph_order = 2,
       times = 1e4,
       niter = 10,
       exp_lh = 1,
@@ -174,7 +174,7 @@ test_that("probabilities of vertices close to the real probability", {
   x <-
     mcmc_sample(
       graph = g,
-      module_size = 3,
+      subgraph_order = 3,
       times = 1e4,
       niter = 100,
       exp_lh = 1,
@@ -188,7 +188,7 @@ test_that("probabilities of vertices close to the real probability", {
   x <-
     mcmc_sample(
       graph = g,
-      module_size = 3,
+      subgraph_order = 3,
       times = 1e4,
       niter = 100,
       exp_lh = 1,

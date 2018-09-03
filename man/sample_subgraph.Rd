@@ -4,12 +4,12 @@
 \alias{sample_subgraph}
 \title{Connected subgraph from uniform distribution.}
 \usage{
-sample_subgraph(graph, module_size, niter)
+sample_subgraph(graph, subgraph_order, niter)
 }
 \arguments{
 \item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
 
-\item{module_size}{The size of subgraph.}
+\item{subgraph_order}{The order of subgraph.}
 
 \item{niter}{Number of iterations.}
 }

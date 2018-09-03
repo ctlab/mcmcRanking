@@ -26,7 +26,7 @@ times <- 1e3
 z <-
   mcmc_sample(
     graph = exampleGraph,
-    module_size = 1,
+    subgraph_order = 1,
     times = times,
     niter = 2e4,
     exp_lh = 1 / 2 ^ (depth:0)

@@ -4,12 +4,12 @@
 \alias{mcmc_onelong}
 \title{Sampling set of connected subgraphs by likelihood value.}
 \usage{
-mcmc_onelong(graph, module_size, start, niter, fixed_size = FALSE)
+mcmc_onelong(graph, subgraph_order, start, niter, fixed_size = FALSE)
 }
 \arguments{
 \item{graph}{An \code{igraph} graph with \code{lieklihood} vertex attribute.}
 
-\item{module_size}{The size of subgraph.}
+\item{subgraph_order}{The size of subgraph.}
 
 \item{start}{Starting with this iteration, we write down all states of the
 Markov process.}

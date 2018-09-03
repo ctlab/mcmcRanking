@@ -6,7 +6,7 @@ test_that("bad call", {
   g <- make_full_graph(4)
   expect_error(mcmc_onelong(
     graph = g,
-    module_size = 2,
+    subgraph_order = 2,
     start = 50,
     niter = 100
   ))
@@ -17,23 +17,23 @@ test_that("bad call", {
   expect_error(mcmc_onelong(graph = g, niter = 100))
   expect_error(mcmc_onelong(
     graph = g,
-    module_size = 2,
+    subgraph_order = 2,
     niter = 100
   ))
   expect_error(mcmc_onelong(
     graph = g,
-    module_size = 2,
+    subgraph_order = 2,
     start = 50
   ))
   expect_error(mcmc_onelong(
     graph = g,
-    module_size = 5,
+    subgraph_order = 5,
     start = 50,
     niter = 100
   ))
   expect_error(mcmc_onelong(
     graph = g,
-    module_size = 2,
+    subgraph_order = 2,
     start = 50,
     niter = -3
   ))
@@ -46,7 +46,7 @@ test_that("mcmc_sample works", {
   x <-
     mcmc_onelong(
       graph = g,
-      module_size = 3,
+      subgraph_order = 3,
       start = 50,
       niter = 100,
       fixed_size = TRUE
@@ -59,7 +59,7 @@ test_that("mcmc_sample works", {
   x <-
     mcmc_onelong(
       graph = g,
-      module_size = 2,
+      subgraph_order = 2,
       start = 1e4,
       niter = 2e4,
       fixed_size = TRUE
