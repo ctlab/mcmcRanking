@@ -4,12 +4,14 @@
 \alias{get_frequency}
 \title{Frequency of vertices.}
 \usage{
-get_frequency(mcmcObj, inds = seq_len(nrow(mcmcObj$mat)))
+get_frequency(mcmcObj, inds = seq_len(nrow(mcmcObj$mat)), prob = FALSE)
 }
 \arguments{
 \item{mcmcObj}{Object of class MCMC.}
 
 \item{inds}{Index numbers of rows involved in the calculation.}
+
+\item{prob}{Logical scalar. Whether to return frequentist probability.}
 }
 \value{
 A named vector of frequency.
@@ -22,6 +24,8 @@ data(exampleGraph)
 x <- mcmc_sample(exampleGraph, subgraph_order = 0, times = 1e3, niter = 100)
 freq <- get_frequency(x)
 tail(sort(freq))
+p <- get_frequency(x, prob = TRUE)
+tail(sort(p))
 }
 \seealso{
 \code{\link{mcmc_sample}, \link{mcmc_onelong}}

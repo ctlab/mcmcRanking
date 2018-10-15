@@ -100,7 +100,7 @@ depth
 To estimate how much iteration is enough to stabilize *MCMC*, we run function `sample_llh` $10^5$ iterations with exponent value of likelihoods $1/2^{depth}$.
 This function returns log-likelihoods of subgraph on every iteration.
 
-```{r message=FALSE, fig.show="hold", warning=FALSE}
+```{r message=FALSE, results="hide", fig.show="hold", warning=FALSE}
 y <- sample_llh(graph = g, subgraph_order = 0, niter = 1e5, exp_lh = 1/2^depth)
 plot(x=names(y), y = y, type = 'l',
      xlab = "iteration number", ylab = "log-likelihood")
@@ -112,12 +112,12 @@ Plot shows that log-likelihood value stabilizes after about $2 \cdot 10^4$ itera
 
 We found out how many iteration enough for convergence of *MCMC* method. Below function `mcmc_sample` iteratively runs *MCMC* with different likelihood values. We sample $10^3$ subgraphs using *MCMC*.
 
-```{r message=FALSE, eval=FALSE}
+```{r message=FALSE, results="hide"}
 z <-
   mcmc_sample(
   graph = g,
   subgraph_order = 0,
-  times = 1e3,
+  times = 1e1,
   niter = 2e4,
   exp_lh = 1 / 2 ^ (depth:0)
   )
@@ -125,29 +125,21 @@ z <-
 
 After running *MCMC*, we calculate probability of gene and connectivity preserving ranking. To increase the accuracy of the probability, increase the number of runs or parameter `times`.  
 
-```{r message=FALSE, eval=FALSE}
-p <- get_frequency(z)/times
+```{r message=FALSE}
+p <- get_frequency(z, prob = TRUE)
 V(g)$q <- 1 - p[V(g)$name]
 r <- probabilistic_rank(graph = g, q = 1 - p)
 V(g)$r <- r[V(g)$name]
 ```
 
-```{r message=FALSE, echo=-(1:6)}
-data("exampleGraph")
-g <- exampleGraph
-p <- 1 - V(g)$q
-names(p) <- V(g)$name
-r <- V(g)$r
-names(r) <- V(g)$name
+```{r message=FALSE}
 head(p, 10)
 head(r, 10)
 ```
 
 Now, we have a vertex probabilities. It allows us to estimate FDR for any subgraph as mean of complementary probability of vertices. Finally, we draw subgraph induced by vertices that has rank not higher than `rank`. Vertices on the plot below colored from *gray* to *gold* according to its importance. Subgraph consisting of more *golden*-colored vertices is more important. 
 
-```{r message=FALSE, tidy=TRUE, echo=-(1:3)}
-data("exampleGraph")
-g <- exampleGraph
+```{r message=FALSE, tidy=TRUE, echo=-1}
 par(mar = c(0,0,0,0))
 meanq <-
   sapply(seq_len(gorder(g)), function(i)

@@ -28,6 +28,7 @@ repetition_depth <- function(x) {
 #'
 #' @param mcmcObj Object of class MCMC.
 #' @param inds Index numbers of rows involved in the calculation.
+#' @param prob Logical scalar. Whether to return frequentist probability.
 #' @return A named vector of frequency.
 #' @seealso \code{\link{mcmc_sample}, \link{mcmc_onelong}}
 #' @export
@@ -36,10 +37,16 @@ repetition_depth <- function(x) {
 #' x <- mcmc_sample(exampleGraph, subgraph_order = 0, times = 1e3, niter = 100)
 #' freq <- get_frequency(x)
 #' tail(sort(freq))
+#' p <- get_frequency(x, prob = TRUE)
+#' tail(sort(p))
 get_frequency <-
-  function(mcmcObj, inds = seq_len(nrow(mcmcObj$mat))) {
+  function(mcmcObj,
+           inds = seq_len(nrow(mcmcObj$mat)),
+           prob = FALSE) {
     freq <- colSums(mcmcObj$mat[inds, , drop = FALSE])
     names(freq) <- mcmcObj$name
+    if (prob)
+      return(freq / nrow(mcmcObj$mat))
     return(freq)
   }
 
