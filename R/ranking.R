@@ -11,12 +11,18 @@
 #' @examples
 #' library(igraph)
 #' data(exampleGraph)
-#' rank <- probabilistic_rank(exampleGraph, V(exampleGraph)$q)
+#' q <- V(exampleGraph)$q
+#' names(q) <- V(exampleGraph)$name
+#' rank <- probabilistic_rank(exampleGraph, q)
 #' head(rank)
 probabilistic_rank <- function(graph, q) {
+  if (is.null(names(q)))
+    stop("Vector q must have a name attribute.")
+  q <- q[V(graph)$name]
+  if (any(is.na(q)))
+    stop("Vector q does not contain probability for all vertices.")
   edgelist <- as_edgelist(graph, names = FALSE) - 1
-  nodes <-
-    data.frame(name = as.vector(V(graph)) - 1, q = q[V(graph)$name])
+  nodes <- data.frame(name = as.vector(V(graph)) - 1, q = q)
   res <- probabilistic_rank_internal(edgelist, nodes)
   names(res) <- V(graph)$name
   return(res)

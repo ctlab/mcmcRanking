@@ -20,7 +20,9 @@ Heuristic ranking maximizing the area under the ROC curve.
 \examples{
 library(igraph)
 data(exampleGraph)
-rank <- probabilistic_rank(exampleGraph, V(exampleGraph)$q)
+q <- V(exampleGraph)$q
+names(q) <- V(exampleGraph)$name
+rank <- probabilistic_rank(exampleGraph, q)
 head(rank)
 }
 \seealso{
