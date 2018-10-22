@@ -48,8 +48,7 @@ test_that("mcmc_sample works", {
       graph = g,
       subgraph_order = 3,
       start = 50,
-      niter = 100,
-      fixed_order = TRUE
+      niter = 100
     )
   expect_identical(sum(get_frequency(x)), 50 * 3)
 
@@ -61,8 +60,7 @@ test_that("mcmc_sample works", {
       graph = g,
       subgraph_order = 2,
       start = 1e4,
-      niter = 2e4,
-      fixed_order = TRUE
+      niter = 2e4
     )
   p <- get_frequency(x) / 1e4
   expect_gte(p["a"], 84 / 89.25 - 0.05)

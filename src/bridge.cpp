@@ -156,6 +156,7 @@ mcmc_onelong_frequency_internal(IntegerMatrix edgelist, NumericVector likelihood
     size_t order = likelihood.size();
     g.initialize_module(g.random_subgraph(module_size));
     IntegerVector ret(order, 0);
+    ret.names() = likelihood.names();
     for (size_t i = 0; i < niter; ++i) {
         g.next_iteration();
         if (i % 10000 == 9999) {

@@ -4,8 +4,7 @@
 \alias{sample_llh}
 \title{Sample log-likelihood values during one run.}
 \usage{
-sample_llh(graph, subgraph_order, niter, exp_lh = 1,
-  fixed_order = FALSE)
+sample_llh(graph, subgraph_order, niter, exp_lh = 1)
 }
 \arguments{
 \item{graph}{The original graph of class \code{igraph}.}
@@ -15,8 +14,6 @@ sample_llh(graph, subgraph_order, niter, exp_lh = 1,
 \item{niter}{Number of iterations the MCMC method will run.}
 
 \item{exp_lh}{The power to which the likelihood values will be raised}
-
-\item{fixed_order}{Logical scalar. Whether to fix the subgraph order.}
 }
 \value{
 A named vector of likelihoods where names are number of iteration.

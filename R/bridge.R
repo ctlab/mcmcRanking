@@ -16,7 +16,7 @@ mcmc <- function(mat) {
 
 #' @importFrom igraph gorder vertex_attr_names is_simple
 check_arguments <- function(graph, subgraph_order, niter) {
-  if (subgraph_order > gorder(graph) || subgraph_order < 0)
+  if (!missing(subgraph_order) && (subgraph_order > gorder(graph) || subgraph_order < 0))
     stop("Subgraph order must be non-negative and not greather than graph order")
   if (niter < 0)
     stop("Number of iteration must be a non-negative number.")
@@ -25,7 +25,7 @@ check_arguments <- function(graph, subgraph_order, niter) {
   if (!is_simple(graph))
     stop(
       "A simple graph is expected.\nSimple graphs are graphs which do not
-      contain loop and multiple edges."
+      contain loops and multiple edges."
     )
 }
 
@@ -65,7 +65,6 @@ sample_subgraph <- function(graph, subgraph_order, niter) {
 #'
 #' @inheritParams sample_subgraph
 #' @param exp_lh The power to which the likelihood values will be raised
-#' @param fixed_order Logical scalar. Whether to fix the subgraph order.
 #' @return A named vector of likelihoods where names are number of iteration.
 #' @importFrom igraph as_edgelist gorder V
 #' @importFrom stats setNames
@@ -78,11 +77,9 @@ sample_llh <-
   function(graph,
            subgraph_order,
            niter,
-           exp_lh = 1,
-           fixed_order = FALSE) {
-    if (missing(subgraph_order) && !fixed_order) {
-      subgraph_order <- 0
-    }
+           exp_lh = 1) {
+    fixed_order <- !missing(subgraph_order)
+    subgraph_order <- ifelse(missing(subgraph_order), 0, subgraph_order)
     check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
 
@@ -112,6 +109,7 @@ sample_llh <-
 #' @seealso \code{\link{sample_llh}, \link{sample_subgraph},
 #'   \link{mcmc_onelong}, \link{get_frequency}}
 #' @importFrom igraph as_edgelist gorder V
+#' @importFrom stats setNames
 #' @export
 #' @examples
 #' data(exampleGraph)
@@ -124,42 +122,32 @@ mcmc_sample <-
            times,
            niter,
            previous_mcmc,
-           exp_lh = 1,
-           fixed_order = FALSE) {
-    if (missing(previous_mcmc) && missing(subgraph_order) && !fixed_order) {
-      subgraph_order <- 0
+           exp_lh = 1) {
+    fixed_order <- !missing(subgraph_order)
+    subgraph_order <- ifelse(missing(subgraph_order), 0, subgraph_order)
+    check_arguments(graph, subgraph_order, niter)
+    if (!xor(missing(times), missing(previous_mcmc))) {
+      stop("Only one of the arguments times or previous_mcmc must be specified.")
     }
-    if (!xor(missing(subgraph_order) &&
-             missing(times),
-             missing(previous_mcmc))) {
-      stop("subgraph_order and times or previous_mcmc must be specified.")
-    }
+    edgelist <- as_edgelist(graph, names = FALSE) - 1
     if (!missing(previous_mcmc)) {
       if (class(previous_mcmc) != "MCMC")
-        stop("previous_mcmc must be class of \"MCMC\"")
+        stop("previous_mcmc must be class of \"MCMC\".")
+      if (ncol(previous_mcmc$mat) != gorder(graph))
+        stop("previous_mcmc's column number is not equal to order of graph.")
       start_module <- previous_mcmc$mat
-      subgraph_order <- sum(start_module[1,])
+    } else {
+      start_module <- t(replicate(
+        times,
+        sample_subgraph_internal(edgelist, gorder(graph), subgraph_order, 1),
+        simplify = TRUE
+      ))
     }
-    check_arguments(graph, subgraph_order, niter)
-    edgelist <- as_edgelist(graph, names = FALSE) - 1
-
-    if (missing(previous_mcmc)) {
-      start_module <-
-        matrix(unlist(
-          replicate(
-            times,
-            sample_subgraph_internal(edgelist, gorder(graph), subgraph_order, 1),
-            simplify = FALSE
-          )
-        ), nrow = times, byrow = TRUE)
-    }
-    likelihoods <- outer(V(graph)$likelihood, exp_lh, "^")
-    rownames(likelihoods) <- V(graph)$name
     ret <- mcmc_sample_internal(edgelist,
-                                 likelihoods,
-                                 fixed_order,
-                                 niter,
-                                 start_module)
+                                outer(setNames(V(graph)$likelihood, V(graph)$name), exp_lh, "^"),
+                                fixed_order,
+                                niter,
+                                start_module)
     return(mcmc(ret))
   }
 
@@ -176,6 +164,7 @@ mcmc_sample <-
 #' @seealso \code{\link{mcmc_onelong_frequency}, \link{mcmc_sample},
 #'   \link{get_frequency}}
 #' @importFrom igraph as_edgelist gorder V
+#' @importFrom stats setNames
 #' @export
 #' @examples
 #' data(exampleGraph)
@@ -186,18 +175,14 @@ mcmc_onelong <-
   function(graph,
            subgraph_order,
            start,
-           niter,
-           fixed_order = FALSE) {
-    if (missing(subgraph_order) && !fixed_order) {
-      subgraph_order <- 0
-    }
+           niter) {
+    fixed_order <- !missing(subgraph_order)
+    subgraph_order <- ifelse(missing(subgraph_order), 0, subgraph_order)
     check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
-    likelihood <- V(graph)$likelihood
-    names(likelihood) <- V(graph)$name
     ret <- mcmc(
       mcmc_onelong_internal(edgelist,
-                            likelihood,
+                            setNames(V(graph)$likelihood, V(graph)$name),
                             fixed_order,
                             subgraph_order,
                             start,
@@ -218,6 +203,7 @@ mcmc_onelong <-
 #' @seealso \code{\link{mcmc_onelong}, \link{sample_subgraph},
 #'   \link{mcmc_sample}}
 #' @importFrom igraph as_edgelist V
+#' @importFrom stats setNames
 #' @export
 #' @examples
 #' data(exampleGraph)
@@ -227,20 +213,17 @@ mcmc_onelong_frequency <-
   function(graph,
            subgraph_order,
            start,
-           niter,
-           fixed_order = FALSE) {
-    if (missing(subgraph_order) && !fixed_order) {
-      subgraph_order <- 0
-    }
+           niter) {
+    fixed_order <- !missing(subgraph_order)
+    subgraph_order <- ifelse(missing(subgraph_order), 0, subgraph_order)
     check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
     res <-
       mcmc_onelong_frequency_internal(edgelist,
-                                      V(graph)$likelihood,
+                                      setNames(V(graph)$likelihood, V(graph)$name),
                                       fixed_order,
                                       subgraph_order,
                                       start,
                                       niter)
-    names(res) <- V(graph)$name
     return(res)
   }

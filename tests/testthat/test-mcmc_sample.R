@@ -46,8 +46,7 @@ test_that("mcmc_sample works", {
       subgraph_order = 3,
       times = 50,
       niter = 100,
-      exp_lh = 0,
-      fixed_order = TRUE
+      exp_lh = 0
     )
   expect_identical(sum(get_frequency(x)), 50 * 3)
 
@@ -67,7 +66,6 @@ test_that("mcmc_sample works", {
   x <-
     mcmc_sample(
       graph = g,
-      subgraph_order = 0,
       times = 100,
       niter = 100
     )
@@ -85,8 +83,7 @@ test_that("module must change in one step", {
       graph = g,
       previous_mcmc = x,
       niter = 1,
-      exp_lh = 1,
-      fixed_order = TRUE
+      exp_lh = 1
     )
   expect_true(any(get_frequency(x) != get_frequency(y)))
 
@@ -100,8 +97,7 @@ test_that("module must change in one step", {
       graph = g,
       previous_mcmc = x,
       niter = 1,
-      exp_lh = 1,
-      fixed_order = TRUE
+      exp_lh = 1
     )
   expect_true(any(get_frequency(x) != get_frequency(y)))
 })
@@ -117,8 +113,7 @@ test_that("not reachable vertecies", {
       graph = g,
       previous_mcmc = x,
       niter = 1,
-      exp_lh = 1,
-      fixed_order = TRUE
+      exp_lh = 1
     )
   expect_identical(sum(get_frequency(x)[letters[c(1, 3, 4, 5)]]), 0)
 
@@ -132,8 +127,7 @@ test_that("not reachable vertecies", {
       graph = g,
       previous_mcmc = x,
       niter = 1,
-      exp_lh = 1,
-      fixed_order = TRUE
+      exp_lh = 1
     )
   expect_identical(sum(get_frequency(x)[letters[c(5, 6)]]), 0)
 })
@@ -148,8 +142,7 @@ test_that("probabilities of vertices close to the real probability", {
       subgraph_order = 2,
       times = 1e4,
       niter = 10,
-      exp_lh = 1,
-      fixed_order = TRUE
+      exp_lh = 1
     )
   expect_lt(max(abs(get_frequency(x) / 1e4 - c(5, 8, 9) / 11)), 0.015)
 
@@ -175,8 +168,7 @@ test_that("probabilities of vertices close to the real probability", {
       subgraph_order = 3,
       times = 1e4,
       niter = 100,
-      exp_lh = 1,
-      fixed_order = TRUE
+      exp_lh = 1
     )
   expect_lt(max(abs(
     get_frequency(x) / 1e4 - c(16, 8, 9, 16, 8, 9) / 22
@@ -189,8 +181,7 @@ test_that("probabilities of vertices close to the real probability", {
       subgraph_order = 3,
       times = 1e4,
       niter = 100,
-      exp_lh = 1,
-      fixed_order = TRUE
+      exp_lh = 1
     )
   expect_lt(max(abs(
     get_frequency(x) / 1e4 - c(60, 24, 15, 60, 24, 15) / 66

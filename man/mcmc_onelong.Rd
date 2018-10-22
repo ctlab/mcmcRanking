@@ -4,7 +4,7 @@
 \alias{mcmc_onelong}
 \title{Sample connected subgraphs by likelihood value during one long MCMC run.}
 \usage{
-mcmc_onelong(graph, subgraph_order, start, niter, fixed_order = FALSE)
+mcmc_onelong(graph, subgraph_order, start, niter)
 }
 \arguments{
 \item{graph}{The original graph of class \code{igraph}.}
@@ -15,8 +15,6 @@ mcmc_onelong(graph, subgraph_order, start, niter, fixed_order = FALSE)
 Markov process.}
 
 \item{niter}{Number of iterations the MCMC method will run.}
-
-\item{fixed_order}{Logical scalar. Whether to fix the subgraph order.}
 }
 \value{
 Object of class MCMC.
