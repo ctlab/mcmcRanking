@@ -8,6 +8,6 @@ test_that("bad call", {
 
 test_that("mcmc constructor works", {
   mat <- matrix(c(TRUE, TRUE, FALSE, TRUE), 1, dimnames = list(c(), letters[1:4]))
-  x <- mcmc(mat = mat)
+  x <- mcmc(mat = mat, TRUE)
   expect_identical(x$mat, mat)
 })

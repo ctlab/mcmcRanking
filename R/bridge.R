@@ -3,14 +3,17 @@
 #' MCMC data structure contains information about subgraph.
 #'
 #' @param mat A boolean matrix object where every row defines a subgraph.
+#' @param fixed_order Logical scalar. whether a matrix was obtained from fixed order subgraphs.
 #' @return Object of class MCMC.
 #' @export
-mcmc <- function(mat) {
+mcmc <- function(mat, fixed_order) {
   if (!is.matrix(mat) & !is.logical(mat))
     stop("mat must be a boolean matrix.")
   if (is.null(colnames(mat)))
     stop("mat must contain column names.")
-  structure(list(mat = mat), class = "MCMC")
+  if(!is.logical(fixed_order) && length(fixed_order) == 1)
+    stop("fixed_order must be a boolean scalar.")
+  structure(list(mat = mat, fixed_order = fixed_order), class = "MCMC")
 }
 
 
@@ -123,7 +126,7 @@ mcmc_sample <-
            niter,
            previous_mcmc,
            exp_lh = 1) {
-    fixed_order <- !missing(subgraph_order)
+    fixed_order <- ifelse(missing(previous_mcmc), !missing(subgraph_order), previous_mcmc$fixed_order)
     subgraph_order <- ifelse(missing(subgraph_order), 0, subgraph_order)
     check_arguments(graph, subgraph_order, niter)
     if (!xor(missing(times), missing(previous_mcmc))) {
@@ -148,7 +151,7 @@ mcmc_sample <-
                                 fixed_order,
                                 niter,
                                 start_module)
-    return(mcmc(ret))
+    return(mcmc(ret, fixed_order))
   }
 
 
@@ -181,17 +184,18 @@ mcmc_onelong <-
     check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
     ret <- mcmc(
-      mcmc_onelong_internal(edgelist,
-                            setNames(V(graph)$likelihood, V(graph)$name),
-                            fixed_order,
-                            subgraph_order,
-                            start,
-                            niter)
+      mcmc_onelong_internal(
+        edgelist,
+        setNames(V(graph)$likelihood, V(graph)$name),
+        fixed_order,
+        subgraph_order,
+        start,
+        niter
+      ),
+      fixed_order
     )
     return(ret)
   }
-
-
 
 #' The frequency of occurrence of vertices in one long MCMC run.
 #'

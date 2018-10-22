@@ -4,10 +4,12 @@
 \alias{mcmc}
 \title{MCMC class constructor}
 \usage{
-mcmc(mat)
+mcmc(mat, fixed_order)
 }
 \arguments{
 \item{mat}{A boolean matrix object where every row defines a subgraph.}
+
+\item{fixed_order}{Logical scalar. whether a matrix was obtained from fixed order subgraphs.}
 }
 \value{
 Object of class MCMC.
