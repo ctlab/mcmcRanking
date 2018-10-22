@@ -67,12 +67,14 @@ NumericVector sample_llh_internal(IntegerMatrix edgelist, NumericVector likeliho
 }
 
 // [[Rcpp::export]]
-LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericMatrix likelihood, bool fixed_size, size_t niter,
+LogicalMatrix mcmc_sample_internal(IntegerMatrix edgelist, NumericMatrix likelihood, bool fixed_size, size_t niter,
                                    LogicalMatrix start_module) {
     Graph g = Graph((NumericVector) likelihood(_, 0), adj_list(edgelist, likelihood.nrow()), fixed_size);
     size_t order = likelihood.nrow();
     unsigned times = start_module.nrow();
-    LogicalVector ret(order * times, false);
+    //LogicalVector ret(order * times, false);
+    LogicalMatrix ret(times, order);
+    colnames(ret) = rownames(likelihood);
 
     RProgress::RProgress pb;
     if (times * likelihood.ncol() * niter > 0) {
@@ -100,14 +102,15 @@ LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericMatrix likelih
                 pb.tick(niter % 10000);
         }
         for (size_t x : g.get_inner_nodes()) {
-            ret[x + i * order] = true;
+            //ret[x + i * order] = true;
+            ret(i, x) = true;
         }
     }
     return ret;
 }
 
 // [[Rcpp::export]]
-LogicalVector
+LogicalMatrix
 mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size, size_t start,
                       size_t niter) {
     RProgress::RProgress pb;
@@ -118,7 +121,9 @@ mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fix
     Graph g = Graph(likelihood, adj_list(edgelist, likelihood.size()), fixed_size);
     size_t order = likelihood.size();
     g.initialize_module(g.random_subgraph(module_size));
-    LogicalVector ret(order * (niter - start), false);
+    //LogicalVector ret(order * (niter - start), false);
+    LogicalMatrix ret(niter - start, order);
+    colnames(ret) = CharacterVector(likelihood.names());
     for (size_t i = 0; i < niter; ++i) {
         g.next_iteration();
         if (i % 10000 == 9999) {
@@ -129,7 +134,8 @@ mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fix
             continue;
         }
         for (size_t x : g.get_inner_nodes()) {
-            ret[x + (i - start) * order] = true;
+            //ret[x + (i - start) * order] = true;
+            ret(i-start, x) = true;
         }
     }
     if (niter > 0)

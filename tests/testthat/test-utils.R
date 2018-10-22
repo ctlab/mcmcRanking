@@ -10,7 +10,7 @@ test_that("repetition_depth works", {
 
 test_that("get_frequency works", {
   mcmcobj <-
-    mcmc(matrix(sample(c(TRUE, FALSE), 100, TRUE), 20), letters[1:5])
+    mcmc(matrix(sample(c(TRUE, FALSE), 100, TRUE), 20, dimnames = list(c(), letters[1:5])))
   ans <- colSums(mcmcobj$mat)
   names(ans) <- letters[1:5]
   freq <- get_frequency(mcmcobj)

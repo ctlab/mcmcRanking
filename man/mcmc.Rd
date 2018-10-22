@@ -4,12 +4,10 @@
 \alias{mcmc}
 \title{MCMC class constructor}
 \usage{
-mcmc(mat, name)
+mcmc(mat)
 }
 \arguments{
 \item{mat}{A boolean matrix object where every row defines a subgraph.}
-
-\item{name}{A character vector contains names of graph vertices.}
 }
 \value{
 Object of class MCMC.

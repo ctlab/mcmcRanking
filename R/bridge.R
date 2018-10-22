@@ -3,19 +3,14 @@
 #' MCMC data structure contains information about subgraph.
 #'
 #' @param mat A boolean matrix object where every row defines a subgraph.
-#' @param name A character vector contains names of graph vertices.
 #' @return Object of class MCMC.
 #' @export
-mcmc <- function(mat, name) {
-  if (!is.matrix(mat))
-    stop("mat must be a matrix.")
-  if (!is.logical(mat))
-    stop("mat must be a boolean vector.")
-  if (!is.character(name))
-    stop("name must be a character vector.")
-  if (ncol(mat) != length(name))
-    stop("Number of columns in mat is not equal to size of name.")
-  structure(list(mat = mat,   name = name), class = "MCMC")
+mcmc <- function(mat) {
+  if (!is.matrix(mat) & !is.logical(mat))
+    stop("mat must be a boolean matrix.")
+  if (is.null(colnames(mat)))
+    stop("mat must contain column names.")
+  structure(list(mat = mat), class = "MCMC")
 }
 
 
@@ -159,13 +154,13 @@ mcmc_sample <-
         ), nrow = times, byrow = TRUE)
     }
     likelihoods <- outer(V(graph)$likelihood, exp_lh, "^")
-    res1 <- mcmc_sample_internal(edgelist,
+    rownames(likelihoods) <- V(graph)$name
+    ret <- mcmc_sample_internal(edgelist,
                                  likelihoods,
                                  fixed_order,
                                  niter,
                                  start_module)
-    start_module <- matrix(res1, ncol = gorder(graph), byrow = TRUE)
-    return(mcmc(start_module, V(graph)$name))
+    return(mcmc(ret))
   }
 
 
@@ -198,15 +193,16 @@ mcmc_onelong <-
     }
     check_arguments(graph, subgraph_order, niter)
     edgelist <- as_edgelist(graph, names = FALSE) - 1
-    res <-
+    likelihood <- V(graph)$likelihood
+    names(likelihood) <- V(graph)$name
+    ret <- mcmc(
       mcmc_onelong_internal(edgelist,
-                            V(graph)$likelihood,
+                            likelihood,
                             fixed_order,
                             subgraph_order,
                             start,
                             niter)
-    ret <-
-      mcmc(matrix(res, ncol = gorder(graph), byrow = TRUE), V(graph)$name)
+    )
     return(ret)
   }
 

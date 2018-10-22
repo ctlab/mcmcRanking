@@ -44,7 +44,6 @@ get_frequency <-
            inds = seq_len(nrow(mcmcObj$mat)),
            prob = FALSE) {
     freq <- colSums(mcmcObj$mat[inds, , drop = FALSE])
-    names(freq) <- mcmcObj$name
     if (prob)
       return(freq / nrow(mcmcObj$mat))
     return(freq)

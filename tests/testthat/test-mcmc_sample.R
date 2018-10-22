@@ -53,8 +53,7 @@ test_that("mcmc_sample works", {
 
   V(g)$likelihood <- seq(1, 7)
   previous_mcmc <-
-    mcmc(matrix(c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE), nrow = 1),
-         V(g)$name)
+    mcmc(matrix(c(rep(TRUE, 4), rep(FALSE, 3)), 1, dimnames = list(c(), V(g)$name)))
   expect_is(mcmc_sample(
     graph = g,
     previous_mcmc = previous_mcmc,
@@ -80,7 +79,7 @@ test_that("module must change in one step", {
   V(g)$name <- letters[1:6]
   V(g)$likelihood <- rep(1, 6)
   x <-
-    mcmc(matrix(c(TRUE, TRUE, TRUE, FALSE, FALSE, FALSE), nrow = 1), V(g)$name)
+    mcmc(matrix(c(rep(TRUE, 3), rep(FALSE, 3)), 1, dimnames = list(c(), V(g)$name)))
   y <-
     mcmc_sample(
       graph = g,
@@ -95,7 +94,7 @@ test_that("module must change in one step", {
   V(g)$name <- letters[1:5]
   V(g)$likelihood <- c(3, 3, 2, 3, 2)
   x <-
-    mcmc(matrix(c(FALSE, FALSE, TRUE, FALSE, TRUE), nrow = 1), V(g)$name)
+    mcmc(matrix(c(FALSE, FALSE, TRUE, FALSE, TRUE), 1, dimnames = list(c(), V(g)$name)))
   y <-
     mcmc_sample(
       graph = g,
@@ -112,8 +111,7 @@ test_that("not reachable vertecies", {
   V(g)$name <- letters[1:6]
   V(g)$likelihood <- 10 ^ c(8, 4, 8, 8, 8, 0)
   x <-
-    mcmc(matrix(c(FALSE, FALSE, FALSE, FALSE, FALSE, TRUE), nrow = 1),
-         V(g)$name)
+    mcmc(matrix(c(rep(FALSE, 5), TRUE), 1, dimnames = list(c(), V(g)$name)))
   x <-
     mcmc_sample(
       graph = g,
@@ -128,7 +126,7 @@ test_that("not reachable vertecies", {
   V(g)$name <- letters[1:6]
   V(g)$likelihood <- 10 ^ c(0, 0, 0, 2, 2, 2)
   x <-
-    mcmc(matrix(c(TRUE, TRUE, TRUE, FALSE, FALSE, FALSE), nrow = 1), V(g)$name)
+    mcmc(matrix(c(rep(TRUE, 3), rep(FALSE, 3)), 1, dimnames = list(c(), V(g)$name)))
   x <-
     mcmc_sample(
       graph = g,

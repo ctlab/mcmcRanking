@@ -35,7 +35,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // mcmc_sample_internal
-LogicalVector mcmc_sample_internal(IntegerMatrix edgelist, NumericMatrix likelihood, bool fixed_size, size_t niter, LogicalMatrix start_module);
+LogicalMatrix mcmc_sample_internal(IntegerMatrix edgelist, NumericMatrix likelihood, bool fixed_size, size_t niter, LogicalMatrix start_module);
 RcppExport SEXP _mcmcRanking_mcmc_sample_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP fixed_sizeSEXP, SEXP niterSEXP, SEXP start_moduleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -50,7 +50,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // mcmc_onelong_internal
-LogicalVector mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size, size_t start, size_t niter);
+LogicalMatrix mcmc_onelong_internal(IntegerMatrix edgelist, NumericVector likelihood, bool fixed_size, int module_size, size_t start, size_t niter);
 RcppExport SEXP _mcmcRanking_mcmc_onelong_internal(SEXP edgelistSEXP, SEXP likelihoodSEXP, SEXP fixed_sizeSEXP, SEXP module_sizeSEXP, SEXP startSEXP, SEXP niterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
