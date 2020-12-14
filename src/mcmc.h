@@ -20,10 +20,19 @@ namespace mcmc {
         HSA outer;
 
         vector <size_t> in_nei_c;
-        vector <unordered_set<size_t>> neis;
+
+        // neis[v][i].first - neighpour
+        // neis[v][i].second - index of v in neis[neighbour]
+        vector <vector<pair<size_t, size_t>>> neis;
 
         mt19937 gen;
         uniform_real_distribution<> unirealdis;
+
+        // These vectors are not local in is_connected in order to avoid memory allocations
+        vector<pair<unsigned, unsigned>> bfsUsed;
+        vector<unsigned> dsu, dsuCnt;
+        unsigned bfsUsedIteration = 0;
+        vector<size_t> bfsQueue;
 
         void update_outer_nodes(unsigned cand_in, unsigned cand_out);
 
@@ -31,14 +40,14 @@ namespace mcmc {
 
         void inner_update(unsigned v, bool is_erased);
 
+        bool is_connected(size_t erased);
+
     public:
         Graph(vector<double> nodes, vector <vector<unsigned>> edges, bool fixed_size);
 
         Graph(Rcpp::NumericVector nodes, vector <vector<unsigned>> edges, bool fixed_size);
 
         void set_nodes(Rcpp::NumericVector nodes);
-
-        bool is_connected();
 
         bool next_iteration();
 

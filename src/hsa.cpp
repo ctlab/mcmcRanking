@@ -1,43 +1,40 @@
 #include "mcmc.h"
 
+static const size_t NONE = -(size_t)1;
+
 namespace mcmc {
-    HSA::HSA(size_t size) : map(size, -1), elements(), contain(size, false) {
+    HSA::HSA(size_t size) : map(size, NONE), elements() {
     }
 
     void HSA::insert(size_t el) {
         map[el] = elements.size();
         elements.push_back(el);
-        contain[el] = true;
     }
 
     void HSA::erase(size_t el) {
-        if (!contain[el]) {
+        size_t ind = map[el];
+        if (ind == NONE) {
             throw std::invalid_argument("erasing non-existing element of a HSA");
         }
-        size_t ind = map[el];
-        elements[ind] = elements[elements.size() - 1];
+        elements[ind] = elements.back();
         map[elements[ind]] = ind;
-        map[el] = -1;
-        contain[el] = false;
+        map[el] = NONE;
         elements.pop_back();
     }
 
     bool HSA::contains(size_t el) {
-        return contain[el];
+        return map[el] != NONE;
     }
 
     void HSA::swap(size_t el, size_t new_el) {
         map[new_el] = map[el];
-        map[el] = -1;
+        map[el] = NONE;
         elements[map[new_el]] = new_el;
-        contain[el] = false;
-        contain[new_el] = true;
     }
 
     void HSA::clear() {
-        fill(map.begin(), map.end(), -1);
+        fill(map.begin(), map.end(), NONE);
         elements.clear();
-        fill(contain.begin(), contain.end(), false);
     }
 
     size_t HSA::size() {
@@ -55,6 +52,4 @@ namespace mcmc {
     vector<size_t> HSA::get_all() {
         return elements;
     }
-
-
 };
