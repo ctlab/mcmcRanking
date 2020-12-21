@@ -9,7 +9,6 @@ namespace mcmc {
     class HSA {
         vector<size_t> map;
         vector<size_t> elements;
-        vector<bool> contain;
     public:
         HSA(size_t size);
 
